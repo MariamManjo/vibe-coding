@@ -485,22 +485,239 @@ export default function Home() {
 
       <div className="section-divider" />
 
-      {/* ── WHAT IS VIBE CODING ────────────────────────── */}
-      <section className="py-32 px-6">
-        <div className="max-w-4xl mx-auto text-center">
-          <p className="text-[#9CA3AF] uppercase tracking-widest text-xs font-body mb-8">What is Vibe Coding</p>
-          <p className="font-heading font-semibold text-3xl md:text-5xl leading-tight text-white/90">
-            Vibe coding is building products by{" "}
-            <span style={{
-              background: "linear-gradient(90deg, #3B82F6, #8B5CF6)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              backgroundClip: "text",
-            }}>
-              describing what you want to AI
+      {/* ── WHAT IS VIBE CODING — animated scene ──────── */}
+      <section className="py-24 px-6 relative overflow-hidden">
+        {/* Ambient background */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-[400px] h-[400px] rounded-full"
+            style={{ background: "radial-gradient(circle, rgba(153,69,255,0.07) 0%, transparent 65%)", filter: "blur(60px)" }} />
+          <div className="absolute top-1/2 right-1/4 -translate-y-1/2 w-[400px] h-[400px] rounded-full"
+            style={{ background: "radial-gradient(circle, rgba(20,241,149,0.06) 0%, transparent 65%)", filter: "blur(60px)" }} />
+        </div>
+
+        <div className="max-w-5xl mx-auto relative z-10">
+
+          {/* Section label */}
+          <p className="text-white/30 uppercase tracking-widest text-xs font-mono text-center mb-4">What is Vibe Coding</p>
+
+          {/* Headline */}
+          <h2 className="font-heading font-black text-4xl md:text-5xl text-center leading-tight mb-14">
+            You describe it.{" "}
+            <span style={{ background: "linear-gradient(90deg, #9945FF, #14F195)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
+              AI builds it.
             </span>
-            {" "}— and letting it write the code.
-            You focus on the idea. AI handles the rest.
+          </h2>
+
+          {/* ═══ Scene ════════════════════════════════════════════ */}
+          <div className="grid md:grid-cols-[1fr_96px_1fr] items-center gap-6 md:gap-4">
+
+            {/* ── LEFT: Builder ── */}
+            <div className="builder-glow rounded-3xl border border-[#9945FF]/20 bg-white/[0.03] p-6 flex flex-col items-center gap-5">
+
+              {/* Builder avatar */}
+              <div className="relative">
+                <div className="absolute inset-[-12px] rounded-full blur-xl opacity-50"
+                  style={{ background: "radial-gradient(circle, rgba(153,69,255,0.5), transparent)" }} />
+                <svg viewBox="0 0 80 90" fill="none" className="relative w-16 h-[72px]">
+                  {/* Head */}
+                  <circle cx="40" cy="22" r="16" fill="url(#builderHead)" stroke="rgba(153,69,255,0.4)" strokeWidth="1.5"/>
+                  {/* Eyes */}
+                  <circle cx="33" cy="21" r="3" fill="white" opacity="0.9"/>
+                  <circle cx="47" cy="21" r="3" fill="white" opacity="0.9"/>
+                  <circle cx="34" cy="22" r="1.5" fill="#1a0a2e"/>
+                  <circle cx="48" cy="22" r="1.5" fill="#1a0a2e"/>
+                  <circle cx="34.5" cy="21" r="0.8" fill="white" opacity="0.6"/>
+                  <circle cx="48.5" cy="21" r="0.8" fill="white" opacity="0.6"/>
+                  {/* Smile */}
+                  <path d="M34 28 Q40 33 46 28" stroke="white" strokeWidth="1.5" strokeLinecap="round" fill="none" opacity="0.7"/>
+                  {/* Body */}
+                  <rect x="22" y="42" width="36" height="32" rx="12" fill="url(#builderBody)" opacity="0.9"/>
+                  {/* Arms */}
+                  <rect x="10" y="44" width="14" height="10" rx="5" fill="url(#builderBody)" opacity="0.8"/>
+                  <rect x="56" y="44" width="14" height="10" rx="5" fill="url(#builderBody)" opacity="0.8"/>
+                  {/* Legs */}
+                  <rect x="26" y="70" width="11" height="16" rx="5" fill="url(#builderBody)" opacity="0.7"/>
+                  <rect x="43" y="70" width="11" height="16" rx="5" fill="url(#builderBody)" opacity="0.7"/>
+                  <defs>
+                    <linearGradient id="builderHead" x1="24" y1="6" x2="56" y2="38" gradientUnits="userSpaceOnUse">
+                      <stop stopColor="#c084fc"/><stop offset="1" stopColor="#9945FF"/>
+                    </linearGradient>
+                    <linearGradient id="builderBody" x1="22" y1="42" x2="58" y2="86" gradientUnits="userSpaceOnUse">
+                      <stop stopColor="#9945FF"/><stop offset="1" stopColor="#6e3bc4"/>
+                    </linearGradient>
+                  </defs>
+                </svg>
+              </div>
+
+              {/* Label */}
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-[#9945FF]" style={{ boxShadow: "0 0 8px #9945FF" }} />
+                <span className="text-white/50 text-xs font-mono uppercase tracking-widest">The Builder</span>
+              </div>
+
+              {/* Speech bubble */}
+              <div className="speech-bob relative w-full">
+                <div className="rounded-2xl border border-[#9945FF]/25 bg-[#9945FF]/[0.07] px-4 py-3 text-left">
+                  {/* Bubble tail */}
+                  <div className="absolute -top-2 left-8 w-4 h-4 rotate-45 border-l border-t border-[#9945FF]/25 bg-[#0A0A0A]" />
+                  <p className="text-white/80 text-sm font-body leading-relaxed">
+                    &ldquo;Make me a landing page with Solana vibes, dark mode, and a mint button.&rdquo;
+                  </p>
+                  <div className="mt-2 flex items-center gap-1.5">
+                    <span className="text-[#9945FF] text-xs font-mono">typed by you</span>
+                    <span className="blink-cur text-[#9945FF] text-sm font-mono">▌</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* ── CENTRE: Symbol stream ── */}
+            <div className="flex flex-col items-center justify-center gap-3 relative h-full min-h-[200px]">
+              {/* Dashed connecting line */}
+              <div className="absolute top-1/2 left-0 right-0 h-px -translate-y-1/2 hidden md:block"
+                style={{ background: "linear-gradient(90deg, rgba(153,69,255,0.3), rgba(20,241,149,0.3))" }} />
+
+              {/* Floating symbols */}
+              <div className="relative flex flex-col items-center gap-4 z-10">
+                {[
+                  { sym: "</>",  cls: "vibe-sym-1", color: "#9945FF" },
+                  { sym: "{ }",  cls: "vibe-sym-2", color: "#3B82F6" },
+                  { sym: "fn()", cls: "vibe-sym-3", color: "#14F195" },
+                  { sym: "0x",   cls: "vibe-sym-4", color: "#9945FF" },
+                  { sym: "✦",    cls: "vibe-sym-5", color: "#14F195" },
+                ].map(({ sym, cls, color }) => (
+                  <span key={sym} className={`${cls} font-mono text-xs font-bold`}
+                    style={{ color, textShadow: `0 0 10px ${color}` }}>
+                    {sym}
+                  </span>
+                ))}
+              </div>
+
+              {/* Arrow */}
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 hidden md:block">
+                <svg viewBox="0 0 32 16" className="w-8 h-4" fill="none">
+                  <path d="M0 8 H28 M22 2 L28 8 L22 14" stroke="url(#arrowG)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <defs>
+                    <linearGradient id="arrowG" x1="0" y1="0" x2="32" y2="0" gradientUnits="userSpaceOnUse">
+                      <stop stopColor="#9945FF"/><stop offset="1" stopColor="#14F195"/>
+                    </linearGradient>
+                  </defs>
+                </svg>
+              </div>
+            </div>
+
+            {/* ── RIGHT: AI generating ── */}
+            <div className="ai-glow rounded-3xl border border-[#14F195]/15 bg-white/[0.03] p-6 flex flex-col items-center gap-5">
+
+              {/* Ghost avatar */}
+              <div className="relative outcome-float-2">
+                <div className="absolute inset-[-10px] rounded-full blur-xl opacity-50"
+                  style={{ background: "radial-gradient(circle, rgba(20,241,149,0.45), rgba(153,69,255,0.3), transparent)" }} />
+                <svg viewBox="0 0 80 90" fill="none" className="relative w-16 h-[72px]"
+                  style={{ filter: "drop-shadow(0 0 12px rgba(20,241,149,0.5))" }}>
+                  <path d="M14 42C14 20 25 6 40 6C55 6 66 20 66 42L66 76C66 79 63 81 61 78L54 72L47 78C45 80 43 80 41 78L40 76L39 78C37 80 35 80 33 78L26 72L19 78C17 81 14 79 14 76Z"
+                    fill="url(#aiGhost)" fillOpacity="0.95" stroke="rgba(20,241,149,0.3)" strokeWidth="1.5"/>
+                  <ellipse cx="30" cy="43" rx="5.5" ry="6.5" fill="white" opacity="0.95"/>
+                  <ellipse cx="50" cy="43" rx="5.5" ry="6.5" fill="white" opacity="0.95"/>
+                  <ellipse cx="31" cy="45" rx="2.8" ry="3.2" fill="#001a0a"/>
+                  <ellipse cx="51" cy="45" rx="2.8" ry="3.2" fill="#001a0a"/>
+                  <circle cx="32" cy="43" r="1.2" fill="white" opacity="0.7"/>
+                  <circle cx="52" cy="43" r="1.2" fill="white" opacity="0.7"/>
+                  {/* Sparkles */}
+                  <circle cx="68" cy="22" r="3.5" fill="#14F195" opacity="0.9" style={{ filter: "blur(0.5px)" }}/>
+                  <circle cx="68" cy="22" r="1.5" fill="white"/>
+                  <circle cx="74" cy="14" r="2" fill="#14F195" opacity="0.6"/>
+                  <circle cx="62" cy="12" r="1.5" fill="#14F195" opacity="0.5"/>
+                  <circle cx="72" cy="30" r="1" fill="white" opacity="0.4"/>
+                  <defs>
+                    <linearGradient id="aiGhost" x1="14" y1="6" x2="66" y2="90" gradientUnits="userSpaceOnUse">
+                      <stop stopColor="#14F195"/><stop offset="1" stopColor="#0a8a52"/>
+                    </linearGradient>
+                  </defs>
+                </svg>
+              </div>
+
+              {/* Label */}
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-[#14F195]" style={{ boxShadow: "0 0 8px #14F195" }} />
+                <span className="text-white/50 text-xs font-mono uppercase tracking-widest">AI Assistant</span>
+              </div>
+
+              {/* Terminal output */}
+              <div className="w-full rounded-xl border border-white/[0.07] bg-black/40 overflow-hidden">
+                {/* Terminal top bar */}
+                <div className="flex items-center gap-1.5 px-3 py-2 border-b border-white/[0.06]">
+                  <div className="w-2.5 h-2.5 rounded-full bg-[#FF5F57]"/>
+                  <div className="w-2.5 h-2.5 rounded-full bg-[#FFBD2E]"/>
+                  <div className="w-2.5 h-2.5 rounded-full bg-[#28C840]"/>
+                  <span className="text-white/20 text-[10px] font-mono ml-2">generating...</span>
+                </div>
+                {/* Code lines */}
+                <div className="p-3 font-mono text-[11px] leading-relaxed space-y-1">
+                  <div className="vl-1 flex gap-2">
+                    <span className="text-[#14F195]/60">1</span>
+                    <span className="text-[#9945FF]/80">const</span>
+                    <span className="text-white/70">page =</span>
+                    <span className="text-[#14F195]/70">&ldquo;landing&rdquo;</span>
+                  </div>
+                  <div className="vl-2 flex gap-2">
+                    <span className="text-[#14F195]/60">2</span>
+                    <span className="text-[#3B82F6]/80">theme</span>
+                    <span className="text-white/50">:</span>
+                    <span className="text-[#14F195]/70">&ldquo;solana&rdquo;</span>
+                  </div>
+                  <div className="vl-3 flex gap-2">
+                    <span className="text-[#14F195]/60">3</span>
+                    <span className="text-[#3B82F6]/80">mode</span>
+                    <span className="text-white/50">:</span>
+                    <span className="text-[#9945FF]/70">&ldquo;dark&rdquo;</span>
+                  </div>
+                  <div className="vl-4 flex gap-2">
+                    <span className="text-[#14F195]/60">4</span>
+                    <span className="text-[#3B82F6]/80">button</span>
+                    <span className="text-white/50">:</span>
+                    <span className="text-[#14F195]/70">&ldquo;Mint NFT&rdquo;</span>
+                  </div>
+                  <div className="vl-5 flex items-center gap-2">
+                    <span className="text-[#14F195]/60">5</span>
+                    <span className="text-[#14F195]">✓</span>
+                    <span className="text-[#14F195]/80">build()</span>
+                    <span className="blink-cur text-[#14F195] text-sm">▌</span>
+                  </div>
+                </div>
+                {/* Mini app preview card */}
+                <div className="vl-preview mx-3 mb-3 rounded-lg overflow-hidden border border-[#14F195]/20">
+                  <div className="flex items-center gap-1.5 px-2 py-1.5 bg-white/[0.04] border-b border-white/[0.06]">
+                    <div className="flex gap-1">
+                      <div className="w-1.5 h-1.5 rounded-full bg-white/20"/>
+                      <div className="w-1.5 h-1.5 rounded-full bg-white/20"/>
+                      <div className="w-1.5 h-1.5 rounded-full bg-white/20"/>
+                    </div>
+                    <div className="flex-1 bg-white/[0.06] rounded text-[9px] font-mono text-white/30 px-2 py-0.5 text-center">
+                      your-app.vercel.app
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <div className="w-1.5 h-1.5 rounded-full bg-[#14F195]" style={{ boxShadow: "0 0 4px #14F195" }}/>
+                      <span className="text-[#14F195] text-[9px] font-mono">LIVE</span>
+                    </div>
+                  </div>
+                  <div className="p-3 text-center" style={{
+                    background: "linear-gradient(135deg, rgba(153,69,255,0.15), rgba(20,241,149,0.08))"
+                  }}>
+                    <div className="text-[10px] font-heading font-bold text-white/80 mb-1">My Solana dApp</div>
+                    <div className="inline-block text-[8px] font-mono bg-[#14F195]/15 border border-[#14F195]/30 text-[#14F195] px-2 py-0.5 rounded-full">
+                      Mint NFT →
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom tagline */}
+          <p className="text-center text-white/35 mt-10 font-mono text-sm tracking-wide">
+            You focus on the idea.{" "}
+            <span style={{ color: "#14F195", opacity: 0.7 }}>AI handles the rest.</span>
           </p>
         </div>
       </section>

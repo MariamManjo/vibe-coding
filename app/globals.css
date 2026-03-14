@@ -241,6 +241,54 @@ h1, h2, h3, h4, h5, h6 {
 
 .blob-3 { animation: blob-move-2 22s ease-in-out infinite 3s; }
 
+/* ── Vibe coding scene ───────────────────────────── */
+@keyframes vibe-drift-r {
+  0%   { transform: translate(0, 0) rotate(0deg); opacity: 0; }
+  15%  { opacity: 1; }
+  85%  { opacity: 0.8; }
+  100% { transform: translate(44px, -22px) rotate(20deg); opacity: 0; }
+}
+.vibe-sym-1 { animation: vibe-drift-r 3.6s ease-in-out infinite; }
+.vibe-sym-2 { animation: vibe-drift-r 3.6s ease-in-out infinite 0.72s; }
+.vibe-sym-3 { animation: vibe-drift-r 3.6s ease-in-out infinite 1.44s; }
+.vibe-sym-4 { animation: vibe-drift-r 3.6s ease-in-out infinite 2.16s; }
+.vibe-sym-5 { animation: vibe-drift-r 3.6s ease-in-out infinite 2.88s; }
+
+@keyframes speech-bob {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-5px); }
+}
+.speech-bob { animation: speech-bob 3s ease-in-out infinite; }
+
+@keyframes vibe-line-in {
+  from { opacity: 0; transform: translateX(-8px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+.vl-1 { animation: vibe-line-in 0.35s ease-out 0.3s  both; }
+.vl-2 { animation: vibe-line-in 0.35s ease-out 0.85s both; }
+.vl-3 { animation: vibe-line-in 0.35s ease-out 1.4s  both; }
+.vl-4 { animation: vibe-line-in 0.35s ease-out 1.95s both; }
+.vl-5 { animation: vibe-line-in 0.35s ease-out 2.5s  both; }
+.vl-preview { animation: vibe-line-in 0.6s ease-out 3.1s both; }
+
+@keyframes blink-cur {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0; }
+}
+.blink-cur { animation: blink-cur 1s step-end infinite; }
+
+@keyframes builder-glow {
+  0%, 100% { box-shadow: 0 0 28px rgba(153,69,255,0.3), 0 0 0 1px rgba(153,69,255,0.12); }
+  50%      { box-shadow: 0 0 52px rgba(153,69,255,0.55), 0 0 0 1px rgba(153,69,255,0.22); }
+}
+.builder-glow { animation: builder-glow 3.5s ease-in-out infinite; }
+
+@keyframes ai-glow {
+  0%, 100% { box-shadow: 0 0 28px rgba(20,241,149,0.22), 0 0 0 1px rgba(20,241,149,0.10); }
+  50%      { box-shadow: 0 0 52px rgba(20,241,149,0.45), 0 0 0 1px rgba(20,241,149,0.20); }
+}
+.ai-glow { animation: ai-glow 3.5s ease-in-out infinite 0.5s; }
+
 /* ── Code rain fall ─────────────────────────────── */
 @keyframes code-fall {
   0%   { transform: translateY(-80px); opacity: 0; }
