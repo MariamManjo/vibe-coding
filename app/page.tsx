@@ -362,6 +362,155 @@ const codeRain = [
 ];
 
 export default function Home() {
+  const moduleScenes = [
+    /* ── 01 AI Foundations: Neural network ──────── */
+    <div key="s0" className="relative flex items-center justify-center overflow-hidden" style={{ height: "168px" }}>
+      <div className="absolute w-28 h-28 rounded-full pointer-events-none"
+        style={{ background: "radial-gradient(circle, rgba(59,130,246,0.2), transparent)", filter: "blur(22px)" }} />
+      <svg viewBox="0 0 220 160" fill="none" className="w-full max-w-[280px] h-40">
+        <line className="line-pulse-1" x1="110" y1="80" x2="34"  y2="28"  stroke="#3B82F6" strokeWidth="1.2" strokeDasharray="5 3"/>
+        <line className="line-pulse-2" x1="110" y1="80" x2="186" y2="28"  stroke="#3B82F6" strokeWidth="1.2" strokeDasharray="5 3"/>
+        <line className="line-pulse-3" x1="110" y1="80" x2="34"  y2="132" stroke="#3B82F6" strokeWidth="1.2" strokeDasharray="5 3"/>
+        <line className="line-pulse-4" x1="110" y1="80" x2="186" y2="132" stroke="#3B82F6" strokeWidth="1.2" strokeDasharray="5 3"/>
+        <circle cx="110" cy="80" r="24" fill="#3B82F6" fillOpacity="0.12" stroke="#3B82F6" strokeWidth="1.8"/>
+        <circle cx="110" cy="80" r="16" fill="#3B82F6" fillOpacity="0.08"/>
+        <text x="110" y="76" textAnchor="middle" fill="#3B82F6" fontSize="8" fontFamily="monospace" fontWeight="bold" opacity="0.9">AI</text>
+        <text x="110" y="87" textAnchor="middle" fill="#3B82F6" fontSize="6" fontFamily="monospace" opacity="0.6">brain</text>
+        <circle className="node-ping-1" cx="34"  cy="28"  r="18" fill="#0A0A0A" stroke="#3B82F6" strokeWidth="1.2"/>
+        <text x="34"  y="25"  textAnchor="middle" fill="#3B82F6" fontSize="8"  fontFamily="monospace" opacity="0.85">GPT</text>
+        <text x="34"  y="35"  textAnchor="middle" fill="#3B82F6" fontSize="6"  fontFamily="monospace" opacity="0.5">-4o</text>
+        <circle className="node-ping-2" cx="186" cy="28"  r="18" fill="#0A0A0A" stroke="#3B82F6" strokeWidth="1.2"/>
+        <text x="186" y="26"  textAnchor="middle" fill="#3B82F6" fontSize="7.5" fontFamily="monospace" opacity="0.85">Claude</text>
+        <text x="186" y="36"  textAnchor="middle" fill="#3B82F6" fontSize="6"  fontFamily="monospace" opacity="0.5">3.5</text>
+        <circle className="node-ping-3" cx="34"  cy="132" r="18" fill="#0A0A0A" stroke="#3B82F6" strokeWidth="1.2"/>
+        <text x="34"  y="129" textAnchor="middle" fill="#3B82F6" fontSize="7"  fontFamily="monospace" opacity="0.85">DALL</text>
+        <text x="34"  y="139" textAnchor="middle" fill="#3B82F6" fontSize="6"  fontFamily="monospace" opacity="0.5">·E 3</text>
+        <circle className="node-ping-4" cx="186" cy="132" r="18" fill="#0A0A0A" stroke="#3B82F6" strokeWidth="1.2"/>
+        <text x="186" y="129" textAnchor="middle" fill="#3B82F6" fontSize="7"  fontFamily="monospace" opacity="0.85">Midj.</text>
+        <text x="186" y="139" textAnchor="middle" fill="#3B82F6" fontSize="6"  fontFamily="monospace" opacity="0.5">v6</text>
+      </svg>
+    </div>,
+
+    /* ── 02 Prompt Engineering: Chat interface ───── */
+    <div key="s1" className="flex flex-col gap-2.5 px-1 py-1 overflow-hidden" style={{ height: "168px" }}>
+      {/* User bubble — static */}
+      <div className="self-start max-w-[88%] bg-[#8B5CF6]/12 border border-[#8B5CF6]/25 rounded-2xl rounded-tl-sm px-3.5 py-2.5">
+        <p className="text-[10px] font-mono text-[#8B5CF6]/85 leading-relaxed">
+          &ldquo;Build me a SaaS landing page,<br />dark theme, add a pricing table.&rdquo;
+        </p>
+        <span className="text-[9px] text-[#8B5CF6]/35 mt-0.5 block">you →</span>
+      </div>
+      {/* Typing dots */}
+      <div className="self-end flex items-center gap-1.5 bg-white/[0.04] border border-white/[0.07] rounded-full px-3 py-1.5">
+        <span className="w-1.5 h-1.5 rounded-full bg-[#8B5CF6]/60" style={{ animation: "blink-cur 0.9s step-end infinite" }} />
+        <span className="w-1.5 h-1.5 rounded-full bg-[#8B5CF6]/60" style={{ animation: "blink-cur 0.9s step-end infinite 0.3s" }} />
+        <span className="w-1.5 h-1.5 rounded-full bg-[#8B5CF6]/60" style={{ animation: "blink-cur 0.9s step-end infinite 0.6s" }} />
+        <span className="text-[8px] text-white/20 ml-0.5 font-mono">AI</span>
+      </div>
+      {/* AI response — glowing loop */}
+      <div className="ai-bubble-glow self-end max-w-[88%] bg-[#14F195]/08 border border-[#14F195]/20 rounded-2xl rounded-tr-sm px-3.5 py-2.5">
+        <div className="flex items-center gap-1.5 mb-1">
+          <span className="text-[#14F195] text-xs">✓</span>
+          <span className="text-[10px] font-mono text-[#14F195]/90 font-semibold">Here&apos;s your landing page</span>
+          <span className="blink-cur text-[#14F195] text-sm leading-none">▌</span>
+        </div>
+        <div className="text-[9px] font-mono text-white/35">landing.html · 312 lines · deployed</div>
+      </div>
+    </div>,
+
+    /* ── 03 MVP Building: 3-stage pipeline ────────── */
+    <div key="s2" className="relative flex flex-col items-center justify-center gap-3 overflow-hidden" style={{ height: "168px" }}>
+      <div className="flex items-center gap-1">
+        {/* Stage 1: Idea */}
+        <div className="mvp-1 flex flex-col items-center gap-1.5">
+          <div className="w-[60px] h-[60px] rounded-2xl border border-[#10B981]/30 bg-[#10B981]/10 flex items-center justify-center text-2xl">💡</div>
+          <span className="text-[8px] font-mono text-[#10B981]/55 uppercase tracking-wider">Idea</span>
+        </div>
+        {/* Arrow 1 */}
+        <div className="mvp-a1 flex items-center pb-4">
+          <svg viewBox="0 0 28 10" className="w-7 h-2.5" fill="none">
+            <path d="M0 5h23M18 1.5l5 3.5-5 3.5" stroke="#10B981" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" opacity="0.45"/>
+          </svg>
+        </div>
+        {/* Stage 2: Wireframe */}
+        <div className="mvp-2 flex flex-col items-center gap-1.5">
+          <div className="w-[60px] h-[60px] rounded-2xl border border-[#10B981]/30 bg-[#10B981]/10 flex items-center justify-center p-2.5">
+            <svg viewBox="0 0 36 28" fill="none" className="w-full h-full">
+              <rect x="1" y="1" width="34" height="6" rx="1.5" stroke="#10B981" strokeWidth="1.2" opacity="0.55"/>
+              <rect x="1" y="10" width="15" height="17" rx="1.5" stroke="#10B981" strokeWidth="1.2" opacity="0.45"/>
+              <rect x="19" y="10" width="16" height="8" rx="1.5" stroke="#10B981" strokeWidth="1.2" opacity="0.45"/>
+              <rect x="19" y="20" width="16" height="7" rx="1.5" stroke="#10B981" strokeWidth="1.2" opacity="0.35"/>
+            </svg>
+          </div>
+          <span className="text-[8px] font-mono text-[#10B981]/55 uppercase tracking-wider">Design</span>
+        </div>
+        {/* Arrow 2 */}
+        <div className="mvp-a2 flex items-center pb-4">
+          <svg viewBox="0 0 28 10" className="w-7 h-2.5" fill="none">
+            <path d="M0 5h23M18 1.5l5 3.5-5 3.5" stroke="#10B981" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" opacity="0.45"/>
+          </svg>
+        </div>
+        {/* Stage 3: Live */}
+        <div className="mvp-3 flex flex-col items-center gap-1.5 relative">
+          <div className="w-[60px] h-[60px] rounded-2xl border border-[#10B981]/45 bg-[#10B981]/15 flex items-center justify-center relative"
+            style={{ boxShadow: "0 0 18px rgba(16,185,129,0.28)" }}>
+            <svg viewBox="0 0 26 26" fill="none" className="w-6 h-6">
+              <path d="M13 2l2.3 7h7.2L17 13l2 7-6-4.5L7 20l2-7-5.5-4h7.2z" fill="#10B981" fillOpacity="0.65" stroke="#10B981" strokeWidth="1.2"/>
+            </svg>
+            <div className="absolute -top-2 -right-2 bg-[#10B981] text-[7px] font-mono font-black text-black px-1.5 py-0.5 rounded-full"
+              style={{ boxShadow: "0 0 8px #10B981" }}>LIVE</div>
+          </div>
+          <span className="text-[8px] font-mono text-[#10B981]/55 uppercase tracking-wider">Shipped</span>
+        </div>
+      </div>
+      {/* URL bar */}
+      <div className="mvp-url w-full bg-black/40 border border-[#10B981]/12 rounded-xl px-3 py-1.5 flex items-center gap-2">
+        <div className="w-1.5 h-1.5 rounded-full bg-[#10B981]" style={{ boxShadow: "0 0 5px #10B981" }} />
+        <span className="text-[9px] font-mono text-white/30 flex-1">your-mvp.vercel.app</span>
+        <span className="text-[8px] font-mono text-[#10B981]/50">↑ deployed</span>
+      </div>
+    </div>,
+
+    /* ── 04 Automation: Workflow nodes ────────────── */
+    <div key="s3" className="relative flex flex-col items-center justify-center gap-3 overflow-hidden" style={{ height: "168px" }}>
+      <svg viewBox="0 0 280 120" fill="none" className="w-full max-w-[300px]">
+        {/* Connection lines */}
+        <line className="line-pulse-2" x1="68" y1="55" x2="112" y2="55" stroke="#F59E0B" strokeWidth="1.2" strokeDasharray="4 3"/>
+        <line className="line-pulse-3" x1="168" y1="55" x2="212" y2="55" stroke="#F59E0B" strokeWidth="1.2" strokeDasharray="4 3"/>
+        {/* Vertical to bottom output */}
+        <line className="line-pulse-4" x1="140" y1="85" x2="140" y2="108" stroke="#F59E0B" strokeWidth="1" strokeDasharray="3 3" opacity="0.4"/>
+        {/* Node 1: Gmail */}
+        <circle className="node-ping-1" cx="40"  cy="55" r="26" fill="#F59E0B" fillOpacity="0.1" stroke="#F59E0B" strokeWidth="1.2"/>
+        <rect x="27" y="44" width="26" height="18" rx="3" stroke="#F59E0B" strokeWidth="1.2" strokeOpacity="0.8"/>
+        <path d="M27 47l13 8 13-8" stroke="#F59E0B" strokeWidth="1.2" strokeLinecap="round" strokeOpacity="0.8"/>
+        <text x="40" y="73" textAnchor="middle" fill="#F59E0B" fontSize="7" fontFamily="monospace" opacity="0.55">Gmail</text>
+        {/* Node 2: Make */}
+        <circle className="node-ping-2" cx="140" cy="55" r="26" fill="#F59E0B" fillOpacity="0.15" stroke="#F59E0B" strokeWidth="1.6"
+          style={{ filter: "drop-shadow(0 0 8px rgba(245,158,11,0.4))" }}/>
+        <path d="M140 41v28M126 55h28" stroke="#F59E0B" strokeWidth="2" strokeLinecap="round"/>
+        <circle cx="140" cy="55" r="5" fill="#F59E0B" fillOpacity="0.5"/>
+        <text x="140" y="92" textAnchor="middle" fill="#F59E0B" fontSize="7" fontFamily="monospace" opacity="0.55">Make</text>
+        {/* Node 3: Notion */}
+        <circle className="node-ping-3" cx="240" cy="55" r="26" fill="#F59E0B" fillOpacity="0.1" stroke="#F59E0B" strokeWidth="1.2"/>
+        <rect x="228" y="43" width="24" height="20" rx="2.5" stroke="#F59E0B" strokeWidth="1.2" strokeOpacity="0.8"/>
+        <line x1="232" y1="49" x2="248" y2="49" stroke="#F59E0B" strokeWidth="1" strokeOpacity="0.7" strokeLinecap="round"/>
+        <line x1="232" y1="53" x2="248" y2="53" stroke="#F59E0B" strokeWidth="1" strokeOpacity="0.7" strokeLinecap="round"/>
+        <line x1="232" y1="57" x2="243" y2="57" stroke="#F59E0B" strokeWidth="1" strokeOpacity="0.5" strokeLinecap="round"/>
+        <text x="240" y="92" textAnchor="middle" fill="#F59E0B" fontSize="7" fontFamily="monospace" opacity="0.55">Notion</text>
+        {/* Traveling packet: SVG animateTransform, 70→210 in SVG units */}
+        <circle cx="68" cy="55" r="4" fill="#F59E0B" style={{ filter: "drop-shadow(0 0 4px #F59E0B)" }}>
+          <animateTransform attributeName="transform" type="translate"
+            values="0,0; 172,0; 172,0" keyTimes="0; 0.82; 1"
+            dur="2.8s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="0; 1; 1; 0" keyTimes="0; 0.06; 0.82; 0.95" dur="2.8s" repeatCount="indefinite"/>
+        </circle>
+        {/* Output badge */}
+        <rect x="82" y="108" width="116" height="14" rx="4" fill="#F59E0B" fillOpacity="0.08" stroke="#F59E0B" strokeWidth="0.8" strokeOpacity="0.3"/>
+        <text x="140" y="118" textAnchor="middle" fill="#F59E0B" fontSize="6.5" fontFamily="monospace" opacity="0.55">↻ runs automatically · 24/7</text>
+      </svg>
+    </div>,
+  ];
+
   return (
     <main className="min-h-screen bg-[#0A0A0A] text-white overflow-x-hidden">
       <Nav />
@@ -1227,7 +1376,7 @@ export default function Home() {
 
           {/* Cards */}
           <div className="grid sm:grid-cols-2 gap-6">
-            {modules.map((mod) => (
+            {modules.map((mod, idx) => (
               <div
                 key={mod.title}
                 className={`${mod.hoverClass} relative group rounded-2xl border border-white/[0.07] overflow-hidden flex flex-col`}
@@ -1267,25 +1416,10 @@ export default function Home() {
                     </div>
                   </div>
 
-                  {/* Description */}
-                  <p className="text-[#9CA3AF] text-sm font-body leading-relaxed">{mod.desc}</p>
-
-                  {/* Topics list */}
-                  <ul className="space-y-2">
-                    {mod.topics.map((t) => (
-                      <li key={t} className="flex items-center gap-2.5 text-sm font-body text-white/70">
-                        <span
-                          className="w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0"
-                          style={{ background: mod.accent + "20" }}
-                        >
-                          <svg viewBox="0 0 10 10" fill="none" className="w-2.5 h-2.5" style={{ color: mod.accent }}>
-                            <path d="M2 5l2.5 2.5L8 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                          </svg>
-                        </span>
-                        {t}
-                      </li>
-                    ))}
-                  </ul>
+                  {/* Animated scene */}
+                  <div className="rounded-xl border border-white/[0.05] overflow-hidden" style={{ background: "rgba(0,0,0,0.25)" }}>
+                    {moduleScenes[idx]}
+                  </div>
 
                   {/* Footer: meta + CTA */}
                   <div className="mt-auto pt-4 border-t border-white/[0.06] flex items-center justify-between gap-4">
