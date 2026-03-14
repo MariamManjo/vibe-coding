@@ -11,7 +11,7 @@ import {
   LAMPORTS_PER_SOL,
 } from "@solana/web3.js";
 
-const COURSE_PRICE_SOL = 0.5;
+const COURSE_PRICE_SOL = 0.01;
 const RECIPIENT_ADDRESS = "GhgXp29MrWxzdU1pdjo7gbmm2QjTY4TE6iomsM4hv9Ct";
 
 async function fetchBlockhash(): Promise<string> {
