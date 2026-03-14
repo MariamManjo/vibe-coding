@@ -164,13 +164,13 @@ export default function Home() {
             Taught by Mariam Manjavidze — hands-on program for complete beginners.
             No coding background needed.
           </p>
-          <a
-            href="#"
+          <Link
+            href="/login"
             className="inline-flex items-center gap-2 bg-[#3B82F6] hover:bg-blue-400 text-white font-semibold text-lg px-8 py-4 rounded-full transition-all hover:scale-105"
             style={{ boxShadow: "0 0 32px rgba(59,130,246,0.45)" }}
           >
             Start Learning →
-          </a>
+          </Link>
         </div>
 
         <div className="scroll-bounce absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-white/30 text-xs font-body">
@@ -440,12 +440,12 @@ export default function Home() {
             Ready to build your first AI product?
           </h2>
           <div className="flex flex-col items-center gap-4">
-            <a
-              href="/program"
+            <Link
+              href="/login"
               className="inline-flex items-center gap-2 bg-white text-[#1d4ed8] font-bold text-xl px-10 py-5 rounded-full transition-all hover:scale-105 hover:shadow-2xl"
             >
               Start Learning →
-            </a>
+            </Link>
             <a
               href="mailto:mariammanjavidze01@gmail.com"
               className="text-white/60 hover:text-white text-sm font-body underline underline-offset-4 transition-colors"

@@ -24,7 +24,7 @@ export default function Nav() {
             Workshop
           </Link>
           <Link
-            href="#"
+            href="/login"
             className="bg-accent hover:bg-blue-500 text-white text-sm font-semibold px-5 py-2 rounded-full transition-all hover:scale-105"
           >
             Enroll Now
@@ -51,7 +51,7 @@ export default function Nav() {
           <Link href="/program" className="text-white/70 hover:text-white transition-colors font-body" onClick={() => setOpen(false)}>Program</Link>
           <Link href="/#modules" className="text-white/70 hover:text-white transition-colors font-body" onClick={() => setOpen(false)}>Modules</Link>
           <Link href="/workshop" className="text-white/70 hover:text-white transition-colors font-body" onClick={() => setOpen(false)}>Workshop</Link>
-          <Link href="#" className="bg-accent text-white font-semibold px-5 py-2.5 rounded-full text-center" onClick={() => setOpen(false)}>Enroll Now</Link>
+          <Link href="/login" className="bg-accent text-white font-semibold px-5 py-2.5 rounded-full text-center" onClick={() => setOpen(false)}>Enroll Now</Link>
         </div>
       )}
     </nav>

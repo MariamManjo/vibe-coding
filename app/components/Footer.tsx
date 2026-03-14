@@ -18,7 +18,7 @@ export default function Footer() {
           <Link href="/program" className="text-[#9CA3AF] hover:text-white transition-colors text-sm font-body">Program</Link>
           <Link href="/#modules" className="text-[#9CA3AF] hover:text-white transition-colors text-sm font-body">Modules</Link>
           <Link href="/workshop" className="text-[#9CA3AF] hover:text-white transition-colors text-sm font-body">Workshop</Link>
-          <a href="#" className="text-[#9CA3AF] hover:text-white transition-colors text-sm font-body">Enroll</a>
+          <Link href="/login" className="text-[#9CA3AF] hover:text-white transition-colors text-sm font-body">Enroll</Link>
         </div>
 
         {/* Social icons */}
