@@ -567,34 +567,109 @@ function PaymentCard({
   balanceStatus: "idle" | "loading" | "loaded" | "error";
 }) {
   const insufficient = balanceStatus === "loaded" && balance !== null && balance < COURSE_PRICE_SOL;
+  const estimatedRemaining =
+    balanceStatus === "loaded" && balance !== null
+      ? Math.max(0, balance - COURSE_PRICE_SOL - 0.000005)
+      : null;
+
+  const BalanceCell = ({ value }: { value: number | null }) => {
+    if (balanceStatus === "idle" || balanceStatus === "loading") {
+      return (
+        <div className="flex items-center gap-1.5">
+          <div className="h-3 w-20 rounded bg-white/10 animate-pulse" />
+        </div>
+      );
+    }
+    if (balanceStatus === "error" || value === null) {
+      return <span className="text-white/30 text-xs italic font-body">Unable to fetch</span>;
+    }
+    return (
+      <span className={`font-mono font-semibold text-sm ${insufficient ? "text-red-400" : "text-[#14F195]"}`}>
+        {value.toFixed(4)} SOL
+      </span>
+    );
+  };
+
   return (
     <div className="glass-card rounded-3xl p-7 md:p-9">
       <StepIndicator current={currentStep} />
 
-      {/* ── Header ── */}
-      <div className="flex items-center gap-3 mb-6">
-        <div
-          className="w-11 h-11 rounded-xl flex items-center justify-center text-xl flex-shrink-0"
-          style={{ background: "linear-gradient(135deg, rgba(153,69,255,0.2), rgba(20,241,149,0.15))", border: "1px solid rgba(153,69,255,0.3)" }}
-        >
-          🎓
+      {/* ── Title ── */}
+      <div className="mb-5">
+        <h2 className="font-heading font-bold text-white text-xl leading-tight mb-0.5">Transaction Review</h2>
+        <p className="text-white/35 text-xs font-body">Review all details before authorizing payment on-chain</p>
+      </div>
+
+      {/* ── Sender → Recipient cards ── */}
+      <div className="flex items-stretch gap-0 mb-4 rounded-2xl overflow-hidden" style={{ border: "1px solid rgba(255,255,255,0.08)" }}>
+        {/* Sender card */}
+        <div className="flex-1 px-4 py-4" style={{ background: "linear-gradient(135deg, rgba(153,69,255,0.08), rgba(153,69,255,0.03))" }}>
+          <p className="text-white/30 text-[9px] font-mono uppercase tracking-widest mb-3">Paying From</p>
+          <div className="flex items-center gap-2 mb-2">
+            <div className="w-8 h-8 rounded-xl flex-shrink-0 flex items-center justify-center" style={{ background: "linear-gradient(135deg, #4C44C6, #9945FF)" }}>
+              <PhantomIcon />
+            </div>
+            <div>
+              <p className="text-white/80 text-xs font-body font-medium leading-tight">Your Wallet</p>
+              <p className="text-white/35 text-[10px] font-body">Phantom · Devnet</p>
+            </div>
+          </div>
+          <p className="text-[#9945FF] text-[11px] font-mono mb-2">{shortenAddress(walletAddress)}</p>
+          <div className="pt-2" style={{ borderTop: "1px solid rgba(153,69,255,0.12)" }}>
+            <p className="text-white/30 text-[9px] font-mono uppercase tracking-wider mb-1">Available Balance</p>
+            <BalanceCell value={balance} />
+          </div>
         </div>
-        <div className="flex-1 min-w-0">
-          <p className="font-heading font-bold text-white text-lg leading-tight">Vibe Coding</p>
-          <p className="text-white/45 text-xs font-body">Full 7-Week Program · Lifetime Access</p>
+
+        {/* Transfer arrow */}
+        <div className="flex flex-col items-center justify-center px-3 bg-white/[0.02]" style={{ borderLeft: "1px solid rgba(255,255,255,0.05)", borderRight: "1px solid rgba(255,255,255,0.05)" }}>
+          <p className="text-white font-mono font-bold text-xs mb-2">{COURSE_PRICE_SOL} SOL</p>
+          <div className="flex flex-col items-center gap-1">
+            <div className="w-px h-4" style={{ background: "linear-gradient(to bottom, #9945FF, #3B82F6)" }} />
+            <div className="w-px h-4" style={{ background: "linear-gradient(to bottom, #3B82F6, #14F195)" }} />
+            <svg className="w-3.5 h-3.5 text-[#14F195]" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+            </svg>
+          </div>
         </div>
-        <div className="text-right flex-shrink-0">
-          <p className="font-heading font-bold text-2xl text-white leading-none">{COURSE_PRICE_SOL} <span className="text-lg">SOL</span></p>
-          <p className="text-white/25 text-[10px] font-body mt-0.5">one-time</p>
+
+        {/* Recipient card */}
+        <div className="flex-1 px-4 py-4" style={{ background: "linear-gradient(135deg, rgba(20,241,149,0.06), rgba(20,241,149,0.02))" }}>
+          <p className="text-white/30 text-[9px] font-mono uppercase tracking-widest mb-3">Paying To</p>
+          <div className="flex items-center gap-2 mb-2">
+            <div className="w-8 h-8 rounded-xl flex-shrink-0 flex items-center justify-center text-base" style={{ background: "rgba(20,241,149,0.12)", border: "1px solid rgba(20,241,149,0.2)" }}>
+              🎓
+            </div>
+            <div>
+              <p className="text-white/80 text-xs font-body font-medium leading-tight">Vibe Coding</p>
+              <p className="text-white/35 text-[10px] font-body">Treasury Wallet</p>
+            </div>
+          </div>
+          <p className="text-[#14F195] text-[11px] font-mono mb-2">{shortenAddress(RECIPIENT_ADDRESS)}</p>
+          <div className="pt-2" style={{ borderTop: "1px solid rgba(20,241,149,0.12)" }}>
+            <p className="text-white/30 text-[9px] font-mono uppercase tracking-wider mb-1">You receive</p>
+            <p className="text-white/60 text-[10px] font-body">Full 7-Week Program</p>
+          </div>
         </div>
       </div>
 
-      {/* ── On-chain transaction breakdown ── */}
+      {/* ── Full transaction breakdown table ── */}
       <div className="rounded-2xl overflow-hidden mb-5" style={{ border: "1px solid rgba(255,255,255,0.07)" }}>
-        <div className="bg-white/[0.03] px-4 py-2.5 border-b border-white/[0.06]">
-          <p className="text-white/35 text-[10px] font-mono uppercase tracking-widest">On-Chain Transaction</p>
+        <div className="bg-white/[0.03] px-4 py-2.5" style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+          <p className="text-white/35 text-[10px] font-mono uppercase tracking-widest">Transaction Details</p>
         </div>
         <div className="divide-y divide-white/[0.05]">
+
+          {/* Transaction type */}
+          <div className="flex items-center justify-between px-4 py-3">
+            <span className="text-white/40 text-xs font-body">Transaction Type</span>
+            <div className="flex items-center gap-1.5">
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-mono" style={{ background: "rgba(59,130,246,0.12)", border: "1px solid rgba(59,130,246,0.25)", color: "#93C5FD" }}>
+                Course Enrollment
+              </span>
+            </div>
+          </div>
+
           {/* Network */}
           <div className="flex items-center justify-between px-4 py-3">
             <span className="text-white/40 text-xs font-body">Network</span>
@@ -603,113 +678,73 @@ function PaymentCard({
               <span className="text-amber-400 text-xs font-mono">Solana Devnet</span>
             </div>
           </div>
-          {/* Amount */}
+
+          {/* Amount to pay */}
           <div className="flex items-center justify-between px-4 py-3">
-            <span className="text-white/40 text-xs font-body">Amount</span>
+            <span className="text-white/40 text-xs font-body">Amount to Pay</span>
             <span className="font-mono font-bold text-white text-sm">{COURSE_PRICE_SOL} SOL</span>
           </div>
-          {/* From */}
+
+          {/* Available balance */}
           <div className="flex items-center justify-between px-4 py-3">
-            <span className="text-white/40 text-xs font-body">From</span>
+            <span className="text-white/40 text-xs font-body">Available Balance</span>
+            <BalanceCell value={balance} />
+          </div>
+
+          {/* Paying from */}
+          <div className="flex items-center justify-between px-4 py-3">
+            <span className="text-white/40 text-xs font-body">Paying From</span>
             <div className="flex items-center gap-2">
-              <div className="w-5 h-5 rounded-md flex items-center justify-center flex-shrink-0" style={{ background: "linear-gradient(135deg, #4C44C6, #9945FF)" }}>
+              <div className="w-4 h-4 rounded flex items-center justify-center flex-shrink-0" style={{ background: "linear-gradient(135deg, #4C44C6, #9945FF)" }}>
                 <PhantomIcon />
               </div>
               <span className="text-[#9945FF] text-xs font-mono">{shortenAddress(walletAddress)}</span>
-              <span className="text-white/25 text-[10px] font-body">(your wallet)</span>
-            </div>
-          </div>
-          {/* Available Balance */}
-          <div className="flex items-center justify-between px-4 py-3">
-            <span className="text-white/40 text-xs font-body">Available</span>
-            <div className="flex items-center gap-2">
-              {(balanceStatus === "idle" || balanceStatus === "loading") && (
-                <div className="flex items-center gap-1.5">
-                  <div className="w-3 h-3 rounded-full bg-white/10 animate-pulse" />
-                  <div className="h-3 w-16 rounded bg-white/10 animate-pulse" />
-                </div>
-              )}
-              {balanceStatus === "loaded" && balance !== null && (
-                <span className={`font-mono font-semibold text-sm ${insufficient ? "text-red-400" : "text-[#14F195]"}`}>
-                  {balance.toFixed(4)} SOL
-                </span>
-              )}
-              {balanceStatus === "error" && (
-                <span className="text-white/30 text-xs font-body italic">Unable to fetch</span>
-              )}
             </div>
           </div>
 
-          {/* To */}
+          {/* Paying to */}
           <div className="flex items-center justify-between px-4 py-3">
-            <span className="text-white/40 text-xs font-body">To</span>
+            <span className="text-white/40 text-xs font-body">Paying To</span>
             <div className="flex items-center gap-2">
-              <div className="w-5 h-5 rounded-md flex items-center justify-center text-xs flex-shrink-0" style={{ background: "rgba(20,241,149,0.12)", border: "1px solid rgba(20,241,149,0.25)" }}>
-                🏦
-              </div>
+              <span className="text-sm">🎓</span>
               <span className="text-[#14F195] text-xs font-mono">{shortenAddress(RECIPIENT_ADDRESS)}</span>
-              <span className="text-white/25 text-[10px] font-body">(treasury)</span>
+              <span className="text-white/25 text-[10px] font-body">Vibe Coding</span>
             </div>
           </div>
-        </div>
-      </div>
 
-      {/* ── Visual transfer diagram ── */}
-      <div className="flex items-stretch gap-0 mb-5 rounded-2xl overflow-hidden" style={{ border: "1px solid rgba(255,255,255,0.06)" }}>
-        {/* Sender */}
-        <div className="flex-1 bg-[#9945FF08] px-4 py-4">
-          <p className="text-white/25 text-[9px] font-mono uppercase tracking-widest mb-2">Sender</p>
-          <div className="flex items-center gap-2 mb-1.5">
-            <div className="w-7 h-7 rounded-lg flex-shrink-0 flex items-center justify-center" style={{ background: "linear-gradient(135deg, #4C44C6, #9945FF)" }}>
-              <PhantomIcon />
-            </div>
-            <span className="text-white/70 text-xs font-body">Your Wallet</span>
+          {/* Estimated remaining */}
+          <div className="flex items-center justify-between px-4 py-3" style={{ background: "rgba(255,255,255,0.015)" }}>
+            <span className="text-white/40 text-xs font-body">Est. Remaining Balance</span>
+            {estimatedRemaining !== null ? (
+              <span className="font-mono text-sm text-white/70">
+                {estimatedRemaining.toFixed(4)} SOL
+              </span>
+            ) : (
+              <div className="h-3 w-20 rounded bg-white/10 animate-pulse" />
+            )}
           </div>
-          <p className="text-[#9945FF] text-[10px] font-mono">{shortenAddress(walletAddress)}</p>
-        </div>
 
-        {/* Arrow */}
-        <div className="flex flex-col items-center justify-center px-3 py-4 bg-white/[0.02]" style={{ borderLeft: "1px solid rgba(255,255,255,0.05)", borderRight: "1px solid rgba(255,255,255,0.05)" }}>
-          <p className="text-white font-mono font-bold text-xs mb-1.5">{COURSE_PRICE_SOL} SOL</p>
-          <div className="flex items-center gap-0.5">
-            <div className="w-6 h-px" style={{ background: "linear-gradient(to right, #9945FF, #14F195)" }} />
-            <svg className="w-3 h-3 text-[#14F195] flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
-            </svg>
-          </div>
-        </div>
-
-        {/* Recipient */}
-        <div className="flex-1 bg-[#14F19508] px-4 py-4">
-          <p className="text-white/25 text-[9px] font-mono uppercase tracking-widest mb-2">Treasury</p>
-          <div className="flex items-center gap-2 mb-1.5">
-            <div className="w-7 h-7 rounded-lg flex-shrink-0 flex items-center justify-center text-sm" style={{ background: "rgba(20,241,149,0.12)", border: "1px solid rgba(20,241,149,0.2)" }}>
-              🏦
-            </div>
-            <span className="text-white/70 text-xs font-body">Vibe Coding</span>
-          </div>
-          <p className="text-[#14F195] text-[10px] font-mono">{shortenAddress(RECIPIENT_ADDRESS)}</p>
         </div>
       </div>
 
       {/* ── You unlock ── */}
       <div className="bg-white/[0.025] border border-white/[0.05] rounded-2xl p-4 mb-5">
         <p className="text-white/30 text-[10px] font-mono uppercase tracking-widest mb-3">You unlock after payment</p>
-        <div className="flex flex-col gap-2">
+        <div className="grid grid-cols-3 gap-2">
           {[
-            { icon: "🎓", text: "7 hands-on lectures — build real features each week" },
-            { icon: "🚀", text: "A working product you design and ship yourself" },
-            { icon: "♾️", text: "Lifetime access — revisit any time, forever" },
-          ].map(({ icon, text }) => (
-            <div key={text} className="flex items-start gap-3">
-              <span className="text-base flex-shrink-0 mt-0.5">{icon}</span>
-              <span className="text-white/60 text-xs font-body leading-relaxed">{text}</span>
+            { icon: "🎓", label: "7 Lectures" },
+            { icon: "🚀", label: "Ship a Product" },
+            { icon: "♾️", label: "Lifetime Access" },
+          ].map(({ icon, label }) => (
+            <div key={label} className="flex flex-col items-center gap-1.5 px-2 py-3 rounded-xl text-center" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.05)" }}>
+              <span className="text-lg">{icon}</span>
+              <span className="text-white/50 text-[10px] font-body leading-tight">{label}</span>
             </div>
           ))}
         </div>
       </div>
 
-      {/* ── Wallet row ── */}
+      {/* ── Connected wallet row ── */}
       <div className="flex items-center justify-between bg-white/[0.03] border border-white/[0.07] rounded-xl px-4 py-2.5 mb-5">
         <div className="flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse" />
