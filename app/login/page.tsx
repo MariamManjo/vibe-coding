@@ -12,8 +12,7 @@ import {
 } from "@solana/web3.js";
 
 const COURSE_PRICE_SOL = 0.5;
-// TODO: Replace with your actual Solana wallet address to receive payments
-const RECIPIENT_ADDRESS = "So1endDq2YkqhipRh3WViPa8hdiSpxWy6z3Z6tMCpAo";
+const RECIPIENT_ADDRESS = "GhgXp29MrWxzdU1pdjo7gbmm2QjTY4TE6iomsM4hv9Ct";
 
 async function fetchBlockhash(): Promise<string> {
   const res = await fetch("/api/blockhash");
@@ -115,9 +114,12 @@ export default function LoginPage() {
       setStep("success");
     } catch (err: unknown) {
       setPayStatus("idle");
-      // Phantom error objects have a numeric `code` — 4001 means user rejected/dismissed
+      console.error("[payment error]", err);
       const code = (err as { code?: number })?.code;
-      const msg = (err instanceof Error ? err.message : String((err as { message?: string })?.message ?? "")).toLowerCase();
+      const rawMsg = err instanceof Error
+        ? err.message
+        : String((err as { message?: string })?.message ?? JSON.stringify(err));
+      const msg = rawMsg.toLowerCase();
       const isRejected =
         code === 4001 ||
         msg.includes("reject") ||
@@ -128,11 +130,11 @@ export default function LoginPage() {
         msg.includes("dismiss") ||
         msg.includes("closed");
       if (isRejected) {
-        setPayError("Transaction was cancelled or blocked. Please try again.");
-      } else if (msg.includes("reach") || msg.includes("network") || msg.includes("blockhash")) {
-        setPayError("Unable to reach the Solana network. Please check your connection and try again.");
+        setPayError("Transaction was cancelled. Please try again.");
+      } else if (msg.includes("reach") || msg.includes("network") || msg.includes("blockhash") || msg.includes("fetch")) {
+        setPayError("Could not connect to Solana. Check your internet and try again.");
       } else {
-        setPayError("Something went wrong. Please try again.");
+        setPayError("Payment failed. Please try again.");
       }
     }
   }, [walletAddress]);

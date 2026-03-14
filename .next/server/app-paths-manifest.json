@@ -1,5 +1,5 @@
 {
   "/page": "app/page.js",
-  "/api/blockhash/route": "app/api/blockhash/route.js",
-  "/login/page": "app/login/page.js"
+  "/login/page": "app/login/page.js",
+  "/api/blockhash/route": "app/api/blockhash/route.js"
 }
