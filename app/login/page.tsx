@@ -256,26 +256,30 @@ function SignInCard({
       <button
         onClick={onConnect}
         disabled={connectStatus === "connecting"}
-        className="w-full flex items-center justify-center gap-3 bg-[#3B82F6] hover:bg-blue-400 disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold text-base px-6 py-4 rounded-2xl transition-all hover:scale-[1.02]"
-        style={{ boxShadow: "0 0 32px rgba(59,130,246,0.35)" }}
+        className="w-full flex items-center justify-center gap-3 disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold text-base px-6 py-4 rounded-2xl transition-all hover:scale-[1.02]"
+        style={{ background: "linear-gradient(135deg, #4C44C6, #9945FF)", boxShadow: "0 0 32px rgba(153,69,255,0.4)" }}
       >
         {connectStatus === "connecting" ? (
           <>
             <Spinner />
-            Connecting…
-          </>
-        ) : hasWallet === false ? (
-          <>
-            <SolanaIcon small />
-            Install Phantom Wallet
+            Connecting to Phantom…
           </>
         ) : (
           <>
-            <SolanaIcon small />
-            Connect Solana Wallet
+            <PhantomIcon />
+            Connect Phantom Wallet
           </>
         )}
       </button>
+
+      {hasWallet === false && (
+        <p className="text-center text-[#9CA3AF] text-xs font-body mt-3">
+          Don&apos;t have Phantom?{" "}
+          <a href="https://phantom.app" target="_blank" rel="noopener noreferrer" className="text-[#9945FF] hover:underline">
+            Install it here →
+          </a>
+        </p>
+      )}
 
       <div className="flex items-center gap-3 mt-6">
         <div className="flex-1 h-px bg-white/10" />
@@ -445,6 +449,27 @@ function SolanaIcon({ small }: { small?: boolean }) {
   return (
     <svg className={size} viewBox="0 0 24 24" fill="currentColor">
       <path d="M4.06 17.12a.74.74 0 0 1 .52-.21h16.24a.37.37 0 0 1 .26.63l-2.77 2.77a.74.74 0 0 1-.52.21H1.55a.37.37 0 0 1-.26-.63l2.77-2.77zm0-13.01a.74.74 0 0 1 .52-.21h16.24a.37.37 0 0 1 .26.63L18.31 7.3a.74.74 0 0 1-.52.21H1.55a.37.37 0 0 1-.26-.63l2.77-2.77zm16.24 6.5a.74.74 0 0 0-.52-.21H3.54a.37.37 0 0 0-.26.63l2.77 2.77a.74.74 0 0 0 .52.21h16.24a.37.37 0 0 0 .26-.63l-2.77-2.77z" />
+    </svg>
+  );
+}
+
+function PhantomIcon() {
+  return (
+    <svg className="w-5 h-5" viewBox="0 0 128 128" fill="none">
+      <rect width="128" height="128" rx="32" fill="url(#ph-grad)" />
+      <defs>
+        <linearGradient id="ph-grad" x1="0" y1="0" x2="128" y2="128" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#534BB1" />
+          <stop offset="1" stopColor="#551BF9" />
+        </linearGradient>
+      </defs>
+      <path
+        d="M110.4 64.8C110.4 40.5 90.6 21 66 21c-25.5 0-45 20.7-45 45.3 0 8.9 2.5 17.2 6.9 24.2 1.1 1.8 3.2 2.7 5.3 2.3l4.8-1c2.5-.5 4.2-2.9 3.7-5.4-.1-.6-.2-1.1-.2-1.7 0-6.2 5-11.2 11.2-11.2 6.2 0 11.2 5 11.2 11.2 0 .8-.1 1.5-.2 2.3-.4 2.4 1.1 4.7 3.5 5.3l5.2 1.3c.7.2 1.4.2 2.1 0 6.5-1.9 12.1-5.8 16.1-11C104.8 78.4 110.4 72 110.4 64.8z"
+        fill="white"
+        fillOpacity="0.9"
+      />
+      <circle cx="53" cy="62" r="5" fill="#534BB1" />
+      <circle cx="75" cy="62" r="5" fill="#534BB1" />
     </svg>
   );
 }
