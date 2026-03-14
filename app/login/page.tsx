@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Nav from "../components/Nav";
 import Footer from "../components/Footer";
@@ -374,7 +375,7 @@ export default function LoginPage() {
             />
           )}
           {step === "success" && (
-            <SuccessCard txSignature={txSignature} />
+            <SuccessCard txSignature={txSignature} walletAddress={walletAddress} />
           )}
         </div>
       </section>
@@ -859,102 +860,150 @@ function PaymentCard({
   );
 }
 
-function SuccessCard({ txSignature }: { txSignature: string | null }) {
-  return (
-    <div className="glass-card rounded-3xl p-7 md:p-9">
-      <StepIndicator current={3} />
+function SuccessCard({
+  txSignature,
+  walletAddress,
+}: {
+  txSignature: string | null;
+  walletAddress: string | null;
+}) {
+  const router = useRouter();
+  const [email, setEmail]               = useState("");
+  const [submitStatus, setSubmitStatus] = useState<"idle" | "submitting" | "submitted" | "error">("idle");
+  const [submitError, setSubmitError]   = useState("");
 
-      {/* ── Access unlocked hero ── */}
-      <div className="text-center mb-7">
-        <div
-          className="relative inline-flex items-center justify-center w-20 h-20 rounded-full mb-5"
-          style={{ background: "linear-gradient(135deg, #10B981, #059669)", boxShadow: "0 0 40px rgba(16,185,129,0.35)" }}
-        >
-          <svg className="w-10 h-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" />
-          </svg>
-        </div>
-        <h2 className="font-heading font-bold text-3xl mb-2">Access Unlocked</h2>
-        <p className="text-white/50 font-body text-sm leading-relaxed">
-          Payment confirmed on-chain. Welcome to Vibe Coding.
-        </p>
-      </div>
+  useEffect(() => {
+    if (submitStatus === "submitted") {
+      const t = setTimeout(() => router.push("/"), 2000);
+      return () => clearTimeout(t);
+    }
+  }, [submitStatus, router]);
 
-      {/* ── What you now have ── */}
-      <div className="rounded-2xl overflow-hidden mb-5" style={{ border: "1px solid rgba(16,185,129,0.2)" }}>
-        <div className="bg-[#10B98108] px-4 py-2.5 border-b border-[#10B98115]">
-          <p className="text-[#10B981]/60 text-[10px] font-mono uppercase tracking-widest">Your access includes</p>
-        </div>
-        <div className="divide-y divide-[#10B98110]">
-          {[
-            { icon: "🎓", title: "7 Hands-On Lectures", desc: "Build real features every week, guided by Mariam" },
-            { icon: "🚀", title: "Ship a Real Product", desc: "Launch something you designed and built yourself" },
-            { icon: "♾️", title: "Lifetime Access", desc: "Revisit all materials any time, forever" },
-          ].map(({ icon, title, desc }) => (
-            <div key={title} className="flex items-start gap-3 px-4 py-3.5">
-              <div
-                className="w-8 h-8 rounded-lg flex items-center justify-center text-base flex-shrink-0 mt-0.5"
-                style={{ background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.2)" }}
-              >
-                {icon}
-              </div>
-              <div>
-                <p className="text-white text-sm font-semibold leading-tight">{title}</p>
-                <p className="text-white/40 text-xs font-body mt-0.5 leading-relaxed">{desc}</p>
-              </div>
-              <svg className="w-4 h-4 text-[#10B981] flex-shrink-0 mt-1 ml-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
-          ))}
-        </div>
-      </div>
+  const handleEmailSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const trimmed = email.trim();
+    if (!trimmed || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
+      setSubmitError("Please enter a valid email address.");
+      return;
+    }
+    setSubmitStatus("submitting");
+    setSubmitError("");
+    try {
+      const res = await fetch("/api/enroll", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: trimmed, walletAddress, txSignature }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error ?? "Submission failed.");
+      setSubmitStatus("submitted");
+    } catch (err) {
+      setSubmitError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
+      setSubmitStatus("error");
+    }
+  };
 
-      {/* ── Transaction proof ── */}
-      {txSignature && (
-        <div className="bg-white/[0.025] border border-white/[0.07] rounded-2xl px-4 py-3.5 mb-5">
-          <div className="flex items-center justify-between mb-2">
-            <p className="text-white/30 text-[10px] font-mono uppercase tracking-widest">Payment Proof</p>
-            <div className="flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-              <span className="text-amber-400/70 text-[10px] font-mono">Solana Devnet</span>
-            </div>
+  /* ── PHASE 1: email form only ── */
+  if (submitStatus !== "submitted") {
+    return (
+      <div className="glass-card rounded-3xl p-7 md:p-9">
+        <StepIndicator current={3} />
+
+        {/* hero */}
+        <div className="text-center mb-7">
+          <div
+            className="relative inline-flex items-center justify-center w-20 h-20 rounded-full mb-5"
+            style={{ background: "linear-gradient(135deg, #10B981, #059669)", boxShadow: "0 0 40px rgba(16,185,129,0.35)" }}
+          >
+            <svg className="w-10 h-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" />
+            </svg>
           </div>
-          <div className="flex items-center justify-between">
-            <span className="text-[#6B7280] text-[11px] font-mono">{txSignature.slice(0, 16)}…{txSignature.slice(-8)}</span>
-            <a
-              href={`${SOLSCAN_BASE}${txSignature}?cluster=devnet`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#3B82F6] hover:text-blue-400 transition-colors"
+          <h2 className="font-heading font-bold text-3xl mb-2">Access Unlocked</h2>
+          <p className="text-white/50 font-body text-sm leading-relaxed">
+            Payment confirmed on-chain. Welcome to Vibe Coding.
+          </p>
+        </div>
+
+        {/* email capture */}
+        <div className="rounded-2xl p-5 mb-5" style={{ background: "linear-gradient(135deg, rgba(59,130,246,0.08), rgba(153,69,255,0.05))", border: "1px solid rgba(59,130,246,0.2)" }}>
+          <div className="flex items-center gap-2 mb-1">
+            <svg className="w-4 h-4 text-[#3B82F6] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+            <p className="text-white font-body font-semibold text-sm">Where should we send course details?</p>
+          </div>
+          <p className="text-white/40 text-xs font-body mb-4 ml-6">
+            Mariam will send your first lecture link and onboarding instructions here.
+          </p>
+          <form onSubmit={handleEmailSubmit} className="flex flex-col gap-3">
+            <input
+              type="email"
+              value={email}
+              onChange={e => { setEmail(e.target.value); setSubmitError(""); }}
+              placeholder="your@email.com"
+              disabled={submitStatus === "submitting"}
+              className="w-full bg-white/[0.06] border rounded-xl px-4 py-3 text-white text-sm font-body placeholder-white/25 outline-none transition-all focus:border-[#3B82F6]/50 disabled:opacity-50"
+              style={{ borderColor: submitError ? "rgba(239,68,68,0.5)" : "rgba(255,255,255,0.12)" }}
+              autoComplete="email"
+              autoFocus
+            />
+            {submitError && (
+              <p className="text-red-400 text-xs font-body flex items-center gap-1.5">
+                <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+                </svg>
+                {submitError}
+              </p>
+            )}
+            <button
+              type="submit"
+              disabled={submitStatus === "submitting" || !email.trim()}
+              className="w-full flex items-center justify-center gap-2 text-white font-heading font-bold text-sm px-4 py-3.5 rounded-xl transition-all hover:scale-[1.01] disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{ background: "linear-gradient(135deg, #3B82F6, #9945FF)" }}
             >
-              <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-              </svg>
-              View on Solscan
-            </a>
-          </div>
+              {submitStatus === "submitting" ? (
+                <><Spinner /> Sending…</>
+              ) : (
+                <>
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                  </svg>
+                  Send Course Details
+                </>
+              )}
+            </button>
+          </form>
         </div>
-      )}
-
-      {/* ── Next step note ── */}
-      <div className="flex items-start gap-2.5 bg-[#3B82F608] border border-[#3B82F620] rounded-xl px-4 py-3 mb-5">
-        <svg className="w-4 h-4 text-[#3B82F6] flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-        </svg>
-        <p className="text-white/50 text-xs font-body leading-relaxed">
-          Check your email for onboarding details and your first lecture link from Mariam.
-        </p>
       </div>
+    );
+  }
 
-      {/* ── CTA ── */}
-      <Link
-        href="/"
-        className="block w-full text-center font-semibold text-white px-6 py-3.5 rounded-2xl transition-all hover:scale-[1.02]"
-        style={{ background: "linear-gradient(135deg, #9945FF, #3B82F6)" }}
+  /* ── PHASE 2: success flash → auto-redirect ── */
+  return (
+    <div className="glass-card rounded-3xl p-7 md:p-9 flex flex-col items-center text-center gap-5">
+      <div
+        className="w-20 h-20 rounded-full flex items-center justify-center"
+        style={{ background: "linear-gradient(135deg, #10B981, #059669)", boxShadow: "0 0 40px rgba(16,185,129,0.35)" }}
       >
-        Back to Home
-      </Link>
+        <svg className="w-10 h-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+        </svg>
+      </div>
+      <div>
+        <h2 className="font-heading font-bold text-2xl mb-1">Course details sent successfully</h2>
+        <p className="text-white/40 font-body text-sm">Redirecting you to the home page…</p>
+      </div>
+      <div className="w-full bg-white/[0.06] rounded-full h-1 overflow-hidden">
+        <div
+          className="h-full rounded-full"
+          style={{
+            background: "linear-gradient(90deg, #10B981, #3B82F6)",
+            animation: "progress-bar 2s linear forwards",
+          }}
+        />
+      </div>
+      <style>{`@keyframes progress-bar { from { width: 0% } to { width: 100% } }`}</style>
     </div>
   );
 }
