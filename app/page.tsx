@@ -4,13 +4,104 @@ import SocialLinks from "./components/SocialLinks";
 import Footer from "./components/Footer";
 
 const steps = [
-  { num: 1, title: "Intro to AI & Vibe Coding", desc: "Understand the tools and mindset" },
-  { num: 2, title: "Prompt Engineering", desc: "Learn to talk to AI effectively" },
-  { num: 3, title: "Design Thinking → MVP", desc: "Turn any idea into a scoped project" },
-  { num: 4, title: "Build MVP with AI Tools", desc: "Ship a real product, no code needed" },
-  { num: 5, title: "Automation & Workflow", desc: "Make your tools work automatically" },
-  { num: 6, title: "Automation Platforms", desc: "Master Make, Zapier and n8n" },
-  { num: 7, title: "AI Workflows in Practice", desc: "Build and ship your final product" },
+  {
+    num: 1, week: "Week 1", tag: "Foundation",
+    title: "Intro to AI & Vibe Coding",
+    desc: "Understand the modern builder mindset, what AI tools can do, and how to think like a product creator from day one.",
+    gradient: "from-blue-600/20 to-blue-900/10",
+    accent: "#3B82F6",
+    icon: (
+      <svg viewBox="0 0 32 32" fill="none" className="w-6 h-6">
+        <circle cx="16" cy="12" r="6" stroke="currentColor" strokeWidth="1.8"/>
+        <path d="M10 12c0-3.31 2.69-6 6-6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+        <path d="M16 18v3M13 21h6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+        <path d="M12 15l-3 5M20 15l3 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" opacity="0.5"/>
+      </svg>
+    ),
+  },
+  {
+    num: 2, week: "Week 2", tag: "Core Skill",
+    title: "Prompt Engineering",
+    desc: "Learn to communicate with AI precisely — write prompts that produce real results, not generic outputs.",
+    gradient: "from-violet-600/20 to-violet-900/10",
+    accent: "#8B5CF6",
+    icon: (
+      <svg viewBox="0 0 32 32" fill="none" className="w-6 h-6">
+        <rect x="4" y="8" width="16" height="10" rx="3" stroke="currentColor" strokeWidth="1.8"/>
+        <path d="M20 13h4a2 2 0 012 2v5a2 2 0 01-2 2H12l-3 3v-3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+        <path d="M9 12h6M9 15h4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+      </svg>
+    ),
+  },
+  {
+    num: 3, week: "Week 3", tag: "Product",
+    title: "Design Thinking → MVP",
+    desc: "Turn any raw idea into a scoped, shippable product. Learn user-focused frameworks that real product teams use.",
+    gradient: "from-cyan-600/20 to-cyan-900/10",
+    accent: "#06B6D4",
+    icon: (
+      <svg viewBox="0 0 32 32" fill="none" className="w-6 h-6">
+        <path d="M16 4l3 8h8l-6.5 5 2.5 8L16 20l-7 5 2.5-8L5 12h8z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round"/>
+      </svg>
+    ),
+  },
+  {
+    num: 4, week: "Week 4", tag: "Build",
+    title: "Build MVP with AI Tools",
+    desc: "Ship a real, working product using AI-first tools. No code required — just vision, prompts, and iteration.",
+    gradient: "from-emerald-600/20 to-emerald-900/10",
+    accent: "#10B981",
+    icon: (
+      <svg viewBox="0 0 32 32" fill="none" className="w-6 h-6">
+        <path d="M16 4l2 6 6 1-4.5 4 1.5 6L16 18l-5 3 1.5-6L8 11l6-1z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round"/>
+        <path d="M22 22l4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+        <circle cx="20" cy="20" r="4" stroke="currentColor" strokeWidth="1.8"/>
+      </svg>
+    ),
+  },
+  {
+    num: 5, week: "Week 5", tag: "Automate",
+    title: "Automation & Workflow",
+    desc: "Stop doing things manually. Design workflows where AI handles the repetitive work so you can focus on what matters.",
+    gradient: "from-orange-600/20 to-orange-900/10",
+    accent: "#F59E0B",
+    icon: (
+      <svg viewBox="0 0 32 32" fill="none" className="w-6 h-6">
+        <circle cx="16" cy="16" r="5" stroke="currentColor" strokeWidth="1.8"/>
+        <circle cx="16" cy="16" r="2" fill="currentColor"/>
+        <path d="M16 4v4M16 24v4M4 16h4M24 16h4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+        <path d="M7.76 7.76l2.83 2.83M21.41 21.41l2.83 2.83M7.76 24.24l2.83-2.83M21.41 10.59l2.83-2.83" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+      </svg>
+    ),
+  },
+  {
+    num: 6, week: "Week 6", tag: "Platforms",
+    title: "Automation Platforms",
+    desc: "Go deep on Make, Zapier, and n8n. Build multi-step automations that connect your tools and eliminate manual busywork.",
+    gradient: "from-pink-600/20 to-pink-900/10",
+    accent: "#EC4899",
+    icon: (
+      <svg viewBox="0 0 32 32" fill="none" className="w-6 h-6">
+        <circle cx="8" cy="16" r="3" stroke="currentColor" strokeWidth="1.8"/>
+        <circle cx="24" cy="8" r="3" stroke="currentColor" strokeWidth="1.8"/>
+        <circle cx="24" cy="24" r="3" stroke="currentColor" strokeWidth="1.8"/>
+        <path d="M11 16h5l5-6M11 16h5l5 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+      </svg>
+    ),
+  },
+  {
+    num: 7, week: "Week 7", tag: "Ship It",
+    title: "AI Workflows in Practice",
+    desc: "Bring everything together. Build and ship your final AI-powered product — and graduate with something real and live.",
+    gradient: "from-purple-600/20 to-purple-900/10",
+    accent: "#A855F7",
+    icon: (
+      <svg viewBox="0 0 32 32" fill="none" className="w-6 h-6">
+        <path d="M16 4c-1 4-4 6-8 7 0 8 4 13 8 17 4-4 8-9 8-17-4-1-7-3-8-7z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round"/>
+        <path d="M12 16l3 3 5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+      </svg>
+    ),
+  },
 ];
 
 const outcomes = [
@@ -259,24 +350,85 @@ export default function Home() {
       <div className="section-divider" />
 
       {/* ── 7-STEP JOURNEY ────────────────────────────── */}
-      <section className="py-24">
-        <div className="max-w-7xl mx-auto px-6 mb-12">
-          <p className="text-[#9CA3AF] uppercase tracking-widest text-xs font-body mb-3">Your Path</p>
-          <h2 className="font-heading font-bold text-4xl md:text-5xl">Your Path From Zero to Builder</h2>
-        </div>
-        <div className="flex md:grid md:grid-cols-7 gap-4 px-6 overflow-x-auto pb-4 md:max-w-7xl md:mx-auto">
-          {steps.map((step) => (
-            <div key={step.num} className="card-hover min-w-[200px] md:min-w-0 flex-shrink-0 bg-white/[0.04] border border-white/10 rounded-2xl p-5 group">
-              <div
-                className="w-9 h-9 rounded-full flex items-center justify-center mb-4 font-heading font-bold text-sm text-white"
-                style={{ background: "linear-gradient(135deg, #3B82F6, #8B5CF6)" }}
-              >
-                {step.num}
-              </div>
-              <h3 className="font-heading font-semibold text-sm mb-2 leading-snug">{step.title}</h3>
-              <p className="text-[#9CA3AF] text-xs font-body leading-relaxed">{step.desc}</p>
+      <section className="py-28 px-6">
+        <div className="max-w-7xl mx-auto">
+          {/* Header */}
+          <div className="mb-16">
+            <div className="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/20 rounded-full px-4 py-1.5 mb-6">
+              <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+              <span className="text-blue-400 text-xs font-body font-medium uppercase tracking-widest">7-Week Program</span>
             </div>
-          ))}
+            <h2 className="font-heading font-bold text-4xl md:text-6xl leading-tight mb-5">
+              Your Path From{" "}
+              <span style={{ background: "linear-gradient(90deg, #3B82F6, #8B5CF6, #A855F7)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
+                Zero to Builder
+              </span>
+            </h2>
+            <p className="text-[#9CA3AF] font-body text-lg max-w-2xl leading-relaxed">
+              A structured 7-week journey — each week builds on the last, taking you from complete beginner to someone who ships real AI-powered products.
+            </p>
+          </div>
+
+          {/* Cards grid */}
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {steps.map((step) => (
+              <div
+                key={step.num}
+                className={`relative group card-hover rounded-2xl border border-white/[0.08] p-6 overflow-hidden transition-all duration-300 ${
+                  step.num === 7 ? "sm:col-span-2 lg:col-span-1" : ""
+                }`}
+                style={{ background: `linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%)` }}
+              >
+                {/* Top accent line */}
+                <div
+                  className="absolute top-0 left-0 right-0 h-[2px] rounded-t-2xl opacity-60 group-hover:opacity-100 transition-opacity"
+                  style={{ background: `linear-gradient(90deg, ${step.accent}, transparent)` }}
+                />
+
+                {/* Week badge + tag */}
+                <div className="flex items-center justify-between mb-5">
+                  <span
+                    className="text-[10px] font-body font-semibold uppercase tracking-widest px-2.5 py-1 rounded-full border"
+                    style={{ color: step.accent, borderColor: step.accent + "40", background: step.accent + "12" }}
+                  >
+                    {step.week}
+                  </span>
+                  <span className="text-[10px] font-body text-white/25 uppercase tracking-widest">{step.tag}</span>
+                </div>
+
+                {/* Icon + number row */}
+                <div className="flex items-center gap-3 mb-4">
+                  <div
+                    className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+                    style={{ background: step.accent + "18", color: step.accent }}
+                  >
+                    {step.icon}
+                  </div>
+                  <span
+                    className="font-heading font-black text-5xl leading-none opacity-10 select-none"
+                    style={{ color: step.accent }}
+                  >
+                    {String(step.num).padStart(2, "0")}
+                  </span>
+                </div>
+
+                {/* Content */}
+                <h3 className="font-heading font-bold text-lg leading-snug mb-2 text-white">{step.title}</h3>
+                <p className="text-[#9CA3AF] text-sm font-body leading-relaxed">{step.desc}</p>
+
+                {/* Progress dots */}
+                <div className="flex gap-1 mt-5">
+                  {Array.from({ length: 7 }).map((_, dotIdx) => (
+                    <div
+                      key={dotIdx}
+                      className="h-0.5 flex-1 rounded-full transition-all"
+                      style={{ background: dotIdx < step.num ? step.accent : "rgba(255,255,255,0.08)" }}
+                    />
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
