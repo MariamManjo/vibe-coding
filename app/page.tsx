@@ -145,10 +145,6 @@ export default function Home() {
         />
 
         <div className="relative z-10 max-w-5xl mx-auto">
-          <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-4 py-1.5 text-sm text-white/60 mb-8 font-body">
-            <span className="w-2 h-2 bg-[#3B82F6] rounded-full animate-pulse" />
-            New cohort starting April 2026
-          </div>
           <h1 className="font-heading font-bold text-5xl md:text-7xl lg:text-8xl leading-[1.05] tracking-tight mb-6">
             Build Real AI Products.{" "}
             <span style={{
