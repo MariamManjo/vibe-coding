@@ -823,6 +823,9 @@ video {
 .mt-1 {
   margin-top: 0.25rem;
 }
+.mb-7 {
+  margin-bottom: 1.75rem;
+}
 .block {
   display: block;
 }
@@ -888,6 +891,9 @@ video {
 }
 .h-px {
   height: 1px;
+}
+.h-6 {
+  height: 1.5rem;
 }
 .min-h-screen {
   min-height: 100vh;
@@ -1112,6 +1118,9 @@ video {
 .rounded-xl {
   border-radius: 0.75rem;
 }
+.rounded-lg {
+  border-radius: 0.5rem;
+}
 .border {
   border-width: 1px;
 }
@@ -1145,6 +1154,9 @@ video {
 }
 .border-white\/15 {
   border-color: rgb(255 255 255 / 0.15);
+}
+.border-amber-500\/20 {
+  border-color: rgb(245 158 11 / 0.2);
 }
 .bg-\[\#0A0A0A\] {
   --tw-bg-opacity: 1;
@@ -1193,6 +1205,12 @@ video {
 .bg-white\/10 {
   background-color: rgb(255 255 255 / 0.1);
 }
+.bg-amber-500\/10 {
+  background-color: rgb(245 158 11 / 0.1);
+}
+.bg-white\/\[0\.05\] {
+  background-color: rgb(255 255 255 / 0.05);
+}
 .object-cover {
   object-fit: cover;
 }
@@ -1204,6 +1222,9 @@ video {
 }
 .p-8 {
   padding: 2rem;
+}
+.p-1 {
+  padding: 0.25rem;
 }
 .px-10 {
   padding-left: 2.5rem;
@@ -1276,6 +1297,10 @@ video {
 .py-5 {
   padding-top: 1.25rem;
   padding-bottom: 1.25rem;
+}
+.py-3\.5 {
+  padding-top: 0.875rem;
+  padding-bottom: 0.875rem;
 }
 .pb-10 {
   padding-bottom: 2.5rem;
@@ -1434,6 +1459,10 @@ video {
 .text-\[\#9945FF\] {
   --tw-text-opacity: 1;
   color: rgb(153 69 255 / var(--tw-text-opacity, 1));
+}
+.text-amber-400 {
+  --tw-text-opacity: 1;
+  color: rgb(251 191 36 / var(--tw-text-opacity, 1));
 }
 .underline {
   text-decoration-line: underline;
@@ -1704,6 +1733,10 @@ h1, h2, h3, h4, h5, h6 {
   color: rgb(255 255 255 / 0.7);
 }
 
+.hover\:text-white\/60:hover {
+  color: rgb(255 255 255 / 0.6);
+}
+
 .hover\:underline:hover {
   text-decoration-line: underline;
 }
@@ -1737,6 +1770,11 @@ h1, h2, h3, h4, h5, h6 {
   border-color: rgb(59 130 246 / var(--tw-border-opacity, 1));
 }
 
+.focus\:border-\[\#9945FF\]:focus {
+  --tw-border-opacity: 1;
+  border-color: rgb(153 69 255 / var(--tw-border-opacity, 1));
+}
+
 .focus\:outline-none:focus {
   outline: 2px solid transparent;
   outline-offset: 2px;
@@ -1751,6 +1789,11 @@ h1, h2, h3, h4, h5, h6 {
 .focus\:ring-\[\#3B82F6\]:focus {
   --tw-ring-opacity: 1;
   --tw-ring-color: rgb(59 130 246 / var(--tw-ring-opacity, 1));
+}
+
+.focus\:ring-\[\#9945FF\]:focus {
+  --tw-ring-opacity: 1;
+  --tw-ring-color: rgb(153 69 255 / var(--tw-ring-opacity, 1));
 }
 
 .disabled\:cursor-not-allowed:disabled {

@@ -18,6 +18,7 @@ const RECIPIENT_ADDRESS = "So1endDq2YkqhipRh3WViPa8hdiSpxWy6z3Z6tMCpAo";
 const SOLANA_RPC = "https://api.mainnet-beta.solana.com";
 
 type Step = "connect" | "payment" | "success";
+type ConnectMode = "wallet" | "email";
 
 interface SolanaProvider {
   isPhantom?: boolean;
@@ -54,23 +55,17 @@ export default function LoginPage() {
   const [payError, setPayError] = useState("");
 
   useEffect(() => {
-    const provider = getProvider();
-    setHasWallet(!!provider);
-    if (provider?.publicKey) {
-      setWalletAddress(provider.publicKey.toString());
-      setStep("payment");
-    }
+    // Only detect whether the extension exists — do NOT auto-advance
+    setHasWallet(!!getProvider());
   }, []);
 
   const connectWallet = useCallback(async () => {
     const provider = getProvider();
-    if (!provider) {
-      window.open("https://phantom.app/", "_blank");
-      return;
-    }
+    if (!provider) return;
     try {
       setConnectStatus("connecting");
       setConnectError("");
+      // Always prompt the Phantom popup by explicitly calling connect()
       const resp = await provider.connect();
       setWalletAddress(resp.publicKey.toString());
       setConnectStatus("idle");
@@ -186,11 +181,7 @@ function StepIndicator({ current }: { current: 1 | 2 | 3 }) {
             <div className="flex flex-col items-center gap-1">
               <div
                 className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
-                  done
-                    ? "bg-[#10B981] text-white"
-                    : active
-                    ? "text-white"
-                    : "bg-white/10 text-white/40"
+                  done ? "bg-[#10B981] text-white" : active ? "text-white" : "bg-white/10 text-white/40"
                 }`}
                 style={active ? { background: "linear-gradient(135deg, #3B82F6, #8B5CF6)" } : undefined}
               >
@@ -198,9 +189,7 @@ function StepIndicator({ current }: { current: 1 | 2 | 3 }) {
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                   </svg>
-                ) : (
-                  s.n
-                )}
+                ) : s.n}
               </div>
               <span className={`text-[10px] font-body ${active ? "text-white/80" : done ? "text-[#10B981]" : "text-white/30"}`}>
                 {s.label}
@@ -229,11 +218,27 @@ function ConnectCard({
   onConnect: () => void;
   currentStep: 1 | 2 | 3;
 }) {
+  const [mode, setMode] = useState<ConnectMode>("wallet");
+  const [email, setEmail] = useState("");
+  const [emailSent, setEmailSent] = useState(false);
+  const [emailLoading, setEmailLoading] = useState(false);
+
+  const handleEmailSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email.trim()) return;
+    setEmailLoading(true);
+    await new Promise((r) => setTimeout(r, 800));
+    setEmailLoading(false);
+    setEmailSent(true);
+    // Open Phantom's email wallet creation in a new tab
+    window.open("https://phantom.app/", "_blank");
+  };
+
   return (
     <div className="glass-card rounded-3xl p-8 md:p-10">
       <StepIndicator current={currentStep} />
 
-      <div className="text-center mb-8">
+      <div className="text-center mb-7">
         <div
           className="inline-flex items-center justify-center w-14 h-14 rounded-2xl mb-5"
           style={{ background: "linear-gradient(135deg, #4C44C6, #9945FF)" }}
@@ -242,9 +247,28 @@ function ConnectCard({
         </div>
         <h1 className="font-heading font-bold text-3xl mb-2">Sign in with Solana</h1>
         <p className="text-[#9CA3AF] font-body text-sm leading-relaxed">
-          Connect your Phantom wallet to sign in.<br />
-          No email or password needed.
+          Use your Phantom wallet to sign in securely.
         </p>
+      </div>
+
+      {/* Tab switcher */}
+      <div className="flex bg-white/[0.05] rounded-xl p-1 mb-6">
+        <button
+          onClick={() => { setMode("wallet"); setEmailSent(false); }}
+          className={`flex-1 text-sm font-body font-medium py-2 rounded-lg transition-all ${
+            mode === "wallet" ? "bg-white/10 text-white" : "text-white/40 hover:text-white/60"
+          }`}
+        >
+          I have a wallet
+        </button>
+        <button
+          onClick={() => setMode("email")}
+          className={`flex-1 text-sm font-body font-medium py-2 rounded-lg transition-all ${
+            mode === "email" ? "bg-white/10 text-white" : "text-white/40 hover:text-white/60"
+          }`}
+        >
+          Create with email
+        </button>
       </div>
 
       {errorMsg && (
@@ -256,32 +280,103 @@ function ConnectCard({
         </div>
       )}
 
-      <button
-        onClick={onConnect}
-        disabled={connectStatus === "connecting"}
-        className="w-full flex items-center justify-center gap-3 disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold text-base px-6 py-4 rounded-2xl transition-all hover:scale-[1.02]"
-        style={{ background: "linear-gradient(135deg, #4C44C6, #9945FF)", boxShadow: "0 0 32px rgba(153,69,255,0.45)" }}
-      >
-        {connectStatus === "connecting" ? (
-          <>
-            <Spinner />
-            Connecting…
-          </>
-        ) : (
-          <>
-            <PhantomIcon />
-            Connect Phantom Wallet
-          </>
-        )}
-      </button>
-
-      {hasWallet === false && (
-        <p className="text-center text-[#9CA3AF] text-xs font-body mt-3">
-          Don&apos;t have Phantom?{" "}
-          <a href="https://phantom.app" target="_blank" rel="noopener noreferrer" className="text-[#9945FF] hover:underline">
-            Install it here →
-          </a>
-        </p>
+      {mode === "wallet" ? (
+        <div className="flex flex-col gap-3">
+          {hasWallet ? (
+            <button
+              onClick={onConnect}
+              disabled={connectStatus === "connecting"}
+              className="w-full flex items-center justify-center gap-3 disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold text-base px-6 py-4 rounded-2xl transition-all hover:scale-[1.02]"
+              style={{ background: "linear-gradient(135deg, #4C44C6, #9945FF)", boxShadow: "0 0 32px rgba(153,69,255,0.45)" }}
+            >
+              {connectStatus === "connecting" ? (
+                <>
+                  <Spinner />
+                  Opening Phantom…
+                </>
+              ) : (
+                <>
+                  <PhantomIcon />
+                  Connect Phantom Wallet
+                </>
+              )}
+            </button>
+          ) : (
+            <div className="flex flex-col gap-3">
+              <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl px-4 py-3 text-sm text-amber-400 font-body text-center">
+                Phantom wallet not detected in this browser.
+              </div>
+              <a
+                href="https://phantom.app/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full flex items-center justify-center gap-3 text-white font-semibold text-base px-6 py-4 rounded-2xl transition-all hover:scale-[1.02]"
+                style={{ background: "linear-gradient(135deg, #4C44C6, #9945FF)", boxShadow: "0 0 32px rgba(153,69,255,0.35)" }}
+              >
+                <PhantomIcon />
+                Install Phantom &amp; Connect
+              </a>
+              <p className="text-center text-[#9CA3AF] text-xs font-body">
+                After installing, refresh this page and try again.
+              </p>
+            </div>
+          )}
+        </div>
+      ) : (
+        <div>
+          {emailSent ? (
+            <div className="text-center">
+              <div
+                className="inline-flex items-center justify-center w-12 h-12 rounded-full mb-4"
+                style={{ background: "linear-gradient(135deg, #10B981, #059669)" }}
+              >
+                <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <p className="font-heading font-semibold text-white mb-2">Check your browser tab</p>
+              <p className="text-[#9CA3AF] text-sm font-body mb-5 leading-relaxed">
+                We opened <span className="text-[#9945FF]">phantom.app</span> for you.
+                Create your wallet there using your email <span className="text-white">{email}</span>, then come back and connect.
+              </p>
+              <button
+                onClick={() => { setEmailSent(false); setMode("wallet"); setEmail(""); }}
+                className="w-full bg-[#3B82F6] hover:bg-blue-400 text-white font-semibold px-6 py-3.5 rounded-2xl transition-all hover:scale-[1.02] text-sm"
+              >
+                I created my wallet — Connect now →
+              </button>
+            </div>
+          ) : (
+            <form onSubmit={handleEmailSubmit} className="flex flex-col gap-3">
+              <p className="text-[#9CA3AF] text-sm font-body text-center mb-1">
+                Enter your email and we&apos;ll help you create a free Solana wallet.
+              </p>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@example.com"
+                required
+                className="w-full bg-white/[0.06] border border-white/15 rounded-xl px-4 py-3 text-white placeholder-white/30 text-sm font-body focus:outline-none focus:border-[#9945FF] focus:ring-1 focus:ring-[#9945FF] transition-colors"
+              />
+              <button
+                type="submit"
+                disabled={emailLoading || !email.trim()}
+                className="w-full flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold text-sm px-6 py-3.5 rounded-2xl transition-all hover:scale-[1.02]"
+                style={{ background: "linear-gradient(135deg, #4C44C6, #9945FF)" }}
+              >
+                {emailLoading ? (
+                  <>
+                    <Spinner />
+                    Opening Phantom…
+                  </>
+                ) : (
+                  "Create Wallet with Email →"
+                )}
+              </button>
+            </form>
+          )}
+        </div>
       )}
 
       <div className="flex items-center gap-3 mt-6">
@@ -402,7 +497,6 @@ function SuccessCard({ txSignature }: { txSignature: string | null }) {
   return (
     <div className="glass-card rounded-3xl p-8 md:p-10 text-center">
       <StepIndicator current={3} />
-
       <div
         className="inline-flex items-center justify-center w-16 h-16 rounded-full mb-6"
         style={{ background: "linear-gradient(135deg, #10B981, #059669)" }}
@@ -451,9 +545,9 @@ function PhantomIcon({ large }: { large?: boolean }) {
   const size = large ? "w-7 h-7" : "w-5 h-5";
   return (
     <svg className={size} viewBox="0 0 128 128" fill="none">
-      <rect width="128" height="128" rx="32" fill="url(#ph-btn)" />
+      <rect width="128" height="128" rx="32" fill="url(#ph-icon)" />
       <defs>
-        <linearGradient id="ph-btn" x1="0" y1="0" x2="128" y2="128" gradientUnits="userSpaceOnUse">
+        <linearGradient id="ph-icon" x1="0" y1="0" x2="128" y2="128" gradientUnits="userSpaceOnUse">
           <stop stopColor="#534BB1" />
           <stop offset="1" stopColor="#551BF9" />
         </linearGradient>
