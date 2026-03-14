@@ -74,10 +74,28 @@ export default function LoginPage() {
   const [hasWallet, setHasWallet] = useState<boolean | null>(null);
   const [connectError, setConnectError] = useState("");
   const [payError, setPayError] = useState("");
+  const [balance, setBalance] = useState<number | null>(null);
+  const [balanceStatus, setBalanceStatus] = useState<"idle" | "loading" | "loaded" | "error">("idle");
 
   useEffect(() => {
     // Only detect whether the extension exists — do NOT auto-advance
     setHasWallet(!!getProvider());
+  }, []);
+
+  const fetchBalance = useCallback(async (address: string) => {
+    setBalanceStatus("loading");
+    setBalance(null);
+    try {
+      const conn = new Connection(DEVNET_RPCS[0], "confirmed");
+      const lamports = await conn.getBalance(new PublicKey(address));
+      const sol = lamports / LAMPORTS_PER_SOL;
+      setBalance(sol);
+      setBalanceStatus("loaded");
+      console.log("[balance] fetched:", sol, "SOL for", address);
+    } catch (err) {
+      console.error("[balance] fetch failed:", err);
+      setBalanceStatus("error");
+    }
   }, []);
 
   const connectWallet = useCallback(async () => {
@@ -88,9 +106,11 @@ export default function LoginPage() {
       setConnectError("");
       // Always prompt the Phantom popup by explicitly calling connect()
       const resp = await provider.connect();
-      setWalletAddress(resp.publicKey.toString());
+      const addr = resp.publicKey.toString();
+      setWalletAddress(addr);
       setConnectStatus("idle");
       setStep("payment");
+      fetchBalance(addr);
     } catch {
       setConnectStatus("idle");
       setConnectError("Connection was cancelled. Please try again.");
@@ -197,6 +217,7 @@ export default function LoginPage() {
       setTxSignature(txSig);
       setPayStatus("idle");
       setStep("success");
+      if (walletAddress) fetchBalance(walletAddress);
     } catch (err: unknown) {
       setPayStatus("idle");
       console.error("[payment error]", err);
@@ -266,6 +287,8 @@ export default function LoginPage() {
               onPurchase={purchaseCourse}
               onDisconnect={disconnectWallet}
               currentStep={stepNumber[step]}
+              balance={balance}
+              balanceStatus={balanceStatus}
             />
           )}
           {step === "success" && (
@@ -531,6 +554,8 @@ function PaymentCard({
   onPurchase,
   onDisconnect,
   currentStep,
+  balance,
+  balanceStatus,
 }: {
   walletAddress: string;
   payStatus: "idle" | "paying";
@@ -538,7 +563,10 @@ function PaymentCard({
   onPurchase: () => void;
   onDisconnect: () => void;
   currentStep: 1 | 2 | 3;
+  balance: number | null;
+  balanceStatus: "idle" | "loading" | "loaded" | "error";
 }) {
+  const insufficient = balanceStatus === "loaded" && balance !== null && balance < COURSE_PRICE_SOL;
   return (
     <div className="glass-card rounded-3xl p-7 md:p-9">
       <StepIndicator current={currentStep} />
@@ -591,6 +619,27 @@ function PaymentCard({
               <span className="text-white/25 text-[10px] font-body">(your wallet)</span>
             </div>
           </div>
+          {/* Available Balance */}
+          <div className="flex items-center justify-between px-4 py-3">
+            <span className="text-white/40 text-xs font-body">Available</span>
+            <div className="flex items-center gap-2">
+              {(balanceStatus === "idle" || balanceStatus === "loading") && (
+                <div className="flex items-center gap-1.5">
+                  <div className="w-3 h-3 rounded-full bg-white/10 animate-pulse" />
+                  <div className="h-3 w-16 rounded bg-white/10 animate-pulse" />
+                </div>
+              )}
+              {balanceStatus === "loaded" && balance !== null && (
+                <span className={`font-mono font-semibold text-sm ${insufficient ? "text-red-400" : "text-[#14F195]"}`}>
+                  {balance.toFixed(4)} SOL
+                </span>
+              )}
+              {balanceStatus === "error" && (
+                <span className="text-white/30 text-xs font-body italic">Unable to fetch</span>
+              )}
+            </div>
+          </div>
+
           {/* To */}
           <div className="flex items-center justify-between px-4 py-3">
             <span className="text-white/40 text-xs font-body">To</span>
@@ -671,6 +720,17 @@ function PaymentCard({
           Disconnect
         </button>
       </div>
+
+      {/* ── Insufficient balance warning ── */}
+      {insufficient && (
+        <div className="flex items-start gap-2 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3 mb-4 text-sm text-red-400 font-body">
+          <svg className="w-4 h-4 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+          </svg>
+          Insufficient balance — you need at least {COURSE_PRICE_SOL} SOL. Get devnet SOL from{" "}
+          <a href="https://faucet.solana.com" target="_blank" rel="noopener noreferrer" className="underline hover:text-red-300">faucet.solana.com</a>.
+        </div>
+      )}
 
       {/* ── Error ── */}
       {errorMsg && (
