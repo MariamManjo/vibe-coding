@@ -581,244 +581,207 @@ function PaymentCard({
       ? Math.max(0, balance - COURSE_PRICE_SOL - 0.000005)
       : null;
 
-  const BalanceCell = ({ value }: { value: number | null }) => {
-    if (balanceStatus === "idle" || balanceStatus === "loading") {
-      return (
-        <div className="flex items-center gap-1.5">
-          <div className="h-3 w-20 rounded bg-white/10 animate-pulse" />
-        </div>
-      );
-    }
-    if (balanceStatus === "error" || value === null) {
-      return <span className="text-white/30 text-xs italic font-body">Unable to fetch</span>;
-    }
-    return (
-      <span className={`font-mono font-semibold text-sm ${insufficient ? "text-red-400" : "text-[#14F195]"}`}>
-        {value.toFixed(4)} SOL
-      </span>
-    );
-  };
-
   return (
-    <div className="glass-card rounded-3xl p-7 md:p-9">
-      <StepIndicator current={currentStep} />
+    <div className="glass-card rounded-3xl overflow-hidden">
 
-      {/* ── Title ── */}
-      <div className="mb-5">
-        <h2 className="font-heading font-bold text-white text-xl leading-tight mb-0.5">Transaction Review</h2>
-        <p className="text-white/35 text-xs font-body">Review all details before authorizing payment on-chain</p>
+      {/* ── Top bar: title + network badge ── */}
+      <div className="flex items-center justify-between px-7 pt-7 pb-0">
+        <div>
+          <StepIndicator current={currentStep} />
+        </div>
+        <span className="flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-mono" style={{ background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.25)", color: "#FCD34D" }}>
+          <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+          Solana Devnet
+        </span>
       </div>
 
-      {/* ── Sender → Recipient cards ── */}
-      <div className="flex items-stretch gap-0 mb-4 rounded-2xl overflow-hidden" style={{ border: "1px solid rgba(255,255,255,0.08)" }}>
-        {/* Sender card */}
-        <div className="flex-1 px-4 py-4" style={{ background: "linear-gradient(135deg, rgba(153,69,255,0.08), rgba(153,69,255,0.03))" }}>
-          <p className="text-white/30 text-[9px] font-mono uppercase tracking-widest mb-3">Paying From</p>
-          <div className="flex items-center gap-2 mb-2">
-            <div className="w-8 h-8 rounded-xl flex-shrink-0 flex items-center justify-center" style={{ background: "linear-gradient(135deg, #4C44C6, #9945FF)" }}>
-              <PhantomIcon />
-            </div>
-            <div>
-              <p className="text-white/80 text-xs font-body font-medium leading-tight">Your Wallet</p>
-              <p className="text-white/35 text-[10px] font-body">Phantom · Devnet</p>
-            </div>
-          </div>
-          <p className="text-[#9945FF] text-[11px] font-mono mb-2">{shortenAddress(walletAddress)}</p>
-          <div className="pt-2" style={{ borderTop: "1px solid rgba(153,69,255,0.12)" }}>
-            <p className="text-white/30 text-[9px] font-mono uppercase tracking-wider mb-1">Available Balance</p>
-            <BalanceCell value={balance} />
-          </div>
+      {/* ── Amount hero ── */}
+      <div className="flex flex-col items-center py-7 px-7">
+        <p className="text-white/35 text-[11px] font-mono uppercase tracking-widest mb-3">Send Payment</p>
+        <div className="relative flex items-end justify-center gap-2 mb-2">
+          <span className="font-heading font-bold text-white leading-none" style={{ fontSize: "clamp(2.8rem, 8vw, 3.8rem)" }}>
+            {COURSE_PRICE_SOL}
+          </span>
+          <span className="font-heading font-bold text-white/50 pb-1" style={{ fontSize: "clamp(1.2rem, 3vw, 1.6rem)" }}>
+            SOL
+          </span>
         </div>
-
-        {/* Transfer arrow */}
-        <div className="flex flex-col items-center justify-center px-3 bg-white/[0.02]" style={{ borderLeft: "1px solid rgba(255,255,255,0.05)", borderRight: "1px solid rgba(255,255,255,0.05)" }}>
-          <p className="text-white font-mono font-bold text-xs mb-2">{COURSE_PRICE_SOL} SOL</p>
-          <div className="flex flex-col items-center gap-1">
-            <div className="w-px h-4" style={{ background: "linear-gradient(to bottom, #9945FF, #3B82F6)" }} />
-            <div className="w-px h-4" style={{ background: "linear-gradient(to bottom, #3B82F6, #14F195)" }} />
-            <svg className="w-3.5 h-3.5 text-[#14F195]" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-            </svg>
-          </div>
-        </div>
-
-        {/* Recipient card */}
-        <div className="flex-1 px-4 py-4" style={{ background: "linear-gradient(135deg, rgba(20,241,149,0.06), rgba(20,241,149,0.02))" }}>
-          <p className="text-white/30 text-[9px] font-mono uppercase tracking-widest mb-3">Paying To</p>
-          <div className="flex items-center gap-2 mb-2">
-            <div className="w-8 h-8 rounded-xl flex-shrink-0 flex items-center justify-center text-base" style={{ background: "rgba(20,241,149,0.12)", border: "1px solid rgba(20,241,149,0.2)" }}>
-              🎓
-            </div>
-            <div>
-              <p className="text-white/80 text-xs font-body font-medium leading-tight">Vibe Coding</p>
-              <p className="text-white/35 text-[10px] font-body">Treasury Wallet</p>
-            </div>
-          </div>
-          <p className="text-[#14F195] text-[11px] font-mono mb-2">{shortenAddress(RECIPIENT_ADDRESS)}</p>
-          <div className="pt-2" style={{ borderTop: "1px solid rgba(20,241,149,0.12)" }}>
-            <p className="text-white/30 text-[9px] font-mono uppercase tracking-wider mb-1">You receive</p>
-            <p className="text-white/60 text-[10px] font-body">Full 7-Week Program</p>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Full transaction breakdown table ── */}
-      <div className="rounded-2xl overflow-hidden mb-5" style={{ border: "1px solid rgba(255,255,255,0.07)" }}>
-        <div className="bg-white/[0.03] px-4 py-2.5" style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-          <p className="text-white/35 text-[10px] font-mono uppercase tracking-widest">Transaction Details</p>
-        </div>
-        <div className="divide-y divide-white/[0.05]">
-
-          {/* Transaction type */}
-          <div className="flex items-center justify-between px-4 py-3">
-            <span className="text-white/40 text-xs font-body">Transaction Type</span>
-            <div className="flex items-center gap-1.5">
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-mono" style={{ background: "rgba(59,130,246,0.12)", border: "1px solid rgba(59,130,246,0.25)", color: "#93C5FD" }}>
-                Course Enrollment
-              </span>
-            </div>
-          </div>
-
-          {/* Network */}
-          <div className="flex items-center justify-between px-4 py-3">
-            <span className="text-white/40 text-xs font-body">Network</span>
-            <div className="flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
-              <span className="text-amber-400 text-xs font-mono">Solana Devnet</span>
-            </div>
-          </div>
-
-          {/* Amount to pay */}
-          <div className="flex items-center justify-between px-4 py-3">
-            <span className="text-white/40 text-xs font-body">Amount to Pay</span>
-            <span className="font-mono font-bold text-white text-sm">{COURSE_PRICE_SOL} SOL</span>
-          </div>
-
-          {/* Available balance */}
-          <div className="flex items-center justify-between px-4 py-3">
-            <span className="text-white/40 text-xs font-body">Available Balance</span>
-            <BalanceCell value={balance} />
-          </div>
-
-          {/* Paying from */}
-          <div className="flex items-center justify-between px-4 py-3">
-            <span className="text-white/40 text-xs font-body">Paying From</span>
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded flex items-center justify-center flex-shrink-0" style={{ background: "linear-gradient(135deg, #4C44C6, #9945FF)" }}>
-                <PhantomIcon />
-              </div>
-              <span className="text-[#9945FF] text-xs font-mono">{shortenAddress(walletAddress)}</span>
-            </div>
-          </div>
-
-          {/* Paying to */}
-          <div className="flex items-center justify-between px-4 py-3">
-            <span className="text-white/40 text-xs font-body">Paying To</span>
-            <div className="flex items-center gap-2">
-              <span className="text-sm">🎓</span>
-              <span className="text-[#14F195] text-xs font-mono">{shortenAddress(RECIPIENT_ADDRESS)}</span>
-              <span className="text-white/25 text-[10px] font-body">Vibe Coding</span>
-            </div>
-          </div>
-
-          {/* Estimated remaining */}
-          <div className="flex items-center justify-between px-4 py-3" style={{ background: "rgba(255,255,255,0.015)" }}>
-            <span className="text-white/40 text-xs font-body">Est. Remaining Balance</span>
-            {estimatedRemaining !== null ? (
-              <span className="font-mono text-sm text-white/70">
-                {estimatedRemaining.toFixed(4)} SOL
-              </span>
-            ) : (
-              <div className="h-3 w-20 rounded bg-white/10 animate-pulse" />
-            )}
-          </div>
-
-        </div>
-      </div>
-
-      {/* ── You unlock ── */}
-      <div className="bg-white/[0.025] border border-white/[0.05] rounded-2xl p-4 mb-5">
-        <p className="text-white/30 text-[10px] font-mono uppercase tracking-widest mb-3">You unlock after payment</p>
-        <div className="grid grid-cols-3 gap-2">
-          {[
-            { icon: "🎓", label: "7 Lectures" },
-            { icon: "🚀", label: "Ship a Product" },
-            { icon: "♾️", label: "Lifetime Access" },
-          ].map(({ icon, label }) => (
-            <div key={label} className="flex flex-col items-center gap-1.5 px-2 py-3 rounded-xl text-center" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.05)" }}>
-              <span className="text-lg">{icon}</span>
-              <span className="text-white/50 text-[10px] font-body leading-tight">{label}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* ── Connected wallet row ── */}
-      <div className="flex items-center justify-between bg-white/[0.03] border border-white/[0.07] rounded-xl px-4 py-2.5 mb-5">
         <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse" />
-          <span className="text-white/40 text-xs font-body">Connected</span>
-          <span className="text-white/80 text-xs font-mono">{shortenAddress(walletAddress)}</span>
+          <div className="w-5 h-5 rounded-lg flex items-center justify-center text-xs" style={{ background: "rgba(59,130,246,0.15)", border: "1px solid rgba(59,130,246,0.25)" }}>
+            🎓
+          </div>
+          <span className="text-white/45 text-xs font-body">Vibe Coding — Full 7-Week Program</span>
         </div>
-        <button onClick={onDisconnect} className="text-[11px] text-white/25 hover:text-white/60 transition-colors underline underline-offset-2">
-          Disconnect
+      </div>
+
+      {/* ── FROM and TO wallet cards ── */}
+      <div className="px-7 pb-0">
+        <div className="relative">
+
+          {/* FROM card */}
+          <div className="rounded-2xl p-4 mb-0.5" style={{ background: "linear-gradient(135deg, rgba(153,69,255,0.1), rgba(153,69,255,0.04))", border: "1px solid rgba(153,69,255,0.2)" }}>
+            <p className="text-white/35 text-[9px] font-mono uppercase tracking-widest mb-3">From</p>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl flex-shrink-0 flex items-center justify-center" style={{ background: "linear-gradient(135deg, #4C44C6, #9945FF)", boxShadow: "0 0 16px rgba(153,69,255,0.3)" }}>
+                  <PhantomIcon />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 mb-0.5">
+                    <span className="text-white font-body font-semibold text-sm">Your Wallet</span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  </div>
+                  <span className="text-[#9945FF] text-[11px] font-mono">{walletAddress.slice(0, 6)}...{walletAddress.slice(-6)}</span>
+                </div>
+              </div>
+              <div className="text-right">
+                <p className="text-white/30 text-[9px] font-mono uppercase tracking-wider mb-1">Balance</p>
+                {(balanceStatus === "idle" || balanceStatus === "loading") && (
+                  <div className="h-4 w-20 rounded bg-white/10 animate-pulse" />
+                )}
+                {balanceStatus === "loaded" && balance !== null && (
+                  <p className={`font-mono font-bold text-sm ${insufficient ? "text-red-400" : "text-[#14F195]"}`}>
+                    {balance.toFixed(4)} <span className="text-xs font-normal opacity-60">SOL</span>
+                  </p>
+                )}
+                {balanceStatus === "error" && (
+                  <p className="text-white/25 text-xs font-body italic">—</p>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Connector arrow */}
+          <div className="flex items-center justify-center my-0.5 relative z-10">
+            <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: "rgba(10,10,20,0.95)", border: "1px solid rgba(255,255,255,0.1)" }}>
+              <svg className="w-4 h-4 text-white/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+              </svg>
+            </div>
+          </div>
+
+          {/* TO card */}
+          <div className="rounded-2xl p-4" style={{ background: "linear-gradient(135deg, rgba(20,241,149,0.07), rgba(20,241,149,0.02))", border: "1px solid rgba(20,241,149,0.18)" }}>
+            <p className="text-white/35 text-[9px] font-mono uppercase tracking-widest mb-3">To</p>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl flex-shrink-0 flex items-center justify-center text-xl" style={{ background: "linear-gradient(135deg, rgba(20,241,149,0.15), rgba(153,69,255,0.1))", border: "1px solid rgba(20,241,149,0.2)" }}>
+                  🎓
+                </div>
+                <div>
+                  <span className="text-white font-body font-semibold text-sm block mb-0.5">Vibe Coding</span>
+                  <span className="text-[#14F195] text-[11px] font-mono">{RECIPIENT_ADDRESS.slice(0, 6)}...{RECIPIENT_ADDRESS.slice(-6)}</span>
+                </div>
+              </div>
+              <div className="text-right">
+                <p className="text-white/30 text-[9px] font-mono uppercase tracking-wider mb-1">Receives</p>
+                <p className="font-mono font-bold text-sm text-white/80">
+                  {COURSE_PRICE_SOL} <span className="text-xs font-normal opacity-60">SOL</span>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Summary rows ── */}
+      <div className="mx-7 mt-4 rounded-2xl overflow-hidden" style={{ border: "1px solid rgba(255,255,255,0.07)" }}>
+        {[
+          {
+            label: "Product",
+            value: <span className="text-white/70 text-xs font-body">Vibe Coding · Full 7-Week Program</span>,
+          },
+          {
+            label: "Network",
+            value: (
+              <span className="flex items-center gap-1.5 text-amber-400 text-xs font-mono">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+                Solana Devnet
+              </span>
+            ),
+          },
+          {
+            label: "Amount",
+            value: <span className="font-mono font-bold text-white text-sm">{COURSE_PRICE_SOL} SOL</span>,
+          },
+          {
+            label: "Est. balance after",
+            value: estimatedRemaining !== null
+              ? <span className="font-mono text-sm text-white/60">{estimatedRemaining.toFixed(4)} SOL</span>
+              : <div className="h-3 w-20 rounded bg-white/10 animate-pulse" />,
+          },
+        ].map(({ label, value }, i, arr) => (
+          <div
+            key={label}
+            className="flex items-center justify-between px-4 py-3"
+            style={{ borderBottom: i < arr.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none" }}
+          >
+            <span className="text-white/35 text-xs font-body">{label}</span>
+            {value}
+          </div>
+        ))}
+      </div>
+
+      {/* ── Warnings ── */}
+      <div className="px-7 mt-4 space-y-3">
+        {insufficient && (
+          <div className="flex items-start gap-2 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3 text-sm text-red-400 font-body">
+            <svg className="w-4 h-4 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+            </svg>
+            Insufficient balance. Get devnet SOL at{" "}
+            <a href="https://faucet.solana.com" target="_blank" rel="noopener noreferrer" className="underline hover:text-red-300">faucet.solana.com</a>.
+          </div>
+        )}
+        {errorMsg && (
+          <div className="flex items-start gap-2 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3 text-sm text-red-400 font-body">
+            <svg className="w-4 h-4 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+            </svg>
+            {errorMsg}
+          </div>
+        )}
+      </div>
+
+      {/* ── Send Payment CTA ── */}
+      <div className="px-7 pt-5 pb-2">
+        <button
+          onClick={onPurchase}
+          disabled={payStatus === "paying"}
+          className="w-full flex items-center justify-center gap-3 text-white font-heading font-bold text-base px-6 py-4 rounded-2xl transition-all hover:scale-[1.015] active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
+          style={{
+            background: "linear-gradient(135deg, #9945FF 0%, #3B82F6 50%, #14F195 100%)",
+            boxShadow: payStatus === "paying" ? "none" : "0 0 40px rgba(153,69,255,0.35), 0 0 80px rgba(20,241,149,0.08)",
+          }}
+        >
+          {payStatus === "paying" ? (
+            <>
+              <Spinner />
+              Broadcasting to Solana…
+            </>
+          ) : (
+            <>
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+              </svg>
+              Send Payment · {COURSE_PRICE_SOL} SOL
+            </>
+          )}
         </button>
       </div>
 
-      {/* ── Insufficient balance warning ── */}
-      {insufficient && (
-        <div className="flex items-start gap-2 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3 mb-4 text-sm text-red-400 font-body">
-          <svg className="w-4 h-4 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
-          </svg>
-          Insufficient balance — you need at least {COURSE_PRICE_SOL} SOL. Get devnet SOL from{" "}
-          <a href="https://faucet.solana.com" target="_blank" rel="noopener noreferrer" className="underline hover:text-red-300">faucet.solana.com</a>.
+      {/* ── Disconnect + trust strip ── */}
+      <div className="flex items-center justify-between px-7 py-5">
+        <div className="flex items-center gap-3 text-white/20 text-[10px] font-body">
+          <span>Non-custodial</span>
+          <span className="w-px h-3 bg-white/10" />
+          <span>Instant settlement</span>
         </div>
-      )}
-
-      {/* ── Error ── */}
-      {errorMsg && (
-        <div className="flex items-start gap-2 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3 mb-4 text-sm text-red-400 font-body">
-          <svg className="w-4 h-4 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
-          </svg>
-          {errorMsg}
-        </div>
-      )}
-
-      {/* ── Sign & Authorize button ── */}
-      <button
-        onClick={onPurchase}
-        disabled={payStatus === "paying"}
-        className="w-full flex items-center justify-center gap-3 text-white font-heading font-bold text-base px-6 py-4 rounded-2xl transition-all hover:scale-[1.02] disabled:opacity-60 disabled:cursor-not-allowed"
-        style={{
-          background: "linear-gradient(135deg, #9945FF 0%, #3B82F6 55%, #14F195 100%)",
-          boxShadow: payStatus === "paying" ? "none" : "0 0 32px rgba(153,69,255,0.4), 0 0 64px rgba(20,241,149,0.1)",
-        }}
-      >
-        {payStatus === "paying" ? (
-          <>
-            <Spinner />
-            Broadcasting to Solana…
-          </>
-        ) : (
-          <>
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-            </svg>
-            Sign &amp; Authorize Payment · {COURSE_PRICE_SOL} SOL
-          </>
-        )}
-      </button>
-
-      {/* ── Trust strip ── */}
-      <div className="flex items-center justify-center gap-3 mt-4 text-white/20 text-[10px] font-body">
-        <span>Non-custodial</span>
-        <span className="w-px h-3 bg-white/10" />
-        <span>We never hold your keys</span>
-        <span className="w-px h-3 bg-white/10" />
-        <span>Instant settlement</span>
+        <button onClick={onDisconnect} className="text-[11px] text-white/20 hover:text-white/50 transition-colors underline underline-offset-2 font-body">
+          Disconnect wallet
+        </button>
       </div>
+
     </div>
   );
 }
