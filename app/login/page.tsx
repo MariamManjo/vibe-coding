@@ -17,9 +17,7 @@ const COURSE_PRICE_SOL = 0.5;
 const RECIPIENT_ADDRESS = "So1endDq2YkqhipRh3WViPa8hdiSpxWy6z3Z6tMCpAo";
 const SOLANA_RPC = "https://api.mainnet-beta.solana.com";
 
-type Step = "sign-in" | "payment" | "success";
-type ConnectStatus = "idle" | "connecting";
-type PayStatus = "idle" | "paying";
+type Step = "account" | "wallet" | "payment" | "success";
 
 interface SolanaProvider {
   isPhantom?: boolean;
@@ -46,22 +44,23 @@ function getProvider(): SolanaProvider | undefined {
 }
 
 export default function LoginPage() {
-  const [step, setStep] = useState<Step>("sign-in");
-  const [connectStatus, setConnectStatus] = useState<ConnectStatus>("idle");
-  const [payStatus, setPayStatus] = useState<PayStatus>("idle");
+  const [step, setStep] = useState<Step>("account");
+  const [userEmail, setUserEmail] = useState("");
   const [walletAddress, setWalletAddress] = useState<string | null>(null);
   const [txSignature, setTxSignature] = useState<string | null>(null);
+  const [connectStatus, setConnectStatus] = useState<"idle" | "connecting">("idle");
+  const [payStatus, setPayStatus] = useState<"idle" | "paying">("idle");
   const [hasWallet, setHasWallet] = useState<boolean | null>(null);
   const [connectError, setConnectError] = useState("");
   const [payError, setPayError] = useState("");
 
   useEffect(() => {
-    const provider = getProvider();
-    setHasWallet(!!provider);
-    if (provider?.publicKey) {
-      setWalletAddress(provider.publicKey.toString());
-      setStep("payment");
-    }
+    setHasWallet(!!getProvider());
+  }, []);
+
+  const handleAccountSignIn = useCallback((email: string) => {
+    setUserEmail(email);
+    setStep("wallet");
   }, []);
 
   const connectWallet = useCallback(async () => {
@@ -87,10 +86,9 @@ export default function LoginPage() {
     const provider = getProvider();
     if (provider) await provider.disconnect();
     setWalletAddress(null);
-    setStep("sign-in");
+    setStep("wallet");
     setPayError("");
     setConnectError("");
-    setTxSignature(null);
   }, []);
 
   const purchaseCourse = useCallback(async () => {
@@ -126,6 +124,13 @@ export default function LoginPage() {
     }
   }, [walletAddress]);
 
+  const stepNumber: Record<Step, 1 | 2 | 3 | 4> = {
+    account: 1,
+    wallet: 2,
+    payment: 3,
+    success: 4,
+  };
+
   return (
     <main className="min-h-screen bg-[#0A0A0A] text-white overflow-x-hidden">
       <Nav />
@@ -141,21 +146,27 @@ export default function LoginPage() {
         />
 
         <div className="relative z-10 w-full max-w-md">
-          {step === "sign-in" && (
-            <SignInCard
+          {step === "account" && (
+            <AccountCard onSignIn={handleAccountSignIn} />
+          )}
+          {step === "wallet" && (
+            <WalletCard
               connectStatus={connectStatus}
               hasWallet={hasWallet}
               errorMsg={connectError}
               onConnect={connectWallet}
+              currentStep={stepNumber[step]}
             />
           )}
           {step === "payment" && walletAddress && (
             <PaymentCard
               walletAddress={walletAddress}
+              userEmail={userEmail}
               payStatus={payStatus}
               errorMsg={payError}
               onPurchase={purchaseCourse}
               onDisconnect={disconnectWallet}
+              currentStep={stepNumber[step]}
             />
           )}
           {step === "success" && (
@@ -169,22 +180,23 @@ export default function LoginPage() {
   );
 }
 
-function StepIndicator({ current }: { current: 1 | 2 | 3 }) {
+function StepIndicator({ current }: { current: 1 | 2 | 3 | 4 }) {
   const steps = [
     { n: 1, label: "Sign In" },
-    { n: 2, label: "Payment" },
-    { n: 3, label: "Done" },
+    { n: 2, label: "Wallet" },
+    { n: 3, label: "Payment" },
+    { n: 4, label: "Done" },
   ];
   return (
-    <div className="flex items-center justify-center gap-2 mb-8">
+    <div className="flex items-center justify-center gap-1.5 mb-8">
       {steps.map((s, i) => {
         const done = s.n < current;
         const active = s.n === current;
         return (
-          <div key={s.n} className="flex items-center gap-2">
+          <div key={s.n} className="flex items-center gap-1.5">
             <div className="flex flex-col items-center gap-1">
               <div
-                className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
+                className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
                   done
                     ? "bg-[#10B981] text-white"
                     : active
@@ -194,19 +206,19 @@ function StepIndicator({ current }: { current: 1 | 2 | 3 }) {
                 style={active ? { background: "linear-gradient(135deg, #3B82F6, #8B5CF6)" } : undefined}
               >
                 {done ? (
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                   </svg>
                 ) : (
                   s.n
                 )}
               </div>
-              <span className={`text-[10px] font-body ${active ? "text-white/80" : done ? "text-[#10B981]" : "text-white/30"}`}>
+              <span className={`text-[10px] font-body whitespace-nowrap ${active ? "text-white/80" : done ? "text-[#10B981]" : "text-white/30"}`}>
                 {s.label}
               </span>
             </div>
             {i < steps.length - 1 && (
-              <div className={`w-10 h-px mb-4 ${s.n < current ? "bg-[#10B981]" : "bg-white/10"}`} />
+              <div className={`w-8 h-px mb-4 ${s.n < current ? "bg-[#10B981]" : "bg-white/10"}`} />
             )}
           </div>
         );
@@ -215,20 +227,139 @@ function StepIndicator({ current }: { current: 1 | 2 | 3 }) {
   );
 }
 
-function SignInCard({
+function AccountCard({ onSignIn }: { onSignIn: (email: string) => void }) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    if (!email.trim()) { setError("Please enter your email."); return; }
+    if (!password.trim()) { setError("Please enter your password."); return; }
+    setLoading(true);
+    await new Promise((r) => setTimeout(r, 900));
+    setLoading(false);
+    onSignIn(email.trim());
+  };
+
+  return (
+    <div className="glass-card rounded-3xl p-8 md:p-10">
+      <StepIndicator current={1} />
+
+      <div className="text-center mb-8">
+        <div
+          className="inline-flex items-center justify-center w-14 h-14 rounded-2xl mb-5"
+          style={{ background: "linear-gradient(135deg, #3B82F6, #8B5CF6)" }}
+        >
+          <svg className="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+          </svg>
+        </div>
+        <h1 className="font-heading font-bold text-3xl mb-2">Sign in</h1>
+        <p className="text-[#9CA3AF] font-body text-sm">
+          Sign in to your VibeCoding account to continue
+        </p>
+      </div>
+
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <div>
+          <label className="block text-sm font-body text-white/70 mb-1.5">Email</label>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="you@example.com"
+            autoComplete="email"
+            className="w-full bg-white/[0.06] border border-white/15 rounded-xl px-4 py-3 text-white placeholder-white/30 text-sm font-body focus:outline-none focus:border-[#3B82F6] focus:ring-1 focus:ring-[#3B82F6] transition-colors"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-body text-white/70 mb-1.5">Password</label>
+          <div className="relative">
+            <input
+              type={showPassword ? "text" : "password"}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
+              autoComplete="current-password"
+              className="w-full bg-white/[0.06] border border-white/15 rounded-xl px-4 py-3 pr-11 text-white placeholder-white/30 text-sm font-body focus:outline-none focus:border-[#3B82F6] focus:ring-1 focus:ring-[#3B82F6] transition-colors"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/70 transition-colors"
+            >
+              {showPassword ? (
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                </svg>
+              ) : (
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+              )}
+            </button>
+          </div>
+        </div>
+
+        {error && (
+          <div className="flex items-center gap-2 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3 text-sm text-red-400 font-body">
+            <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+            </svg>
+            {error}
+          </div>
+        )}
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full flex items-center justify-center gap-2 bg-[#3B82F6] hover:bg-blue-400 disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold text-base px-6 py-4 rounded-2xl transition-all hover:scale-[1.02] mt-1"
+          style={{ boxShadow: "0 0 32px rgba(59,130,246,0.35)" }}
+        >
+          {loading ? (
+            <>
+              <Spinner />
+              Signing in…
+            </>
+          ) : (
+            "Sign In →"
+          )}
+        </button>
+      </form>
+
+      <p className="text-center text-[#9CA3AF] text-xs font-body mt-5">
+        Questions?{" "}
+        <a href="mailto:mariammanjavidze01@gmail.com" className="text-[#3B82F6] hover:underline">
+          Email Mariam
+        </a>
+      </p>
+    </div>
+  );
+}
+
+function WalletCard({
   connectStatus,
   hasWallet,
   errorMsg,
   onConnect,
+  currentStep,
 }: {
-  connectStatus: ConnectStatus;
+  connectStatus: "idle" | "connecting";
   hasWallet: boolean | null;
   errorMsg: string;
   onConnect: () => void;
+  currentStep: 1 | 2 | 3 | 4;
 }) {
   return (
     <div className="glass-card rounded-3xl p-8 md:p-10">
-      <StepIndicator current={1} />
+      <StepIndicator current={currentStep} />
 
       <div className="text-center mb-8">
         <div
@@ -299,33 +430,46 @@ function SignInCard({
 
 function PaymentCard({
   walletAddress,
+  userEmail,
   payStatus,
   errorMsg,
   onPurchase,
   onDisconnect,
+  currentStep,
 }: {
   walletAddress: string;
-  payStatus: PayStatus;
+  userEmail: string;
+  payStatus: "idle" | "paying";
   errorMsg: string;
   onPurchase: () => void;
   onDisconnect: () => void;
+  currentStep: 1 | 2 | 3 | 4;
 }) {
   return (
     <div className="glass-card rounded-3xl p-8 md:p-10">
-      <StepIndicator current={2} />
+      <StepIndicator current={currentStep} />
 
-      <div className="flex items-center justify-between bg-white/[0.04] border border-white/10 rounded-xl px-4 py-3 mb-6">
-        <div className="flex items-center gap-2.5">
-          <div className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse" />
-          <span className="text-sm font-body text-white/80">Signed in</span>
-        </div>
-        <div className="flex items-center gap-3">
-          <span className="text-sm font-mono text-[#9CA3AF]">{shortenAddress(walletAddress)}</span>
+      <div className="flex flex-col gap-2 mb-6">
+        {userEmail && (
+          <div className="flex items-center gap-2.5 bg-white/[0.04] border border-white/10 rounded-xl px-4 py-2.5">
+            <svg className="w-3.5 h-3.5 text-[#10B981] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+            </svg>
+            <span className="text-xs font-body text-white/60">Signed in as</span>
+            <span className="text-xs font-body text-white/90 truncate">{userEmail}</span>
+          </div>
+        )}
+        <div className="flex items-center justify-between bg-white/[0.04] border border-white/10 rounded-xl px-4 py-2.5">
+          <div className="flex items-center gap-2.5">
+            <div className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse" />
+            <span className="text-xs font-body text-white/60">Wallet</span>
+            <span className="text-xs font-mono text-white/90">{shortenAddress(walletAddress)}</span>
+          </div>
           <button
             onClick={onDisconnect}
             className="text-xs text-[#9CA3AF] hover:text-white transition-colors underline underline-offset-2"
           >
-            Sign out
+            Change
           </button>
         </div>
       </div>
@@ -398,7 +542,7 @@ function PaymentCard({
 function SuccessCard({ txSignature }: { txSignature: string | null }) {
   return (
     <div className="glass-card rounded-3xl p-8 md:p-10 text-center">
-      <StepIndicator current={3} />
+      <StepIndicator current={4} />
 
       <div
         className="inline-flex items-center justify-center w-16 h-16 rounded-full mb-6"
@@ -444,10 +588,9 @@ function Spinner() {
   );
 }
 
-function SolanaIcon({ small }: { small?: boolean }) {
-  const size = small ? "w-5 h-5" : "w-7 h-7";
+function SolanaIcon() {
   return (
-    <svg className={size} viewBox="0 0 24 24" fill="currentColor">
+    <svg className="w-7 h-7" viewBox="0 0 24 24" fill="currentColor">
       <path d="M4.06 17.12a.74.74 0 0 1 .52-.21h16.24a.37.37 0 0 1 .26.63l-2.77 2.77a.74.74 0 0 1-.52.21H1.55a.37.37 0 0 1-.26-.63l2.77-2.77zm0-13.01a.74.74 0 0 1 .52-.21h16.24a.37.37 0 0 1 .26.63L18.31 7.3a.74.74 0 0 1-.52.21H1.55a.37.37 0 0 1-.26-.63l2.77-2.77zm16.24 6.5a.74.74 0 0 0-.52-.21H3.54a.37.37 0 0 0-.26.63l2.77 2.77a.74.74 0 0 0 .52.21h16.24a.37.37 0 0 0 .26-.63l-2.77-2.77z" />
     </svg>
   );
