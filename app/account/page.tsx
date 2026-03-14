@@ -1,6 +1,5 @@
 "use client";
 
-import { useSession, signOut } from "next-auth/react";
 import { useEffect, useState, useCallback } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
@@ -8,6 +7,13 @@ import Nav from "../components/Nav";
 import Footer from "../components/Footer";
 
 const SOLSCAN_BASE = "https://solscan.io/tx/";
+
+interface User {
+  id: number;
+  email: string;
+  name: string | null;
+  created_at: string;
+}
 
 interface Purchase {
   id: number;
@@ -21,17 +27,31 @@ interface Purchase {
 }
 
 export default function AccountPage() {
-  const { data: session, status } = useSession();
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const [purchases, setPurchases] = useState<Purchase[]>([]);
-  const [purchasesLoading, setPurchasesLoading] = useState(true);
-  const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
+  const [user, setUser]               = useState<User | null>(null);
+  const [loading, setLoading]         = useState(true);
+  const [purchases, setPurchases]     = useState<Purchase[]>([]);
+  const [purchLoading, setPurchLoading] = useState(true);
+  const [saveStatus, setSaveStatus]   = useState<"idle" | "saving" | "saved" | "error">("idle");
 
   const sig    = searchParams.get("sig");
   const wallet = searchParams.get("wallet");
 
+  /* ── fetch current user ── */
+  useEffect(() => {
+    fetch("/api/auth/me")
+      .then(r => r.json())
+      .then(d => {
+        if (!d.user) { router.push("/login"); return; }
+        setUser(d.user);
+      })
+      .catch(() => router.push("/login"))
+      .finally(() => setLoading(false));
+  }, [router]);
+
+  /* ── save purchase after auth ── */
   const savePurchase = useCallback(async () => {
     if (!sig || !wallet) return;
     setSaveStatus("saving");
@@ -41,7 +61,7 @@ export default function AccountPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ txSignature: sig, walletAddress: wallet }),
       });
-      if (!res.ok) throw new Error("save failed");
+      if (!res.ok) throw new Error();
       setSaveStatus("saved");
       router.replace("/account");
     } catch {
@@ -49,41 +69,38 @@ export default function AccountPage() {
     }
   }, [sig, wallet, router]);
 
+  /* ── fetch purchase history ── */
   const fetchPurchases = useCallback(async () => {
-    setPurchasesLoading(true);
+    setPurchLoading(true);
     try {
       const res = await fetch("/api/purchase");
       if (!res.ok) throw new Error();
       const json = await res.json();
       setPurchases(json.purchases ?? []);
     } finally {
-      setPurchasesLoading(false);
+      setPurchLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/login");
-    }
-  }, [status, router]);
-
-  useEffect(() => {
-    if (status === "authenticated") {
-      if (sig && wallet && saveStatus === "idle") {
-        savePurchase();
-      } else {
-        fetchPurchases();
-      }
-    }
-  }, [status, sig, wallet, saveStatus, savePurchase, fetchPurchases]);
-
-  useEffect(() => {
-    if (saveStatus === "saved") {
+    if (!user) return;
+    if (sig && wallet && saveStatus === "idle") {
+      savePurchase();
+    } else {
       fetchPurchases();
     }
+  }, [user, sig, wallet, saveStatus, savePurchase, fetchPurchases]);
+
+  useEffect(() => {
+    if (saveStatus === "saved") fetchPurchases();
   }, [saveStatus, fetchPurchases]);
 
-  if (status === "loading" || status === "unauthenticated") {
+  const handleLogout = async () => {
+    await fetch("/api/auth/logout", { method: "POST" });
+    router.push("/");
+  };
+
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="w-8 h-8 rounded-full border-2 border-white/20 border-t-[#9945FF] animate-spin" />
@@ -91,34 +108,30 @@ export default function AccountPage() {
     );
   }
 
-  const user = session!.user!;
+  if (!user) return null;
 
   return (
     <div className="min-h-screen flex flex-col">
       <Nav />
-
       <main className="flex-1 max-w-2xl mx-auto w-full px-4 py-12">
 
         {/* ── Profile header ── */}
         <div className="glass-card rounded-3xl p-6 mb-6 flex items-center gap-4">
-          {user.image ? (
-            <img
-              src={user.image}
-              alt={user.name ?? ""}
-              className="w-14 h-14 rounded-full ring-2 ring-white/10 flex-shrink-0"
-            />
-          ) : (
-            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#9945FF] to-[#3B82F6] flex items-center justify-center text-2xl font-bold flex-shrink-0">
-              {user.name?.[0] ?? user.email?.[0] ?? "?"}
-            </div>
-          )}
+          <div
+            className="w-14 h-14 rounded-full flex items-center justify-center text-xl font-bold flex-shrink-0"
+            style={{ background: "linear-gradient(135deg, #9945FF, #3B82F6)" }}
+          >
+            {user.email[0].toUpperCase()}
+          </div>
           <div className="flex-1 min-w-0">
-            <p className="font-heading font-bold text-lg leading-tight truncate">{user.name}</p>
+            <p className="font-heading font-bold text-base leading-tight truncate">
+              {user.name ?? user.email.split("@")[0]}
+            </p>
             <p className="text-white/40 text-sm font-body truncate">{user.email}</p>
           </div>
           <button
-            onClick={() => signOut({ callbackUrl: "/" })}
-            className="text-xs text-white/30 hover:text-white/60 transition-colors font-body border border-white/10 rounded-lg px-3 py-1.5"
+            onClick={handleLogout}
+            className="text-xs text-white/30 hover:text-white/60 transition-colors font-body border border-white/10 hover:border-white/20 rounded-lg px-3 py-1.5"
           >
             Sign out
           </button>
@@ -133,11 +146,11 @@ export default function AccountPage() {
         )}
         {saveStatus === "error" && (
           <div className="rounded-2xl px-4 py-3 mb-5" style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)" }}>
-            <p className="text-red-400 text-sm font-body">Could not save purchase. Please contact support.</p>
+            <p className="text-red-400 text-sm font-body">Could not attach purchase. Please contact support.</p>
           </div>
         )}
 
-        {/* ── Access card ── */}
+        {/* ── Access unlocked card ── */}
         {purchases.length > 0 && (
           <div
             className="rounded-3xl p-6 mb-6"
@@ -150,11 +163,11 @@ export default function AccountPage() {
               >
                 🎓
               </div>
-              <div>
+              <div className="flex-1 min-w-0">
                 <p className="font-heading font-bold text-base leading-tight">Vibe Coding</p>
                 <p className="text-white/40 text-xs font-body">Full 7-Week Program</p>
               </div>
-              <div className="ml-auto flex items-center gap-1.5 px-2.5 py-1 rounded-full" style={{ background: "rgba(16,185,129,0.15)", border: "1px solid rgba(16,185,129,0.25)" }}>
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full flex-shrink-0" style={{ background: "rgba(16,185,129,0.15)", border: "1px solid rgba(16,185,129,0.25)" }}>
                 <span className="w-1.5 h-1.5 rounded-full bg-[#10B981]" />
                 <span className="text-[#10B981] text-[10px] font-mono font-semibold">Access Unlocked</span>
               </div>
@@ -181,7 +194,7 @@ export default function AccountPage() {
             <span className="text-white/30 text-xs font-mono">{purchases.length} record{purchases.length !== 1 ? "s" : ""}</span>
           </div>
 
-          {purchasesLoading ? (
+          {purchLoading ? (
             <div className="px-6 py-10 flex justify-center">
               <div className="w-6 h-6 rounded-full border-2 border-white/20 border-t-[#9945FF] animate-spin" />
             </div>
@@ -191,10 +204,8 @@ export default function AccountPage() {
             </div>
           ) : (
             <div className="divide-y divide-white/[0.05]">
-              {purchases.map((p) => (
+              {purchases.map(p => (
                 <div key={p.id} className="px-6 py-5">
-
-                  {/* top row */}
                   <div className="flex items-start justify-between mb-4">
                     <div>
                       <p className="font-semibold text-sm leading-tight">{p.product_name}</p>
@@ -211,19 +222,22 @@ export default function AccountPage() {
                     </div>
                   </div>
 
-                  {/* detail rows */}
                   <div className="space-y-2.5 rounded-2xl p-4" style={{ background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.06)" }}>
-                    {[
-                      { label: "Status", value: p.access_unlocked ? "✓ Confirmed on-chain" : "Pending", valueClass: p.access_unlocked ? "text-[#10B981]" : "text-amber-400" },
-                      { label: "Wallet", value: `${p.wallet_address.slice(0, 8)}…${p.wallet_address.slice(-6)}`, valueClass: "font-mono" },
-                    ].map(({ label, value, valueClass }) => (
-                      <div key={label} className="flex items-center justify-between">
-                        <span className="text-white/35 text-[11px] font-mono uppercase tracking-wider">{label}</span>
-                        <span className={`text-xs font-body ${valueClass}`}>{value}</span>
-                      </div>
-                    ))}
-
-                    {/* Signature row */}
+                    {/* Status */}
+                    <div className="flex items-center justify-between">
+                      <span className="text-white/35 text-[11px] font-mono uppercase tracking-wider">Status</span>
+                      <span className={`text-xs font-semibold ${p.access_unlocked ? "text-[#10B981]" : "text-amber-400"}`}>
+                        {p.access_unlocked ? "✓ Confirmed on-chain" : "Pending"}
+                      </span>
+                    </div>
+                    {/* Wallet */}
+                    <div className="flex items-center justify-between">
+                      <span className="text-white/35 text-[11px] font-mono uppercase tracking-wider">Wallet</span>
+                      <span className="text-xs font-mono text-white/60">
+                        {p.wallet_address.slice(0, 8)}…{p.wallet_address.slice(-6)}
+                      </span>
+                    </div>
+                    {/* Signature + Solscan */}
                     <div className="flex items-center justify-between">
                       <span className="text-white/35 text-[11px] font-mono uppercase tracking-wider">Signature</span>
                       <div className="flex items-center gap-2">
@@ -256,7 +270,6 @@ export default function AccountPage() {
           </Link>
         </div>
       </main>
-
       <Footer />
     </div>
   );
