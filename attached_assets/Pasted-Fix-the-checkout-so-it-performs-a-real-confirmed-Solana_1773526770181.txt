@@ -1,0 +1,55 @@
+Fix the checkout so it performs a real confirmed Solana Devnet transfer before showing success.
+
+Current problem:
+The UI shows a success screen, but the sender wallet balance does not decrease and the treasury wallet does not receive funds. That means the app is showing a fake or premature success state.
+
+Implement a real transfer flow with these exact rules:
+
+Network:
+Solana Devnet only
+
+Sender:
+the currently connected Phantom wallet only
+
+Recipient treasury wallet:
+GhgXp29MrWxzdU1pdjo7gbmm2QjTY4TE6iomsM4hv9Ct
+
+Amount:
+0.01 SOL
+
+Technical requirements:
+1. Use @solana/web3.js
+2. Create a real Devnet connection:
+   new Connection("https://api.devnet.solana.com", "confirmed")
+3. Use provider.publicKey as the sender
+4. Use new PublicKey("GhgXp29MrWxzdU1pdjo7gbmm2QjTY4TE6iomsM4hv9Ct") as the recipient
+5. Create a real transfer transaction with SystemProgram.transfer
+6. Convert 0.01 SOL into lamports using LAMPORTS_PER_SOL
+7. Set transaction.feePayer = provider.publicKey
+8. Fetch and set the latest blockhash
+9. Send the transaction using:
+   await provider.sendTransaction(transaction, connection)
+10. Confirm it using:
+   await connection.confirmTransaction(signature, "confirmed")
+
+Critical behavior:
+- Do not show the success screen unless the transaction is confirmed on Devnet
+- If sendTransaction or confirmTransaction fails, show an error instead of success
+- After confirmation, re-fetch the sender wallet balance
+- Also fetch the recipient treasury wallet balance
+- Display the real transaction signature and Solscan Devnet link
+- Log all payment steps in the console
+
+Validation checks before sending:
+- sender must exist
+- recipient must be exactly GhgXp29MrWxzdU1pdjo7gbmm2QjTY4TE6iomsM4hv9Ct
+- sender and recipient must not be the same
+- sender balance must be enough for 0.01 SOL plus fee
+- network must be Devnet
+
+If any validation fails, show a clear UI error and do not proceed.
+
+Do not mock payment success.
+Do not simulate transfer.
+Do not unlock access before confirmed on-chain payment.
+Keep the current checkout UI, but make the transfer real.

@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
 
+// Force Next.js to never cache this route — each blockhash must be fresh
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 const NETWORK = process.env.SOLANA_NETWORK ?? "devnet";
 
 const RPC_ENDPOINTS: Record<string, string[]> = {

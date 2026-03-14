@@ -2549,6 +2549,12 @@ video {
 .\[pay\:7\] {
   pay: 7;
 }
+.\[pay\:8\] {
+  pay: 8;
+}
+.\[pay\:9\] {
+  pay: 9;
+}
 .\[pay\:error\] {
   pay: error;
 }

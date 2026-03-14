@@ -180,7 +180,7 @@ export default function LoginPage() {
       setPayStatus("paying");
       setPayError("");
 
-      // ── Pre-flight validation ───────────────────────────────────────────────
+      // ── 1. Pre-flight validation ────────────────────────────────────────────
       const fromPubkey = new PublicKey(walletAddress);
       const toPubkey   = new PublicKey(RECIPIENT_ADDRESS);
       const lamports   = Math.round(COURSE_PRICE_SOL * LAMPORTS_PER_SOL);
@@ -188,9 +188,12 @@ export default function LoginPage() {
       console.log("[pay:1] sender pubkey  :", fromPubkey.toString());
       console.log("[pay:1] recipient pubkey:", toPubkey.toString());
       console.log("[pay:1] network        :", NETWORK);
-      console.log("[pay:1] current balance:", balance, "SOL");
+      console.log("[pay:1] balance (state):", balance, "SOL");
       console.log("[pay:1] amount lamports:", lamports, "(=", COURSE_PRICE_SOL, "SOL)");
 
+      if (!fromPubkey) {
+        throw new Error("No sender wallet connected.");
+      }
       if (fromPubkey.toString() === toPubkey.toString()) {
         throw new Error("Sender and recipient are the same address. Payment blocked.");
       }
@@ -206,123 +209,128 @@ export default function LoginPage() {
       console.log("[pay:1] ✓ all pre-flight checks passed");
 
       // ── 2. Devnet connection ────────────────────────────────────────────────
-      let connection!: Connection;
-      let connectedRpc = "";
-      for (const rpc of DEVNET_RPCS) {
-        try {
-          const candidate = new Connection(rpc, "confirmed");
-          await candidate.getVersion();
-          connection   = candidate;
-          connectedRpc = rpc;
-          console.log("[pay:2] RPC healthy:", rpc);
-          break;
-        } catch (probeErr) {
-          console.warn("[pay:2] RPC unreachable, trying next:", rpc, probeErr);
-        }
-      }
-      if (!connection) {
-        console.warn("[pay:2] all probes failed — using fallback");
-        connection   = new Connection(DEVNET_RPCS[0], "confirmed");
-        connectedRpc = DEVNET_RPCS[0];
+      // Use a hardcoded devnet URL to guarantee the network — never mainnet.
+      const connection = new Connection("https://api.devnet.solana.com", "confirmed");
+      console.log("[pay:2] connection created: https://api.devnet.solana.com");
+
+      // ── 3. Pre-payment balance snapshot (proves money actually moves) ───────
+      const balanceBefore = await connection.getBalance(fromPubkey);
+      console.log("[pay:3] balance before payment:", balanceBefore / LAMPORTS_PER_SOL, "SOL", `(${balanceBefore} lamports)`);
+
+      if (balanceBefore < lamports + 5000) {
+        throw new Error(
+          `Insufficient balance: wallet has ${(balanceBefore / LAMPORTS_PER_SOL).toFixed(6)} SOL, ` +
+          `need at least ${COURSE_PRICE_SOL} SOL + network fee.`
+        );
       }
 
-      // ── 3. Blockhash ────────────────────────────────────────────────────────
-      const { blockhash, lastValidBlockHeight } = await fetchBlockhash();
-      console.log("[pay:3] blockhash           :", blockhash);
-      console.log("[pay:3] lastValidBlockHeight:", lastValidBlockHeight);
-      console.log("[pay:3] rpc                 :", connectedRpc);
+      // ── 4. Fresh blockhash directly from the RPC ───────────────────────────
+      // Fetching directly from Connection guarantees a fresh blockhash every
+      // time — no server-side cache can interfere here.
+      const { blockhash, lastValidBlockHeight } =
+        await connection.getLatestBlockhash("confirmed");
+      console.log("[pay:4] blockhash           :", blockhash);
+      console.log("[pay:4] lastValidBlockHeight:", lastValidBlockHeight);
 
-      // ── 4. Build transaction ────────────────────────────────────────────────
-      const transaction = new Transaction({
-        recentBlockhash: blockhash,
-        feePayer: fromPubkey,
-      }).add(SystemProgram.transfer({ fromPubkey, toPubkey, lamports }));
+      // ── 5. Build transaction ────────────────────────────────────────────────
+      const transaction = new Transaction();
+      transaction.recentBlockhash = blockhash;
+      transaction.feePayer        = fromPubkey;
+      transaction.add(SystemProgram.transfer({ fromPubkey, toPubkey, lamports }));
 
-      console.log("[pay:4] transaction built:", {
-        feePayer:    fromPubkey.toString(),
-        recentBlockhash: blockhash,
-        instructions: transaction.instructions.length,
-        fromPubkey:  fromPubkey.toString(),
-        toPubkey:    toPubkey.toString(),
+      console.log("[pay:5] transaction built:", {
+        feePayer        : transaction.feePayer?.toString(),
+        recentBlockhash : transaction.recentBlockhash,
+        instructionCount: transaction.instructions.length,
+        from            : fromPubkey.toString(),
+        to              : toPubkey.toString(),
         lamports,
       });
 
-      // ── 5. Sign + send ──────────────────────────────────────────────────────
-      // Try provider.sendTransaction first (Phantom ≥ 0.9).
-      // If that method is unavailable or throws immediately (no Phantom popup),
-      // fall back to the signTransaction + sendRawTransaction path which is
-      // confirmed working on this setup.
+      // ── 6. Sign + send ──────────────────────────────────────────────────────
+      // Primary path: provider.sendTransaction (Phantom handles sign + send).
+      // Fallback:     manual signTransaction → sendRawTransaction (confirmed working).
       if (typeof provider.sendTransaction === "function") {
-        console.log("[pay:5] trying provider.sendTransaction …");
+        console.log("[pay:6] calling provider.sendTransaction …");
         try {
-          txSig = await provider.sendTransaction(transaction, connection, {
-            skipPreflight: true,
-          });
-          console.log("[pay:5] provider.sendTransaction result:", txSig);
+          txSig = await provider.sendTransaction(transaction, connection);
+          console.log("[pay:6] provider.sendTransaction ✓ signature:", txSig);
         } catch (sendErr: unknown) {
-          const sendErrMsg = extractError(sendErr);
-          console.warn("[pay:5] provider.sendTransaction failed:", sendErrMsg, sendErr);
-          // Re-throw user cancellations immediately
-          if (isUserRejection(sendErr)) throw sendErr;
-          // Otherwise fall back to manual sign + broadcast
-          console.log("[pay:5] falling back to signTransaction + sendRawTransaction …");
+          if (isUserRejection(sendErr)) throw sendErr;   // bubble user cancel
+          console.warn("[pay:6] provider.sendTransaction failed:", extractError(sendErr));
+          console.log("[pay:6] falling back to signTransaction + sendRawTransaction …");
           const signedTx = await provider.signTransaction(transaction);
           txSig = await connection.sendRawTransaction(signedTx.serialize(), {
             skipPreflight: true,
           });
-          console.log("[pay:5] sendRawTransaction result:", txSig);
+          console.log("[pay:6] sendRawTransaction ✓ signature:", txSig);
         }
       } else {
-        console.log("[pay:5] provider.sendTransaction unavailable — using signTransaction + sendRawTransaction");
+        console.log("[pay:6] provider.sendTransaction not found — using signTransaction + sendRawTransaction");
         const signedTx = await provider.signTransaction(transaction);
         txSig = await connection.sendRawTransaction(signedTx.serialize(), {
           skipPreflight: true,
         });
-        console.log("[pay:5] sendRawTransaction result:", txSig);
+        console.log("[pay:6] sendRawTransaction ✓ signature:", txSig);
       }
 
-      // ── 6. Confirm ──────────────────────────────────────────────────────────
-      let confirmed = false;
+      // ── 7. Confirm ──────────────────────────────────────────────────────────
+      console.log("[pay:7] waiting for confirmation …");
       try {
         const confirmResult = await connection.confirmTransaction(
           { signature: txSig, blockhash, lastValidBlockHeight },
           "confirmed",
         );
-        console.log("[pay:6] confirmTransaction result:", confirmResult);
-        confirmed = true;
-      } catch (confirmErr) {
-        console.warn("[pay:6] confirmTransaction threw — falling back to status check:", confirmErr);
+        const confirmErr = confirmResult?.value?.err;
+        if (confirmErr) {
+          throw new Error("Transaction landed but was rejected on-chain: " + JSON.stringify(confirmErr));
+        }
+        console.log("[pay:7] confirmTransaction ✓", confirmResult?.value);
+      } catch (confirmThrow) {
+        // If confirmTransaction itself throws (polling timeout), fall back to status check
+        console.warn("[pay:7] confirmTransaction threw — checking status directly:", confirmThrow);
         const status = await connection.getSignatureStatus(txSig, {
           searchTransactionHistory: true,
         });
-        const conf = status?.value?.confirmationStatus;
+        const conf       = status?.value?.confirmationStatus;
         const onChainErr = status?.value?.err;
-        console.log("[pay:6] getSignatureStatus result:", { confirmationStatus: conf, err: onChainErr ?? null });
-        if (conf === "confirmed" || conf === "finalized") {
-          confirmed = true;
-        } else if (onChainErr) {
+        console.log("[pay:7] getSignatureStatus:", { confirmationStatus: conf, err: onChainErr ?? null });
+        if (onChainErr) {
           throw new Error("Transaction rejected on-chain: " + JSON.stringify(onChainErr));
-        } else {
+        }
+        if (conf !== "confirmed" && conf !== "finalized") {
           throw new Error(
-            "Transaction sent but could not be confirmed within the block window. " +
-            "Check Solscan: " + SOLSCAN_BASE + txSig + "?cluster=devnet"
+            "Transaction sent but not yet confirmed. Check Solscan: " +
+            SOLSCAN_BASE + txSig + "?cluster=devnet"
           );
         }
       }
 
-      if (confirmed) {
-        console.log("[pay:7] ✓ enrollment confirmed — signature:", txSig);
-        setTxSignature(txSig);
-        setPayStatus("idle");
-        setStep("success");
-        if (walletAddress) fetchBalance(walletAddress);
+      // ── 8. Post-payment balance verification ───────────────────────────────
+      const balanceAfter = await connection.getBalance(fromPubkey);
+      console.log("[pay:8] balance after payment:", balanceAfter / LAMPORTS_PER_SOL, "SOL", `(${balanceAfter} lamports)`);
+      console.log("[pay:8] actual deduction:", (balanceBefore - balanceAfter) / LAMPORTS_PER_SOL, "SOL");
+
+      if (balanceAfter >= balanceBefore) {
+        throw new Error(
+          "Balance did not decrease after send — the transfer may not have executed. " +
+          "Signature: " + txSig
+        );
       }
+
+      // ── 9. Success ──────────────────────────────────────────────────────────
+      console.log("[pay:9] ✓ real transfer confirmed — full signature:", txSig);
+      setTxSignature(txSig);
+      setPayStatus("idle");
+      setStep("success");
+      // Refresh balance in state to reflect the deducted amount
+      fetchBalance(walletAddress);
 
     } catch (err: unknown) {
       setPayStatus("idle");
       const msg = extractError(err);
-      console.error("[pay:error] raw error object:", err);
-      console.error("[pay:error] extracted message:", msg);
+      console.error("[pay:error] raw object:", err);
+      console.error("[pay:error] message   :", msg);
       setPayError(msg);
     }
   }, [walletAddress, balance, fetchBalance]);
