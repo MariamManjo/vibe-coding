@@ -1370,7 +1370,7 @@ export default function Home() {
             </p>
 
             {/* Main CTA button */}
-            <a href="#enroll"
+            <a href="/login"
               className="journey-cta-btn relative z-10 group/cta inline-flex items-center gap-3 font-heading font-bold text-xl text-white px-10 py-5 rounded-full transition-all duration-300 hover:scale-105 overflow-hidden"
               style={{ background: "linear-gradient(135deg, #9945FF 0%, #3B82F6 50%, #14F195 100%)" }}>
               {/* Shimmer sweep */}
