@@ -1353,6 +1353,71 @@ export default function Home() {
               </div>
             ))}
           </div>
+
+          {/* ── Journey CTA ── */}
+          <div className="relative mt-16 flex flex-col items-center text-center">
+            {/* Connecting thread from cards to CTA */}
+            <div className="w-px h-12 mb-4"
+              style={{ background: "linear-gradient(180deg, rgba(153,69,255,0.5), rgba(20,241,149,0.3))" }}/>
+
+            {/* Glow halo behind button */}
+            <div className="absolute top-12 left-1/2 -translate-x-1/2 w-[420px] h-[120px] pointer-events-none"
+              style={{ background: "radial-gradient(ellipse, rgba(153,69,255,0.18) 0%, rgba(20,241,149,0.09) 45%, transparent 70%)", filter: "blur(32px)" }}/>
+
+            {/* Micro-headline */}
+            <p className="text-white/25 text-xs font-mono uppercase tracking-[0.22em] mb-4 relative z-10">
+              ready to start?
+            </p>
+
+            {/* Main CTA button */}
+            <a href="#enroll"
+              className="journey-cta-btn relative z-10 group/cta inline-flex items-center gap-3 font-heading font-bold text-xl text-white px-10 py-5 rounded-full transition-all duration-300 hover:scale-105 overflow-hidden"
+              style={{ background: "linear-gradient(135deg, #9945FF 0%, #3B82F6 50%, #14F195 100%)" }}>
+              {/* Shimmer sweep */}
+              <span className="absolute inset-0 translate-x-[-110%] group-hover/cta:translate-x-[110%] transition-transform duration-700 skew-x-[-18deg]"
+                style={{ background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.18), transparent)" }}/>
+              {/* Rocket icon */}
+              <svg className="w-5 h-5 relative z-10 group-hover/cta:-translate-y-0.5 group-hover/cta:translate-x-0.5 transition-transform duration-300"
+                viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2}>
+                <path strokeLinecap="round" strokeLinejoin="round"
+                  d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2l9.5-9.5a3.535 3.535 0 10-5-5L4.5 16.5z"/>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 5l4 4"/>
+              </svg>
+              <span className="relative z-10">Start the 7-Week Journey</span>
+              <svg className="w-5 h-5 relative z-10 group-hover/cta:translate-x-1 transition-transform duration-300"
+                viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/>
+              </svg>
+            </a>
+
+            {/* Social proof micro-copy */}
+            <div className="relative z-10 mt-5 flex items-center gap-4">
+              <div className="flex -space-x-2">
+                {["#9945FF","#3B82F6","#14F195","#F59E0B","#EC4899"].map((c) => (
+                  <div key={c} className="w-6 h-6 rounded-full border-2 border-[#0a0a0a]"
+                    style={{ background: `radial-gradient(circle at 40% 35%, white 0%, ${c} 60%)` }}/>
+                ))}
+              </div>
+              <span className="text-white/30 text-xs font-body">
+                Join builders already shipping AI products
+              </span>
+            </div>
+
+            {/* Week countdown row */}
+            <div className="relative z-10 mt-6 flex items-center gap-2">
+              {Array.from({ length: 7 }).map((_, i) => (
+                <div key={i} className="flex flex-col items-center gap-1">
+                  <div className="w-2 h-2 rounded-full"
+                    style={{ background: `hsl(${260 + i * 15}, 80%, 65%)`,
+                      boxShadow: `0 0 6px hsl(${260 + i * 15}, 80%, 65%)` }}/>
+                  <span className="text-[8px] font-mono text-white/20">W{i+1}</span>
+                </div>
+              ))}
+              <div className="ml-1 w-px h-4" style={{ background: "rgba(255,255,255,0.1)" }}/>
+              <span className="text-[9px] font-mono text-white/20 ml-1">7 weeks · beginner → builder</span>
+            </div>
+          </div>
+
         </div>
       </section>
 
@@ -1987,7 +2052,7 @@ export default function Home() {
       <div className="section-divider" />
 
       {/* ── FINAL CTA — Web3 meme block ────────────────── */}
-      <section className="py-32 px-6 relative overflow-hidden">
+      <section id="enroll" className="py-32 px-6 relative overflow-hidden">
 
         {/* Animated orbs */}
         <div className="cta-orb-1 absolute top-[-80px] left-[-80px] w-[500px] h-[500px] rounded-full pointer-events-none"

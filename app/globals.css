@@ -239,6 +239,13 @@ h1, h2, h3, h4, h5, h6 {
 }
 .hero-cta-btn { animation: hero-btn-glow 3s ease-in-out infinite; }
 
+@keyframes journey-btn-glow {
+  0%, 100% { box-shadow: 0 0 28px rgba(153,69,255,0.4), 0 0 56px rgba(20,241,149,0.1); }
+  50%       { box-shadow: 0 0 48px rgba(153,69,255,0.65), 0 0 96px rgba(20,241,149,0.22), 0 0 24px rgba(59,130,246,0.35); }
+}
+.journey-cta-btn { animation: journey-btn-glow 3.5s ease-in-out infinite; }
+.journey-cta-btn:hover { animation: none; box-shadow: 0 0 60px rgba(153,69,255,0.7), 0 0 120px rgba(20,241,149,0.28); }
+
 .blob-3 { animation: blob-move-2 22s ease-in-out infinite 3s; }
 
 /* ── Weekly step card visuals ────────────────────── */
