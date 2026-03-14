@@ -150,63 +150,83 @@ const outcomes = [
 
 const modules = [
   {
+    num: "01",
     title: "AI Foundations",
-    desc: "Understand how AI works and how to think like a builder",
-    gradient: "linear-gradient(135deg, #1a1a2e, #16213e)",
+    tagline: "From curious to confident in AI",
+    desc: "Understand how modern AI tools work, what they can and can't do, and how to adopt the builder mindset that turns ideas into products.",
+    topics: ["What is generative AI", "Tools landscape overview", "Builder vs. consumer mindset", "Your first AI experiment"],
+    duration: "2 hrs",
+    level: "Beginner",
+    gradient: "linear-gradient(135deg, #080d1a 0%, #0d1835 100%)",
     accent: "#3B82F6",
     hoverClass: "card-hover",
     icon: (
-      <svg viewBox="0 0 40 40" fill="none" className="w-8 h-8">
-        <circle cx="20" cy="20" r="8" stroke="#3B82F6" strokeWidth="2" />
-        <circle cx="20" cy="20" r="14" stroke="#3B82F6" strokeWidth="1.5" strokeDasharray="4 3" />
-        <circle cx="20" cy="6" r="2.5" fill="#3B82F6" />
-        <circle cx="20" cy="34" r="2.5" fill="#3B82F6" />
-        <circle cx="6" cy="20" r="2.5" fill="#3B82F6" />
-        <circle cx="34" cy="20" r="2.5" fill="#3B82F6" />
+      <svg viewBox="0 0 44 44" fill="none" className="w-9 h-9">
+        <circle cx="22" cy="22" r="9" stroke="currentColor" strokeWidth="2"/>
+        <circle cx="22" cy="22" r="16" stroke="currentColor" strokeWidth="1.5" strokeDasharray="5 3" opacity="0.5"/>
+        <circle cx="22" cy="6" r="3" fill="currentColor"/>
+        <circle cx="22" cy="38" r="3" fill="currentColor"/>
+        <circle cx="6" cy="22" r="3" fill="currentColor"/>
+        <circle cx="38" cy="22" r="3" fill="currentColor"/>
       </svg>
     ),
   },
   {
+    num: "02",
     title: "Prompt Engineering",
-    desc: "Learn to communicate with AI — the most important skill",
-    gradient: "linear-gradient(135deg, #0f0c29, #302b63)",
+    tagline: "Talk to AI — and actually get results",
+    desc: "Master the art of writing prompts that produce real, usable outputs. Learn frameworks used by professionals to get consistent results every time.",
+    topics: ["Prompt anatomy & structure", "Context, role & constraints", "Iterative refinement", "Prompt templates library"],
+    duration: "3 hrs",
+    level: "Beginner",
+    gradient: "linear-gradient(135deg, #0c0a20 0%, #1a1540 100%)",
     accent: "#8B5CF6",
     hoverClass: "card-hover card-hover-purple",
     icon: (
-      <svg viewBox="0 0 40 40" fill="none" className="w-8 h-8">
-        <path d="M20 4 L24 16 L36 16 L26 23 L30 36 L20 29 L10 36 L14 23 L4 16 L16 16 Z"
-          stroke="#8B5CF6" strokeWidth="2" strokeLinejoin="round" />
+      <svg viewBox="0 0 44 44" fill="none" className="w-9 h-9">
+        <rect x="4" y="10" width="22" height="14" rx="4" stroke="currentColor" strokeWidth="2"/>
+        <path d="M26 17h6a4 4 0 014 4v8a4 4 0 01-4 4H14l-4 4v-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        <path d="M10 16h10M10 20h7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" opacity="0.6"/>
       </svg>
     ),
   },
   {
+    num: "03",
     title: "MVP Building with AI",
-    desc: "Turn any idea into a real working product",
-    gradient: "linear-gradient(135deg, #0a1a0a, #0d2b0d)",
+    tagline: "Ship a real product — no code needed",
+    desc: "Go from blank page to live product. Use AI-first tools to design, prototype, and deploy a working MVP that you can show to real users.",
+    topics: ["Idea → scoped product", "Wireframing with AI", "Building with no-code tools", "Deploying your MVP live"],
+    duration: "4 hrs",
+    level: "Intermediate",
+    gradient: "linear-gradient(135deg, #021510 0%, #042b1d 100%)",
     accent: "#10B981",
     hoverClass: "card-hover card-hover-green",
     icon: (
-      <svg viewBox="0 0 40 40" fill="none" className="w-8 h-8">
-        <path d="M20 4 L26 14 L38 14 L28 22 L32 34 L20 26 L8 34 L12 22 L2 14 L14 14 Z"
-          stroke="#10B981" strokeWidth="2" strokeLinejoin="round" />
-        <path d="M20 34 L20 38 M16 38 L24 38" stroke="#10B981" strokeWidth="2" strokeLinecap="round" />
+      <svg viewBox="0 0 44 44" fill="none" className="w-9 h-9">
+        <path d="M22 4l3 9h9l-7 5.5 2.5 9L22 22l-7.5 5.5 2.5-9L10 13h9z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round"/>
+        <path d="M28 32l6 6" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"/>
+        <circle cx="26" cy="30" r="5.5" stroke="currentColor" strokeWidth="2"/>
       </svg>
     ),
   },
   {
+    num: "04",
     title: "Automation & Workflows",
-    desc: "Connect tools, build workflows, ship your first automation",
-    gradient: "linear-gradient(135deg, #1a1000, #2d1f00)",
+    tagline: "Let AI do the repetitive work for you",
+    desc: "Design and deploy automated workflows using Make, Zapier, and n8n. Connect your apps, eliminate manual tasks, and run on autopilot.",
+    topics: ["Automation fundamentals", "Make / Zapier / n8n deep dive", "Multi-step workflow design", "Real automation templates"],
+    duration: "3 hrs",
+    level: "Intermediate",
+    gradient: "linear-gradient(135deg, #150f00 0%, #2a1e00 100%)",
     accent: "#F59E0B",
     hoverClass: "card-hover card-hover-amber",
     icon: (
-      <svg viewBox="0 0 40 40" fill="none" className="w-8 h-8">
-        <circle cx="8" cy="20" r="4" stroke="#F59E0B" strokeWidth="2" />
-        <circle cx="32" cy="8" r="4" stroke="#F59E0B" strokeWidth="2" />
-        <circle cx="32" cy="32" r="4" stroke="#F59E0B" strokeWidth="2" />
-        <line x1="12" y1="18" x2="28" y2="10" stroke="#F59E0B" strokeWidth="1.5" />
-        <line x1="12" y1="22" x2="28" y2="30" stroke="#F59E0B" strokeWidth="1.5" />
-        <line x1="36" y1="11" x2="36" y2="29" stroke="#F59E0B" strokeWidth="1.5" strokeDasharray="3 2" />
+      <svg viewBox="0 0 44 44" fill="none" className="w-9 h-9">
+        <circle cx="10" cy="22" r="5" stroke="currentColor" strokeWidth="2"/>
+        <circle cx="34" cy="10" r="5" stroke="currentColor" strokeWidth="2"/>
+        <circle cx="34" cy="34" r="5" stroke="currentColor" strokeWidth="2"/>
+        <path d="M15 20L29 12M15 24L29 32" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+        <path d="M39 13v18" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="3 2" opacity="0.5"/>
       </svg>
     ),
   },
@@ -500,31 +520,117 @@ export default function Home() {
       <div className="section-divider" />
 
       {/* ── MODULES ────────────────────────────────────── */}
-      <section id="modules" className="py-24 px-6">
+      <section id="modules" className="py-28 px-6">
         <div className="max-w-7xl mx-auto">
-          <p className="text-[#9CA3AF] uppercase tracking-widest text-xs font-body mb-3">Pick Your Path</p>
-          <h2 className="font-heading font-bold text-4xl md:text-5xl mb-16">Or Learn One Topic at a Time</h2>
+
+          {/* Header */}
+          <div className="mb-16">
+            <div className="inline-flex items-center gap-2 bg-white/[0.05] border border-white/10 rounded-full px-4 py-1.5 mb-6">
+              <svg viewBox="0 0 16 16" fill="none" className="w-3.5 h-3.5 text-white/60">
+                <rect x="1" y="1" width="6" height="6" rx="1.5" stroke="currentColor" strokeWidth="1.5"/>
+                <rect x="9" y="1" width="6" height="6" rx="1.5" stroke="currentColor" strokeWidth="1.5"/>
+                <rect x="1" y="9" width="6" height="6" rx="1.5" stroke="currentColor" strokeWidth="1.5"/>
+                <rect x="9" y="9" width="6" height="6" rx="1.5" stroke="currentColor" strokeWidth="1.5"/>
+              </svg>
+              <span className="text-white/50 text-xs font-body font-medium uppercase tracking-widest">Standalone Mini-Courses</span>
+            </div>
+            <h2 className="font-heading font-bold text-4xl md:text-6xl leading-tight mb-5">
+              Pick One Topic.{" "}
+              <span className="text-white/30">Learn it deeply.</span>
+            </h2>
+            <p className="text-[#9CA3AF] font-body text-lg max-w-2xl leading-relaxed">
+              Each module is a self-contained mini-course you can take independently — no need to enroll in the full program. Start with what matters to you most.
+            </p>
+          </div>
+
+          {/* Cards */}
           <div className="grid sm:grid-cols-2 gap-6">
             {modules.map((mod) => (
               <div
                 key={mod.title}
-                className={`${mod.hoverClass} border border-white/10 rounded-2xl p-8 flex flex-col gap-5`}
+                className={`${mod.hoverClass} relative group rounded-2xl border border-white/[0.07] overflow-hidden flex flex-col`}
                 style={{ background: mod.gradient }}
               >
-                <div>{mod.icon}</div>
-                <div>
-                  <h3 className="font-heading font-bold text-xl mb-2" style={{ color: mod.accent }}>
-                    {mod.title}
-                  </h3>
+                {/* Top accent bar */}
+                <div className="h-[3px] w-full" style={{ background: `linear-gradient(90deg, ${mod.accent}, transparent 70%)` }} />
+
+                <div className="p-7 flex flex-col gap-6 flex-1">
+                  {/* Top row: module number ghost + standalone badge */}
+                  <div className="flex items-start justify-between">
+                    <span
+                      className="font-heading font-black text-6xl leading-none select-none"
+                      style={{ color: mod.accent, opacity: 0.12 }}
+                    >
+                      {mod.num}
+                    </span>
+                    <span
+                      className="text-[10px] font-body font-semibold uppercase tracking-widest px-2.5 py-1 rounded-full border mt-1"
+                      style={{ color: mod.accent, borderColor: mod.accent + "40", background: mod.accent + "15" }}
+                    >
+                      Mini-Course
+                    </span>
+                  </div>
+
+                  {/* Icon + title block */}
+                  <div className="flex items-start gap-4">
+                    <div
+                      className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
+                      style={{ background: mod.accent + "18", color: mod.accent }}
+                    >
+                      {mod.icon}
+                    </div>
+                    <div>
+                      <h3 className="font-heading font-bold text-xl leading-snug mb-1 text-white">{mod.title}</h3>
+                      <p className="font-body text-sm" style={{ color: mod.accent + "CC" }}>{mod.tagline}</p>
+                    </div>
+                  </div>
+
+                  {/* Description */}
                   <p className="text-[#9CA3AF] text-sm font-body leading-relaxed">{mod.desc}</p>
+
+                  {/* Topics list */}
+                  <ul className="space-y-2">
+                    {mod.topics.map((t) => (
+                      <li key={t} className="flex items-center gap-2.5 text-sm font-body text-white/70">
+                        <span
+                          className="w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0"
+                          style={{ background: mod.accent + "20" }}
+                        >
+                          <svg viewBox="0 0 10 10" fill="none" className="w-2.5 h-2.5" style={{ color: mod.accent }}>
+                            <path d="M2 5l2.5 2.5L8 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                        </span>
+                        {t}
+                      </li>
+                    ))}
+                  </ul>
+
+                  {/* Footer: meta + CTA */}
+                  <div className="mt-auto pt-4 border-t border-white/[0.06] flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                      <span className="flex items-center gap-1.5 text-xs text-white/40 font-body">
+                        <svg viewBox="0 0 14 14" fill="none" className="w-3.5 h-3.5">
+                          <circle cx="7" cy="7" r="5.5" stroke="currentColor" strokeWidth="1.4"/>
+                          <path d="M7 4.5V7l2 1.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
+                        </svg>
+                        {mod.duration}
+                      </span>
+                      <span
+                        className="text-[10px] font-body px-2 py-0.5 rounded-full"
+                        style={{ background: mod.accent + "15", color: mod.accent + "AA" }}
+                      >
+                        {mod.level}
+                      </span>
+                    </div>
+                    <a
+                      href="mailto:mariammanjavidze01@gmail.com"
+                      className="inline-flex items-center gap-1.5 text-sm font-semibold font-body px-4 py-2 rounded-xl transition-all hover:scale-105"
+                      style={{ background: mod.accent + "18", color: mod.accent, border: `1px solid ${mod.accent}30` }}
+                    >
+                      Email Me →
+                    </a>
+                  </div>
                 </div>
-                <a
-                  href="mailto:mariammanjavidze01@gmail.com"
-                  className="self-start text-sm font-semibold px-4 py-2 rounded-full border transition-all hover:scale-105"
-                  style={{ borderColor: mod.accent + "50", color: mod.accent }}
-                >
-                  Email Me →
-                </a>
               </div>
             ))}
           </div>
