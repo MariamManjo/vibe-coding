@@ -815,7 +815,7 @@ export default function Home() {
 
           {/* CTA button — premium Solana gradient + pulsing glow */}
           <Link
-            href="/login"
+            href="/start"
             className="hero-cta-btn inline-flex items-center gap-3 text-white font-bold text-lg px-10 py-5 rounded-full transition-all duration-300 hover:scale-105 hover:brightness-110"
             style={{
               background: "linear-gradient(135deg, #9945FF 0%, #3B82F6 60%, #14F195 100%)",
@@ -1370,7 +1370,7 @@ export default function Home() {
             </p>
 
             {/* Main CTA button */}
-            <a href="/login"
+            <a href="/start"
               className="journey-cta-btn relative z-10 group/cta inline-flex items-center gap-3 font-heading font-bold text-xl text-white px-10 py-5 rounded-full transition-all duration-300 hover:scale-105 overflow-hidden"
               style={{ background: "linear-gradient(135deg, #9945FF 0%, #3B82F6 50%, #14F195 100%)" }}>
               {/* Shimmer sweep */}
@@ -2184,7 +2184,7 @@ export default function Home() {
               {/* CTA button */}
               <div className="flex flex-col items-center gap-5">
                 <Link
-                  href="/login"
+                  href="/start"
                   className="glow-cta-btn inline-flex items-center gap-3 font-heading font-bold text-lg md:text-xl px-10 py-5 rounded-2xl transition-all hover:scale-105 text-[#0a0a0a]"
                   style={{ background: "linear-gradient(135deg, #14F195, #9945FF)", backgroundSize: "200%" }}
                 >
