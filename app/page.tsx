@@ -1686,44 +1686,299 @@ export default function Home() {
 
       <div className="section-divider" />
 
-      {/* ── WORKSHOP BLOCK ─────────────────────────────── */}
-      <section className="py-24 px-6">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-10">
-            <p className="text-[#9CA3AF] uppercase tracking-widest text-xs font-body mb-4">
-              Teams & Organizations
-            </p>
-            <h2 className="font-heading font-bold text-4xl md:text-5xl">
-              Bring Vibe Coding to Your Organization
+      {/* ── WORKSHOP BLOCK — animated org stories ──────── */}
+      <section className="py-24 px-6 relative overflow-hidden">
+        {/* Ambient */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-0 left-1/4 w-[500px] h-[400px] rounded-full"
+            style={{ background: "radial-gradient(circle, rgba(59,130,246,0.07) 0%, transparent 65%)", filter: "blur(70px)" }}/>
+          <div className="absolute bottom-0 right-1/4 w-[500px] h-[400px] rounded-full"
+            style={{ background: "radial-gradient(circle, rgba(20,241,149,0.06) 0%, transparent 65%)", filter: "blur(70px)" }}/>
+        </div>
+
+        <div className="max-w-6xl mx-auto relative z-10">
+          {/* Header */}
+          <div className="text-center mb-14">
+            <p className="text-white/30 uppercase tracking-widest text-xs font-mono mb-4">Teams &amp; Organizations</p>
+            <h2 className="font-heading font-bold text-4xl md:text-5xl leading-tight mb-4">
+              Bring Vibe Coding to Your{" "}
+              <span style={{ background: "linear-gradient(90deg, #3B82F6, #9945FF, #14F195)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
+                Organization
+              </span>
             </h2>
+            <p className="text-white/40 font-body text-base max-w-xl mx-auto">
+              From classrooms to boardrooms — Mariam delivers hands-on AI programs that create real builders.
+            </p>
           </div>
 
-          {/* 4 glassmorphism cards */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
-            {[
-              { emoji: "🎓", title: "University", desc: "Guest lectures & semester integrations" },
-              { emoji: "🚀", title: "Startup", desc: "Hands-on AI product workshops" },
-              { emoji: "⚡", title: "Bootcamp", desc: "Intensive multi-day AI programs" },
-              { emoji: "🏢", title: "Corporate", desc: "Team training & AI adoption sessions" },
-            ].map((item) => (
-              <div
-                key={item.title}
-                className="glass-card rounded-2xl p-5 text-center hover:-translate-y-1 transition-all duration-300"
-              >
-                <div className="text-3xl mb-3">{item.emoji}</div>
-                <div className="font-heading font-bold text-sm text-white mb-1">{item.title}</div>
-                <div className="text-[#9CA3AF] text-xs font-body leading-snug">{item.desc}</div>
+          {/* ── Story cards (2×2 grid) ── */}
+          <div className="grid sm:grid-cols-2 gap-6 mb-12">
+
+            {/* ── Card 1: University ── */}
+            <div className="group card-hover relative rounded-3xl border border-[#3B82F6]/15 overflow-hidden"
+              style={{ background: "linear-gradient(135deg, #060d1a 0%, #0b1835 100%)" }}>
+              <div className="h-[3px] w-full" style={{ background: "linear-gradient(90deg, #3B82F6, transparent 60%)" }}/>
+              <div className="p-6">
+                {/* Header row */}
+                <div className="flex items-center justify-between mb-5">
+                  <span className="text-[10px] font-mono uppercase tracking-widest px-3 py-1 rounded-full border border-[#3B82F6]/30 text-[#3B82F6]/80 bg-[#3B82F6]/10">University</span>
+                  <span className="text-[9px] font-mono text-white/20 uppercase tracking-widest">education</span>
+                </div>
+                {/* Animated classroom scene */}
+                <div className="relative rounded-xl border border-[#3B82F6]/10 bg-black/30 overflow-hidden mb-5" style={{ height: "140px" }}>
+                  {/* Classroom projector screen at top */}
+                  <div className="absolute top-3 left-1/2 -translate-x-1/2 w-[120px] h-[50px] rounded-lg border border-[#3B82F6]/25 bg-[#3B82F6]/08 overflow-hidden">
+                    {/* AI interface on screen */}
+                    <div className="p-1.5 space-y-1">
+                      <div className="vl-1 h-1 rounded-full w-3/4" style={{ background: "linear-gradient(90deg, rgba(59,130,246,0.6), transparent)" }}/>
+                      <div className="vl-2 h-1 rounded-full w-1/2" style={{ background: "linear-gradient(90deg, rgba(59,130,246,0.5), transparent)" }}/>
+                      <div className="vl-3 flex items-center gap-1">
+                        <span className="text-[#3B82F6] text-[8px]">✓</span>
+                        <div className="h-1 flex-1 rounded-full" style={{ background: "linear-gradient(90deg, rgba(20,241,149,0.5), transparent)" }}/>
+                      </div>
+                      <div className="vl-4 h-1 rounded-full w-2/3" style={{ background: "linear-gradient(90deg, rgba(59,130,246,0.4), transparent)" }}/>
+                    </div>
+                  </div>
+                  {/* Student rows */}
+                  <div className="absolute bottom-4 left-0 right-0 flex flex-col gap-2 items-center">
+                    {[[5],[7],[9]].map((row, ri) => (
+                      <div key={ri} className="flex gap-2.5">
+                        {Array.from({ length: row[0] }).map((_, ci) => {
+                          const pingClass = ["node-ping-1","node-ping-2","node-ping-3","node-ping-4"][(ri*3+ci)%4];
+                          return (
+                            <div key={ci} className={`${pingClass} flex flex-col items-center gap-0.5`}>
+                              <div className="w-3 h-3 rounded-full border border-[#3B82F6]/35 bg-[#3B82F6]/15"/>
+                              <div className="w-4 h-1.5 rounded-sm bg-[#3B82F6]/10"/>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    ))}
+                  </div>
+                  {/* Glow from screen */}
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-16 rounded-full pointer-events-none"
+                    style={{ background: "radial-gradient(circle, rgba(59,130,246,0.15), transparent)", filter: "blur(10px)" }}/>
+                </div>
+                {/* Footer */}
+                <h3 className="font-heading font-bold text-lg text-white mb-1">University Programs</h3>
+                <p className="text-white/45 text-sm font-body mb-4">Guest lectures, semester integrations, and AI literacy workshops for students and faculty.</p>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-2 h-2 rounded-full bg-[#3B82F6]" style={{ boxShadow: "0 0 6px #3B82F6" }}/>
+                    <span className="text-[#3B82F6]/70 text-xs font-mono">500+ students reached</span>
+                  </div>
+                  <span className="text-[9px] font-mono text-white/15 group-hover:text-white/40 transition-colors">contact →</span>
+                </div>
               </div>
-            ))}
+            </div>
+
+            {/* ── Card 2: Startup ── */}
+            <div className="group card-hover relative rounded-3xl border border-[#14F195]/12 overflow-hidden"
+              style={{ background: "linear-gradient(135deg, #021510 0%, #042b1d 100%)" }}>
+              <div className="h-[3px] w-full" style={{ background: "linear-gradient(90deg, #14F195, transparent 60%)" }}/>
+              <div className="p-6">
+                <div className="flex items-center justify-between mb-5">
+                  <span className="text-[10px] font-mono uppercase tracking-widest px-3 py-1 rounded-full border border-[#14F195]/30 text-[#14F195]/80 bg-[#14F195]/10">Startup</span>
+                  <span className="text-[9px] font-mono text-white/20 uppercase tracking-widest">product</span>
+                </div>
+                {/* Animated MVP launch scene */}
+                <div className="relative rounded-xl border border-[#14F195]/10 bg-black/30 overflow-hidden mb-5" style={{ height: "140px" }}>
+                  {/* Team at laptop (left) */}
+                  <div className="absolute left-4 top-1/2 -translate-y-1/2 flex flex-col items-center gap-1">
+                    {/* Two team members */}
+                    <div className="flex gap-1.5 mb-1">
+                      {[1,2,3].map((i) => (
+                        <div key={i} className={`node-ping-${i} flex flex-col items-center gap-0.5`}>
+                          <div className="w-4 h-4 rounded-full border border-[#14F195]/35 bg-[#14F195]/15"/>
+                          <div className="w-5 h-2.5 rounded-sm bg-[#14F195]/10"/>
+                        </div>
+                      ))}
+                    </div>
+                    {/* Laptop */}
+                    <div className="w-14 h-9 rounded-sm border border-[#14F195]/30 bg-[#14F195]/08 p-1">
+                      <div className="space-y-0.5">
+                        <div className="vl-1 h-0.5 rounded w-4/5" style={{ background: "rgba(20,241,149,0.5)" }}/>
+                        <div className="vl-2 h-0.5 rounded w-3/5" style={{ background: "rgba(20,241,149,0.4)" }}/>
+                        <div className="vl-3 h-0.5 rounded w-4/5" style={{ background: "rgba(20,241,149,0.5)" }}/>
+                        <div className="vl-4 h-0.5 rounded w-2/5" style={{ background: "rgba(20,241,149,0.3)" }}/>
+                      </div>
+                    </div>
+                    <span className="text-[7px] font-mono text-[#14F195]/40 mt-0.5">building...</span>
+                  </div>
+                  {/* Arrow → */}
+                  <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+                    <svg viewBox="0 0 32 16" className="w-8 h-4" fill="none">
+                      <path d="M0 8h26M20 3l6 5-6 5" stroke="#14F195" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" opacity="0.4"/>
+                    </svg>
+                  </div>
+                  {/* Rocket + LIVE (right) */}
+                  <div className="absolute right-5 top-1/2 -translate-y-1/2 flex flex-col items-center gap-1.5 float-small">
+                    <svg viewBox="0 0 36 44" fill="none" className="w-8 h-9"
+                      style={{ filter: "drop-shadow(0 0 8px rgba(20,241,149,0.6))" }}>
+                      <path d="M18 2C18 2 9 11 9 24h18C27 11 18 2 18 2z" fill="#14F195" fillOpacity="0.65" stroke="#14F195" strokeWidth="1.4"/>
+                      <rect x="11" y="22" width="14" height="10" rx="2" fill="#14F195" fillOpacity="0.4" stroke="#14F195" strokeWidth="1.2"/>
+                      <path d="M13 32l-3 7h16l-3-7z" fill="#14F195" fillOpacity="0.3"/>
+                      <circle cx="18" cy="19" r="4" fill="#14F195" fillOpacity="0.3" stroke="#14F195" strokeWidth="1.2"/>
+                      <circle cx="18" cy="19" r="2" fill="#14F195" opacity="0.7"/>
+                      <path d="M14 39c0 3.5 2 6 4 8 2-2 4-4.5 4-8z" fill="#9945FF" fillOpacity="0.7"/>
+                    </svg>
+                    <div className="bg-[#14F195] text-[7px] font-mono font-black text-black px-2 py-0.5 rounded-full"
+                      style={{ boxShadow: "0 0 8px #14F195" }}>LIVE</div>
+                  </div>
+                  {/* Glow */}
+                  <div className="absolute right-8 top-1/2 -translate-y-1/2 w-20 h-20 rounded-full pointer-events-none"
+                    style={{ background: "radial-gradient(circle, rgba(20,241,149,0.15), transparent)", filter: "blur(14px)" }}/>
+                </div>
+                <h3 className="font-heading font-bold text-lg text-white mb-1">Startup Workshops</h3>
+                <p className="text-white/45 text-sm font-body mb-4">Hands-on AI product sprints — teams go from zero to a working MVP in days, not months.</p>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-2 h-2 rounded-full bg-[#14F195]" style={{ boxShadow: "0 0 6px #14F195" }}/>
+                    <span className="text-[#14F195]/70 text-xs font-mono">0 → MVP in 4 weeks</span>
+                  </div>
+                  <span className="text-[9px] font-mono text-white/15 group-hover:text-white/40 transition-colors">contact →</span>
+                </div>
+              </div>
+            </div>
+
+            {/* ── Card 3: Bootcamp ── */}
+            <div className="group card-hover relative rounded-3xl border border-[#9945FF]/15 overflow-hidden"
+              style={{ background: "linear-gradient(135deg, #0c0820 0%, #1a1240 100%)" }}>
+              <div className="h-[3px] w-full" style={{ background: "linear-gradient(90deg, #9945FF, transparent 60%)" }}/>
+              <div className="p-6">
+                <div className="flex items-center justify-between mb-5">
+                  <span className="text-[10px] font-mono uppercase tracking-widest px-3 py-1 rounded-full border border-[#9945FF]/30 text-[#9945FF]/80 bg-[#9945FF]/10">Bootcamp</span>
+                  <span className="text-[9px] font-mono text-white/20 uppercase tracking-widest">intensive</span>
+                </div>
+                {/* Animated intensity meter scene */}
+                <div className="relative rounded-xl border border-[#9945FF]/10 bg-black/30 overflow-hidden mb-5" style={{ height: "140px" }}>
+                  {/* Day counter (left) */}
+                  <div className="absolute left-5 top-1/2 -translate-y-1/2 flex flex-col gap-2">
+                    {[
+                      { day: "Day 1", done: true,  cls: "vl-1" },
+                      { day: "Day 2", done: true,  cls: "vl-3" },
+                      { day: "Day 3", done: false, cls: "vl-5" },
+                    ].map(({ day, done, cls }) => (
+                      <div key={day} className={`${cls} flex items-center gap-2`}>
+                        <div className={`w-4 h-4 rounded-full border flex items-center justify-center text-[8px]`}
+                          style={{ borderColor: done ? "#9945FF" : "#9945FF60", background: done ? "#9945FF25" : "transparent" }}>
+                          {done ? <span className="text-[#9945FF]">✓</span> : <span className="text-[#9945FF]/40">○</span>}
+                        </div>
+                        <span className={`text-[9px] font-mono ${done ? "text-[#9945FF]/80" : "text-[#9945FF]/35"}`}>{day}</span>
+                      </div>
+                    ))}
+                  </div>
+                  {/* Energy bar (centre) */}
+                  <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-2">
+                    <div className="h-24 w-5 rounded-full border border-[#9945FF]/30 bg-black/40 overflow-hidden relative">
+                      <div className="absolute bottom-0 left-0 right-0 rounded-full"
+                        style={{ height: "68%", background: "linear-gradient(180deg, #9945FF, #14F195)", boxShadow: "0 0 10px rgba(153,69,255,0.5)", animation: "headline-pulse 2.5s ease-in-out infinite" }}/>
+                    </div>
+                    <span className="text-[8px] font-mono text-[#9945FF]/50">intensity</span>
+                  </div>
+                  {/* Lightning symbols (right) */}
+                  <div className="absolute right-5 top-1/2 -translate-y-1/2 flex flex-col gap-1.5">
+                    {[
+                      { cls: "node-ping-1", size: "text-lg" },
+                      { cls: "node-ping-2", size: "text-sm" },
+                      { cls: "node-ping-3", size: "text-base" },
+                    ].map(({ cls, size }, i) => (
+                      <span key={i} className={`${cls} ${size} text-[#9945FF]`}
+                        style={{ filter: "drop-shadow(0 0 4px rgba(153,69,255,0.8))" }}>⚡</span>
+                    ))}
+                  </div>
+                  {/* Ambient glow */}
+                  <div className="absolute inset-0 pointer-events-none"
+                    style={{ background: "radial-gradient(circle at 50% 50%, rgba(153,69,255,0.06), transparent 70%)" }}/>
+                </div>
+                <h3 className="font-heading font-bold text-lg text-white mb-1">AI Bootcamp</h3>
+                <p className="text-white/45 text-sm font-body mb-4">Intensive 3-day immersive programs where participants build and ship real AI-powered products.</p>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-2 h-2 rounded-full bg-[#9945FF]" style={{ boxShadow: "0 0 6px #9945FF" }}/>
+                    <span className="text-[#9945FF]/70 text-xs font-mono">3-day intensive program</span>
+                  </div>
+                  <span className="text-[9px] font-mono text-white/15 group-hover:text-white/40 transition-colors">contact →</span>
+                </div>
+              </div>
+            </div>
+
+            {/* ── Card 4: Corporate ── */}
+            <div className="group card-hover relative rounded-3xl border border-[#F59E0B]/12 overflow-hidden"
+              style={{ background: "linear-gradient(135deg, #150f00 0%, #2a1e00 100%)" }}>
+              <div className="h-[3px] w-full" style={{ background: "linear-gradient(90deg, #F59E0B, transparent 60%)" }}/>
+              <div className="p-6">
+                <div className="flex items-center justify-between mb-5">
+                  <span className="text-[10px] font-mono uppercase tracking-widest px-3 py-1 rounded-full border border-[#F59E0B]/30 text-[#F59E0B]/80 bg-[#F59E0B]/10">Corporate</span>
+                  <span className="text-[9px] font-mono text-white/20 uppercase tracking-widest">enterprise</span>
+                </div>
+                {/* Animated workflow automation scene */}
+                <div className="relative rounded-xl border border-[#F59E0B]/10 bg-black/30 overflow-hidden mb-5" style={{ height: "140px" }}>
+                  {/* Before label */}
+                  <div className="absolute top-3 left-4 flex items-center gap-1.5">
+                    <div className="w-1.5 h-1.5 rounded-full bg-red-500/60"/>
+                    <span className="text-[8px] font-mono text-white/25">manual: 4hrs/day</span>
+                  </div>
+                  {/* After label */}
+                  <div className="absolute top-3 right-4 flex items-center gap-1.5">
+                    <div className="w-1.5 h-1.5 rounded-full bg-[#F59E0B]" style={{ boxShadow: "0 0 5px #F59E0B" }}/>
+                    <span className="text-[8px] font-mono text-[#F59E0B]/60">auto: 8 min</span>
+                  </div>
+                  {/* Workflow SVG */}
+                  <svg viewBox="0 0 280 80" fill="none" className="absolute bottom-4 left-1/2 -translate-x-1/2 w-[85%]">
+                    {/* Lines */}
+                    <line className="line-pulse-2" x1="54"  y1="40" x2="96"  y2="40" stroke="#F59E0B" strokeWidth="1" strokeDasharray="4 3"/>
+                    <line className="line-pulse-3" x1="144" y1="40" x2="186" y2="40" stroke="#F59E0B" strokeWidth="1" strokeDasharray="4 3"/>
+                    {/* Node 1: Email */}
+                    <circle className="node-ping-1" cx="34"  cy="40" r="18" fill="#F59E0B" fillOpacity="0.1" stroke="#F59E0B" strokeWidth="1"/>
+                    <rect x="24" y="33" width="20" height="14" rx="2" stroke="#F59E0B" strokeWidth="1" strokeOpacity="0.75"/>
+                    <path d="M24 36l10 6 10-6" stroke="#F59E0B" strokeWidth="1" strokeLinecap="round" strokeOpacity="0.75"/>
+                    <text x="34" y="64" textAnchor="middle" fill="#F59E0B" fontSize="6" fontFamily="monospace" opacity="0.5">Email</text>
+                    {/* Node 2: Automation hub */}
+                    <circle className="node-ping-2" cx="120" cy="40" r="22" fill="#F59E0B" fillOpacity="0.14" stroke="#F59E0B" strokeWidth="1.4"
+                      style={{ filter: "drop-shadow(0 0 6px rgba(245,158,11,0.4))" }}/>
+                    <path d="M120 27v26M107 40h26" stroke="#F59E0B" strokeWidth="1.8" strokeLinecap="round"/>
+                    <circle cx="120" cy="40" r="4.5" fill="#F59E0B" fillOpacity="0.45"/>
+                    <text x="120" y="72" textAnchor="middle" fill="#F59E0B" fontSize="6" fontFamily="monospace" opacity="0.5">Make</text>
+                    {/* Node 3: Calendar */}
+                    <circle className="node-ping-3" cx="206" cy="40" r="18" fill="#F59E0B" fillOpacity="0.1" stroke="#F59E0B" strokeWidth="1"/>
+                    <rect x="196" y="31" width="20" height="18" rx="2" stroke="#F59E0B" strokeWidth="1" strokeOpacity="0.75"/>
+                    <line x1="196" y1="36" x2="216" y2="36" stroke="#F59E0B" strokeWidth="0.8" strokeOpacity="0.6"/>
+                    <line x1="200" y1="41" x2="212" y2="41" stroke="#F59E0B" strokeWidth="0.8" strokeOpacity="0.5"/>
+                    <line x1="200" y1="44" x2="209" y2="44" stroke="#F59E0B" strokeWidth="0.8" strokeOpacity="0.35"/>
+                    <text x="206" y="64" textAnchor="middle" fill="#F59E0B" fontSize="6" fontFamily="monospace" opacity="0.5">Calendar</text>
+                    {/* Traveling packet */}
+                    <circle cx="54" cy="40" r="4" fill="#F59E0B" style={{ filter: "drop-shadow(0 0 4px #F59E0B)" }}>
+                      <animateTransform attributeName="transform" type="translate"
+                        values="0,0; 152,0; 152,0" keyTimes="0; 0.82; 1"
+                        dur="3s" repeatCount="indefinite"/>
+                      <animate attributeName="opacity" values="0; 1; 1; 0" keyTimes="0; 0.06; 0.82; 0.96" dur="3s" repeatCount="indefinite"/>
+                    </circle>
+                  </svg>
+                </div>
+                <h3 className="font-heading font-bold text-lg text-white mb-1">Corporate Training</h3>
+                <p className="text-white/45 text-sm font-body mb-4">Team AI adoption programs — employees learn to automate workflows and eliminate repetitive work.</p>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-2 h-2 rounded-full bg-[#F59E0B]" style={{ boxShadow: "0 0 6px #F59E0B" }}/>
+                    <span className="text-[#F59E0B]/70 text-xs font-mono">60% time saved on avg</span>
+                  </div>
+                  <span className="text-[9px] font-mono text-white/15 group-hover:text-white/40 transition-colors">contact →</span>
+                </div>
+              </div>
+            </div>
+
           </div>
 
+          {/* CTA */}
           <div className="flex justify-center">
-            <a
-              href="mailto:mariammanjavidze01@gmail.com"
-              className="inline-flex items-center gap-2 bg-[#3B82F6] hover:bg-blue-400 text-white font-semibold text-lg px-8 py-4 rounded-full transition-all hover:scale-105"
-              style={{ boxShadow: "0 0 24px rgba(59,130,246,0.4)" }}
-            >
-              Get in Touch
+            <a href="mailto:mariammanjavidze01@gmail.com"
+              className="hero-cta-btn inline-flex items-center gap-3 text-white font-bold text-lg px-10 py-5 rounded-full transition-all duration-300 hover:scale-105 hover:brightness-110"
+              style={{ background: "linear-gradient(135deg, #3B82F6 0%, #9945FF 60%, #14F195 100%)" }}>
+              <span>Get in Touch</span>
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+              </svg>
             </a>
           </div>
         </div>
