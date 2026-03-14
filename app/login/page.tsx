@@ -14,8 +14,16 @@ import {
 const COURSE_PRICE_SOL = 0.01;
 const RECIPIENT_ADDRESS = "GhgXp29MrWxzdU1pdjo7gbmm2QjTY4TE6iomsM4hv9Ct";
 
-async function fetchBlockhash(): Promise<string> {
-  const res = await fetch("/api/blockhash");
+type SolanaNetwork = "mainnet" | "devnet" | "testnet";
+
+const NETWORK_CONFIG: Record<SolanaNetwork, { label: string; color: string; solscan: string; badge: string }> = {
+  mainnet: { label: "Mainnet", color: "#10B981", solscan: "https://solscan.io/tx/", badge: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30" },
+  devnet:  { label: "Devnet",  color: "#F59E0B", solscan: "https://solscan.io/tx/?cluster=devnet", badge: "bg-amber-500/20 text-amber-400 border-amber-500/30" },
+  testnet: { label: "Testnet", color: "#8B5CF6", solscan: "https://solscan.io/tx/?cluster=testnet", badge: "bg-violet-500/20 text-violet-400 border-violet-500/30" },
+};
+
+async function fetchBlockhash(network: SolanaNetwork): Promise<string> {
+  const res = await fetch(`/api/blockhash?network=${network}`);
   if (!res.ok) throw new Error("Unable to reach the Solana network. Please try again.");
   const json = await res.json();
   if (!json.blockhash) throw new Error("Unable to reach the Solana network. Please try again.");
@@ -58,6 +66,7 @@ export default function LoginPage() {
   const [hasWallet, setHasWallet] = useState<boolean | null>(null);
   const [connectError, setConnectError] = useState("");
   const [payError, setPayError] = useState("");
+  const [network, setNetwork] = useState<SolanaNetwork>("mainnet");
 
   useEffect(() => {
     // Only detect whether the extension exists — do NOT auto-advance
@@ -101,7 +110,7 @@ export default function LoginPage() {
       const toPubkey = new PublicKey(RECIPIENT_ADDRESS);
       const lamports = Math.round(COURSE_PRICE_SOL * LAMPORTS_PER_SOL);
 
-      const blockhash = await fetchBlockhash();
+      const blockhash = await fetchBlockhash(network);
 
       const transaction = new Transaction({
         recentBlockhash: blockhash,
@@ -137,7 +146,7 @@ export default function LoginPage() {
         setPayError("Payment failed. Please try again.");
       }
     }
-  }, [walletAddress]);
+  }, [walletAddress, network]);
 
   const stepNumber = { connect: 1, payment: 2, success: 3 } as const;
 
@@ -173,10 +182,12 @@ export default function LoginPage() {
               onPurchase={purchaseCourse}
               onDisconnect={disconnectWallet}
               currentStep={stepNumber[step]}
+              network={network}
+              onNetworkChange={setNetwork}
             />
           )}
           {step === "success" && (
-            <SuccessCard txSignature={txSignature} />
+            <SuccessCard txSignature={txSignature} network={network} />
           )}
         </div>
       </section>
@@ -435,10 +446,14 @@ function PaymentCard({
   onPurchase,
   onDisconnect,
   currentStep,
+  network,
+  onNetworkChange,
 }: {
   walletAddress: string;
   payStatus: "idle" | "paying";
   errorMsg: string;
+  network: SolanaNetwork;
+  onNetworkChange: (n: SolanaNetwork) => void;
   onPurchase: () => void;
   onDisconnect: () => void;
   currentStep: 1 | 2 | 3;
@@ -461,9 +476,39 @@ function PaymentCard({
         </button>
       </div>
 
-      <div className="mb-6">
+      <div className="mb-4">
         <h2 className="font-heading font-bold text-2xl mb-1">Complete your purchase</h2>
         <p className="text-[#9CA3AF] font-body text-sm">One-time payment — lifetime access</p>
+      </div>
+
+      {/* Network selector */}
+      <div className="mb-5">
+        <p className="text-xs text-white/40 font-body mb-2 uppercase tracking-widest">Network</p>
+        <div className="flex gap-2">
+          {(["mainnet", "devnet", "testnet"] as SolanaNetwork[]).map((n) => {
+            const cfg = NETWORK_CONFIG[n];
+            const active = network === n;
+            return (
+              <button
+                key={n}
+                onClick={() => onNetworkChange(n)}
+                disabled={payStatus === "paying"}
+                className={`flex-1 py-2 rounded-xl text-xs font-semibold font-body border transition-all ${
+                  active
+                    ? `${cfg.badge} border-current scale-[1.03]`
+                    : "bg-white/[0.03] border-white/10 text-white/40 hover:text-white/60"
+                }`}
+              >
+                {cfg.label}
+              </button>
+            );
+          })}
+        </div>
+        {network !== "mainnet" && (
+          <p className="text-amber-400 text-xs font-body mt-2 text-center">
+            ⚠ {NETWORK_CONFIG[network].label} — switch your Phantom wallet to {NETWORK_CONFIG[network].label} before paying
+          </p>
+        )}
       </div>
 
       <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-5 mb-6">
@@ -526,7 +571,8 @@ function PaymentCard({
   );
 }
 
-function SuccessCard({ txSignature }: { txSignature: string | null }) {
+function SuccessCard({ txSignature, network }: { txSignature: string | null; network: SolanaNetwork }) {
+  const cfg = NETWORK_CONFIG[network];
   return (
     <div className="glass-card rounded-3xl p-8 md:p-10 text-center">
       <StepIndicator current={3} />
@@ -539,21 +585,27 @@ function SuccessCard({ txSignature }: { txSignature: string | null }) {
         </svg>
       </div>
       <h2 className="font-heading font-bold text-3xl mb-3">You&apos;re enrolled!</h2>
-      <p className="text-[#9CA3AF] font-body mb-6 leading-relaxed">
+      <p className="text-[#9CA3AF] font-body mb-4 leading-relaxed">
         Payment confirmed on-chain. Welcome to Vibe Coding —<br />check your email for next steps.
       </p>
+      <span className={`inline-flex items-center gap-1.5 text-xs font-body px-3 py-1 rounded-full border mb-6 ${cfg.badge}`}>
+        <span className="w-1.5 h-1.5 rounded-full" style={{ background: cfg.color }} />
+        {cfg.label}
+      </span>
       {txSignature && (
-        <a
-          href={`https://solscan.io/tx/${txSignature}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 text-xs text-[#3B82F6] hover:underline font-mono mb-8"
-        >
-          <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-          </svg>
-          {txSignature.slice(0, 16)}…{txSignature.slice(-8)}
-        </a>
+        <div className="block mb-8">
+          <a
+            href={`${cfg.solscan}${txSignature}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 text-xs text-[#3B82F6] hover:underline font-mono"
+          >
+            <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+            </svg>
+            {txSignature.slice(0, 16)}…{txSignature.slice(-8)}
+          </a>
+        </div>
       )}
       <Link
         href="/"
