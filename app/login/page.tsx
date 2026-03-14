@@ -109,61 +109,102 @@ export default function LoginPage() {
   const purchaseCourse = useCallback(async () => {
     const provider = getProvider();
     if (!provider || !walletAddress) return;
+
+    // Tracks the signature so we can verify on-chain even if confirmTransaction throws
+    let txSig: string | null = null;
+
     try {
       setPayStatus("paying");
       setPayError("");
 
       const fromPubkey = new PublicKey(walletAddress);
-      const toPubkey = new PublicKey(RECIPIENT_ADDRESS);
-      const lamports = Math.round(COURSE_PRICE_SOL * LAMPORTS_PER_SOL);
+      const toPubkey   = new PublicKey(RECIPIENT_ADDRESS);
+      const lamports   = Math.round(COURSE_PRICE_SOL * LAMPORTS_PER_SOL);
 
-      // Build a devnet Connection we control — this is what broadcasts the tx.
-      // We do NOT use signAndSendTransaction because Phantom would broadcast to
-      // whatever network the wallet is configured on (typically mainnet), causing
-      // a "blockhash not found" failure (code -32603). Instead we:
-      //   1. signTransaction — Phantom only signs, does NOT broadcast.
-      //   2. sendRawTransaction via our Connection — always hits devnet.
-      const connection = new Connection(DEVNET_RPCS[0], {
-        commitment: "confirmed",
-        disableRetryOnRateLimit: false,
-      });
+      // ── 1. Create a working devnet Connection ──────────────────────────────
+      // Try each RPC in order; log success/failure for each attempt.
+      // If every probe fails we still fall back to the primary — it may recover
+      // by the time the transaction is sent (transient devnet hiccup).
+      let connection!: Connection;
+      let connectedRpc = "";
+      for (const rpc of DEVNET_RPCS) {
+        try {
+          const candidate = new Connection(rpc, "confirmed");
+          await candidate.getVersion();          // lightweight health probe
+          connection  = candidate;
+          connectedRpc = rpc;
+          console.log("[solana] RPC connected:", rpc);
+          break;
+        } catch (probeErr) {
+          console.error("[solana] RPC unreachable, trying next:", rpc, probeErr);
+        }
+      }
+      if (!connection) {
+        console.warn("[solana] all RPC probes failed — using primary as fallback");
+        connection  = new Connection(DEVNET_RPCS[0], "confirmed");
+        connectedRpc = DEVNET_RPCS[0];
+      }
 
+      // ── 2. Fetch a fresh blockhash ─────────────────────────────────────────
       const { blockhash, lastValidBlockHeight } = await fetchBlockhash();
+      console.log("[solana] blockhash fetched:", blockhash, "via", connectedRpc);
 
+      // ── 3. Build the transfer transaction ─────────────────────────────────
       const transaction = new Transaction({
         recentBlockhash: blockhash,
         feePayer: fromPubkey,
       }).add(SystemProgram.transfer({ fromPubkey, toPubkey, lamports }));
 
-      // Step 1: ask Phantom to sign only — does NOT broadcast
+      // ── 4. Phantom signs only — does NOT broadcast ─────────────────────────
       const signedTx = await provider.signTransaction(transaction);
 
-      // Step 2: broadcast ourselves to devnet.
-      // skipPreflight: true avoids a false "Blockhash not found" rejection
-      // that happens when the preflight node hasn't yet propagated the blockhash
-      // from the node we fetched it from (common on the public devnet RPC cluster).
-      const signature = await connection.sendRawTransaction(signedTx.serialize(), {
+      // ── 5. We broadcast to devnet ourselves ───────────────────────────────
+      // skipPreflight: true avoids a false "Blockhash not found" preflight
+      // rejection caused by RPC node desync on the public devnet cluster.
+      txSig = await connection.sendRawTransaction(signedTx.serialize(), {
         skipPreflight: true,
       });
+      console.log("[solana] transaction sent:", txSig);
 
-      // Step 3: wait for on-chain confirmation using the block-height strategy
-      // (the deprecated string-only form of confirmTransaction can hang on devnet).
-      await connection.confirmTransaction(
-        { signature, blockhash, lastValidBlockHeight },
-        "confirmed"
-      );
+      // ── 6. Confirm with block-height strategy ─────────────────────────────
+      // If confirmTransaction throws (e.g. block-height window expired while
+      // waiting) we fall back to a direct status check — the tx may have already
+      // landed even though the polling timed out.
+      try {
+        await connection.confirmTransaction(
+          { signature: txSig, blockhash, lastValidBlockHeight },
+          "confirmed",
+        );
+        console.log("[solana] transaction confirmed:", txSig);
+      } catch (confirmErr) {
+        console.warn("[solana] confirmTransaction threw — checking status directly:", confirmErr);
+        const status = await connection.getSignatureStatus(txSig, {
+          searchTransactionHistory: true,
+        });
+        const conf = status?.value?.confirmationStatus;
+        console.log("[solana] status check result:", conf, status?.value?.err ?? "no error");
+        if (conf === "confirmed" || conf === "finalized") {
+          console.log("[solana] transaction confirmed via status check:", txSig);
+          // falls through to success
+        } else if (status?.value?.err) {
+          throw new Error("Transaction rejected on-chain: " + JSON.stringify(status.value.err));
+        } else {
+          throw new Error("Transaction could not be confirmed — check Solscan with signature: " + txSig);
+        }
+      }
 
-      setTxSignature(signature);
+      setTxSignature(txSig);
       setPayStatus("idle");
       setStep("success");
     } catch (err: unknown) {
       setPayStatus("idle");
       console.error("[payment error]", err);
-      const code = (err as { code?: number })?.code;
-      const rawMsg = err instanceof Error
+      const code    = (err as { code?: number })?.code;
+      const rawMsg  = err instanceof Error
         ? err.message
         : String((err as { message?: string })?.message ?? JSON.stringify(err));
       const msg = rawMsg.toLowerCase();
+
       const isRejected =
         code === 4001 ||
         msg.includes("reject") ||
@@ -179,6 +220,7 @@ export default function LoginPage() {
         msg.includes("fetch") ||
         msg.includes("rpc") ||
         msg.includes("timeout");
+
       if (isRejected) {
         setPayError("Transaction was cancelled. Please try again.");
       } else if (isNetwork) {
