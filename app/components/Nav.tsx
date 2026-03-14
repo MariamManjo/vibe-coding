@@ -1,59 +1,49 @@
 "use client";
 import Link from "next/link";
-import { useState } from "react";
 
 export default function Nav() {
-  const [open, setOpen] = useState(false);
-
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-[#0A0A0A]/90 backdrop-blur-sm border-b border-white/10">
-      <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-        <Link href="/" className="font-heading font-bold text-xl tracking-tight">
+    <nav
+      className="fixed top-0 left-0 right-0 z-50"
+      style={{
+        background: "rgba(10,10,10,0.75)",
+        backdropFilter: "blur(16px)",
+        WebkitBackdropFilter: "blur(16px)",
+        borderBottom: "1px solid rgba(255,255,255,0.07)",
+      }}
+    >
+      <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+
+        {/* Logo */}
+        <Link
+          href="/"
+          className="font-heading font-bold text-xl tracking-tight transition-all duration-300 hover:drop-shadow-[0_0_12px_rgba(153,69,255,0.7)]"
+        >
           Vibe<span className="text-accent">Coding</span>
         </Link>
 
-        {/* Desktop links */}
-        <div className="hidden md:flex items-center gap-8">
-          <Link href="/program" className="text-white/70 hover:text-white transition-colors text-sm font-body">
-            Program
-          </Link>
-          <Link href="/#modules" className="text-white/70 hover:text-white transition-colors text-sm font-body">
-            Modules
-          </Link>
-          <Link href="/workshop" className="text-white/70 hover:text-white transition-colors text-sm font-body">
-            Workshop
-          </Link>
-          <Link
-            href="/start"
-            className="bg-accent hover:bg-blue-500 text-white text-sm font-semibold px-5 py-2 rounded-full transition-all hover:scale-105"
-          >
-            Enroll Now
-          </Link>
-        </div>
-
-        {/* Mobile hamburger */}
-        <button
-          className="md:hidden text-white/80 hover:text-white"
-          onClick={() => setOpen(!open)}
-          aria-label="Toggle menu"
+        {/* Single CTA */}
+        <Link
+          href="/start"
+          className="relative overflow-hidden text-white text-sm font-semibold px-5 py-2.5 rounded-full transition-all duration-200 hover:scale-105 hover:shadow-[0_0_20px_rgba(153,69,255,0.5)]"
+          style={{
+            background: "linear-gradient(135deg, #9945FF 0%, #3B82F6 60%, #14F195 100%)",
+            backgroundSize: "200% 200%",
+            animation: "nav-cta-shift 4s ease infinite",
+          }}
         >
-          <div className="w-6 flex flex-col gap-1.5">
-            <span className={`block h-0.5 bg-current transition-all ${open ? "rotate-45 translate-y-2" : ""}`} />
-            <span className={`block h-0.5 bg-current transition-all ${open ? "opacity-0" : ""}`} />
-            <span className={`block h-0.5 bg-current transition-all ${open ? "-rotate-45 -translate-y-2" : ""}`} />
-          </div>
-        </button>
+          <span className="relative z-10">Start Building →</span>
+        </Link>
+
       </div>
 
-      {/* Mobile menu */}
-      {open && (
-        <div className="md:hidden bg-[#0A0A0A] border-t border-white/10 px-6 py-4 flex flex-col gap-4">
-          <Link href="/program" className="text-white/70 hover:text-white transition-colors font-body" onClick={() => setOpen(false)}>Program</Link>
-          <Link href="/#modules" className="text-white/70 hover:text-white transition-colors font-body" onClick={() => setOpen(false)}>Modules</Link>
-          <Link href="/workshop" className="text-white/70 hover:text-white transition-colors font-body" onClick={() => setOpen(false)}>Workshop</Link>
-          <Link href="/start" className="bg-accent text-white font-semibold px-5 py-2.5 rounded-full text-center" onClick={() => setOpen(false)}>Enroll Now</Link>
-        </div>
-      )}
+      <style>{`
+        @keyframes nav-cta-shift {
+          0%   { background-position: 0% 50%; }
+          50%  { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+      `}</style>
     </nav>
   );
 }
