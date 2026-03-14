@@ -46,7 +46,11 @@ interface SolanaProvider {
   disconnect: () => Promise<void>;
   publicKey?: { toString: () => string } | null;
   signTransaction: (tx: Transaction) => Promise<Transaction>;
-  signAndSendTransaction?: (tx: Transaction) => Promise<{ signature: string }>;
+  sendTransaction: (
+    tx: Transaction,
+    connection: Connection,
+    opts?: { skipPreflight?: boolean; preflightCommitment?: string }
+  ) => Promise<string>;
 }
 
 declare global {
@@ -173,20 +177,25 @@ export default function LoginPage() {
       const transaction = new Transaction({
         recentBlockhash: blockhash,
         feePayer: fromPubkey,
-      }).add(SystemProgram.transfer({ fromPubkey, toPubkey, lamports }));
+      }).add(
+        SystemProgram.transfer({
+          fromPubkey,
+          toPubkey: new PublicKey(RECIPIENT_ADDRESS),
+          lamports,
+        })
+      );
 
-      // ── 4. Phantom signs only — does NOT broadcast ─────────────────────────
-      const signedTx = await provider.signTransaction(transaction);
-
-      // ── 5. We broadcast to devnet ourselves ───────────────────────────────
-      // skipPreflight: true avoids a false "Blockhash not found" preflight
-      // rejection caused by RPC node desync on the public devnet cluster.
-      txSig = await connection.sendRawTransaction(signedTx.serialize(), {
+      // ── 4. Phantom signs and sends via our devnet connection ───────────────
+      // provider.sendTransaction signs the tx with the user's key internally,
+      // then sends it over the connection we supply — guaranteeing devnet.
+      // skipPreflight: true prevents false-positive preflight rejections from
+      // RPC node desync on the public devnet cluster.
+      txSig = await provider.sendTransaction(transaction, connection, {
         skipPreflight: true,
       });
-      console.log("[solana] transaction sent:", txSig);
+      console.log("[solana] transaction sent via provider.sendTransaction:", txSig);
 
-      // ── 6. Confirm with block-height strategy ─────────────────────────────
+      // ── 5. Confirm with block-height strategy ─────────────────────────────
       // If confirmTransaction throws (e.g. block-height window expired while
       // waiting) we fall back to a direct status check — the tx may have already
       // landed even though the polling timed out.
