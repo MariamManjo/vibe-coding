@@ -321,6 +321,29 @@ const stats = [
   { value: "2+", label: "Years Teaching AI & Design" },
 ];
 
+const codeRain = [
+  { char: "0",    left: "4%",  delay: "0s",    dur: "5.2s", opacity: "0.06" },
+  { char: "{}",   left: "10%", delay: "1.3s",  dur: "7.1s", opacity: "0.05" },
+  { char: "0",    left: "17%", delay: "0.5s",  dur: "6.0s", opacity: "0.08" },
+  { char: "//",   left: "24%", delay: "2.2s",  dur: "8.4s", opacity: "0.05" },
+  { char: "<>",   left: "31%", delay: "0.9s",  dur: "5.8s", opacity: "0.06" },
+  { char: "null", left: "39%", delay: "3.1s",  dur: "9.2s", opacity: "0.04" },
+  { char: "0",    left: "46%", delay: "1.6s",  dur: "6.7s", opacity: "0.07" },
+  { char: "=>",   left: "53%", delay: "0.3s",  dur: "7.8s", opacity: "0.05" },
+  { char: "0",    left: "60%", delay: "2.9s",  dur: "5.3s", opacity: "0.08" },
+  { char: "true", left: "67%", delay: "1.1s",  dur: "8.1s", opacity: "0.04" },
+  { char: "{}",   left: "74%", delay: "3.6s",  dur: "6.4s", opacity: "0.06" },
+  { char: "0",    left: "81%", delay: "0.7s",  dur: "7.3s", opacity: "0.07" },
+  { char: "//",   left: "88%", delay: "2.5s",  dur: "5.6s", opacity: "0.05" },
+  { char: "0",    left: "94%", delay: "1.9s",  dur: "9.0s", opacity: "0.06" },
+  { char: "<>",   left: "7%",  delay: "4.1s",  dur: "6.8s", opacity: "0.04" },
+  { char: "0",    left: "35%", delay: "0.8s",  dur: "8.3s", opacity: "0.07" },
+  { char: "fn()", left: "56%", delay: "2.3s",  dur: "7.0s", opacity: "0.04" },
+  { char: "0",    left: "71%", delay: "4.6s",  dur: "5.5s", opacity: "0.08" },
+  { char: "=>",   left: "14%", delay: "3.4s",  dur: "6.2s", opacity: "0.05" },
+  { char: "0",    left: "42%", delay: "1.0s",  dur: "8.8s", opacity: "0.06" },
+];
+
 export default function Home() {
   return (
     <main className="min-h-screen bg-[#0A0A0A] text-white overflow-x-hidden">
@@ -719,39 +742,150 @@ export default function Home() {
 
       <div className="section-divider" />
 
-      {/* ── IS THIS FOR YOU ────────────────────────────── */}
-      <section className="py-24 px-6 bg-white/[0.02]">
-        <div className="max-w-4xl mx-auto text-center">
-          <p className="text-[#9CA3AF] uppercase tracking-widest text-xs font-body mb-8">Is This For You?</p>
-          <h2 className="font-heading font-bold text-4xl md:text-6xl leading-tight mb-8">
-            You don&apos;t need to know how to code.
-            <br />
-            <span className="text-[#9CA3AF] font-medium text-3xl md:text-4xl">
-              You don&apos;t need a tech background.
-            </span>
+      {/* ── IS THIS FOR YOU — Visual storytelling ───────── */}
+      <section className="py-28 px-6 relative overflow-hidden">
+        {/* Ambient orbs */}
+        <div className="absolute top-0 left-0 w-[500px] h-[500px] rounded-full pointer-events-none"
+          style={{ background: "radial-gradient(circle, rgba(153,69,255,0.1) 0%, transparent 65%)", filter: "blur(80px)" }} />
+        <div className="absolute bottom-0 right-0 w-[500px] h-[500px] rounded-full pointer-events-none"
+          style={{ background: "radial-gradient(circle, rgba(20,241,149,0.08) 0%, transparent 65%)", filter: "blur(80px)" }} />
+
+        {/* Code rain */}
+        {codeRain.map((drop, i) => (
+          <span
+            key={i}
+            className="code-drop absolute top-0 font-mono text-sm select-none pointer-events-none"
+            style={{
+              left: drop.left,
+              animationDuration: drop.dur,
+              animationDelay: drop.delay,
+              color: `rgba(255,255,255,${drop.opacity})`,
+            }}
+          >
+            {drop.char}
+          </span>
+        ))}
+
+        <div className="max-w-5xl mx-auto relative z-10 text-center">
+
+          {/* Badge */}
+          <div className="inline-flex items-center gap-2 bg-white/[0.04] border border-white/10 rounded-full px-4 py-1.5 mb-10">
+            <span className="text-white/40 text-xs font-mono uppercase tracking-widest">for absolute beginners</span>
+          </div>
+
+          {/* Headline — minimal */}
+          <h2 className="font-heading font-black text-5xl md:text-7xl lg:text-8xl leading-none tracking-tight mb-4">
+            No code.
           </h2>
-          <p className="text-[#9CA3AF] text-xl font-body leading-relaxed mb-16">
-            You just need an idea and the will to build it.
-          </p>
-          <div className="grid sm:grid-cols-3 gap-6 text-center">
-            {[
-              { highlight: "0 coding skills needed", sub: "Start from absolute zero" },
-              { highlight: "7 hands-on lectures", sub: "Learn by building real things" },
-              { highlight: "1 real product shipped", sub: "Graduate with something live" },
-            ].map((item) => (
-              <div key={item.highlight} className="bg-white/[0.04] border border-white/10 rounded-2xl p-6">
-                <div
-                  className="font-heading font-bold text-xl mb-2"
-                  style={{
-                    background: "linear-gradient(90deg, #3B82F6, #8B5CF6)",
-                    WebkitBackgroundClip: "text",
-                    WebkitTextFillColor: "transparent",
-                    backgroundClip: "text",
-                  }}
-                >
-                  {item.highlight}
+          <h2 className="font-heading font-black text-5xl md:text-7xl lg:text-8xl leading-none tracking-tight mb-12"
+            style={{ background: "linear-gradient(90deg, #9945FF, #14F195)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
+            Just vibes.
+          </h2>
+
+          {/* ── Visual trio ── */}
+          <div className="grid grid-cols-3 gap-4 md:gap-8 mb-16 max-w-3xl mx-auto items-center">
+
+            {/* Col 1 — Code barrier (crossed out) */}
+            <div className="relative group">
+              <div className="rounded-2xl border border-white/[0.08] p-4 bg-white/[0.02] font-mono text-left overflow-hidden">
+                <div className="text-[10px] md:text-xs text-white/25 leading-relaxed space-y-1">
+                  <div><span className="text-[#9945FF]/40">if</span> <span className="text-white/20">(skill</span></div>
+                  <div className="pl-2 text-white/15">=== &quot;coding&quot;</div>
+                  <div className="text-white/20">{"{"}build(){" }"}</div>
+                  <div className="text-white/15 pl-2">return app</div>
+                  <div className="text-white/20">{"}"}</div>
                 </div>
-                <p className="text-[#9CA3AF] text-sm font-body">{item.sub}</p>
+                {/* Animated X slash overlay */}
+                <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none">
+                  <line className="slash-line" x1="8" y1="8" x2="92" y2="92" stroke="#ff4444" strokeWidth="3" strokeLinecap="round"/>
+                  <line className="slash-line" x1="92" y1="8" x2="8" y2="92" stroke="#ff4444" strokeWidth="3" strokeLinecap="round" style={{ animationDelay: "0.3s" }}/>
+                </svg>
+              </div>
+              <p className="text-white/20 text-[10px] font-mono uppercase tracking-widest mt-2">the old gate</p>
+            </div>
+
+            {/* Col 2 — AI Ghost bridge (center) */}
+            <div className="flex flex-col items-center gap-3">
+              {/* Arrows pointing inward then outward */}
+              <div className="flex items-center gap-2 mb-1">
+                <div className="h-px flex-1"
+                  style={{ background: "linear-gradient(90deg, transparent, rgba(153,69,255,0.6))" }} />
+                <div className="w-1.5 h-1.5 rounded-full bg-[#9945FF]"
+                  style={{ boxShadow: "0 0 8px #9945FF" }} />
+                <div className="h-px flex-1"
+                  style={{ background: "linear-gradient(90deg, rgba(20,241,149,0.6), transparent)" }} />
+              </div>
+
+              {/* Ghost character */}
+              <div className="relative outcome-float-2">
+                <div className="absolute inset-[-8px] rounded-full blur-xl opacity-60"
+                  style={{ background: "radial-gradient(circle, rgba(153,69,255,0.5), rgba(20,241,149,0.3), transparent)" }} />
+                <svg viewBox="0 0 80 90" fill="none" className="relative w-16 h-20 md:w-20 md:h-24"
+                  style={{ filter: "drop-shadow(0 0 14px rgba(153,69,255,0.7))" }}>
+                  <path d="M14 42C14 20 25 6 40 6C55 6 66 20 66 42L66 76C66 79 63 81 61 78L54 72L47 78C45 80 43 80 41 78L40 76L39 78C37 80 35 80 33 78L26 72L19 78C17 81 14 79 14 76Z"
+                    fill="url(#ghostG2)" fillOpacity="0.95" stroke="rgba(153,69,255,0.5)" strokeWidth="1.5"/>
+                  <ellipse cx="30" cy="43" rx="5.5" ry="6.5" fill="white" opacity="0.95"/>
+                  <ellipse cx="50" cy="43" rx="5.5" ry="6.5" fill="white" opacity="0.95"/>
+                  <ellipse cx="31" cy="45" rx="2.8" ry="3.2" fill="#1a0a2e"/>
+                  <ellipse cx="51" cy="45" rx="2.8" ry="3.2" fill="#1a0a2e"/>
+                  <circle cx="32" cy="43" r="1.2" fill="white" opacity="0.7"/>
+                  <circle cx="52" cy="43" r="1.2" fill="white" opacity="0.7"/>
+                  {/* Holding sparkle wand */}
+                  <line x1="66" y1="55" x2="76" y2="38" stroke="#14F195" strokeWidth="2" strokeLinecap="round"/>
+                  <circle cx="77" cy="36" r="4" fill="#14F195" opacity="0.9" style={{ filter: "blur(0.5px)" }}/>
+                  <circle cx="77" cy="36" r="2" fill="white"/>
+                  {/* Small sparkles from wand */}
+                  <circle cx="73" cy="30" r="1.5" fill="#14F195" opacity="0.7"/>
+                  <circle cx="80" cy="28" r="1" fill="#14F195" opacity="0.5"/>
+                  <circle cx="75" cy="24" r="1" fill="white" opacity="0.4"/>
+                  <defs>
+                    <linearGradient id="ghostG2" x1="14" y1="6" x2="66" y2="90" gradientUnits="userSpaceOnUse">
+                      <stop stopColor="#9945FF"/>
+                      <stop offset="1" stopColor="#6e3bc4"/>
+                    </linearGradient>
+                  </defs>
+                </svg>
+              </div>
+
+              <span className="text-[10px] font-mono text-[#14F195]/60 uppercase tracking-widest">AI handles it</span>
+            </div>
+
+            {/* Col 3 — Shipped product (terminal) */}
+            <div className="relative group">
+              <div className="rounded-2xl border border-[#14F195]/15 p-4 bg-[#14F195]/[0.03] font-mono text-left overflow-hidden"
+                style={{ boxShadow: "0 0 20px rgba(20,241,149,0.06)" }}>
+                <div className="text-[10px] md:text-xs leading-relaxed space-y-1.5">
+                  <div className="text-white/30">$ deploy</div>
+                  <div className="text-[#14F195]/80">▸ building...</div>
+                  <div className="text-[#14F195]/80">▸ optimising...</div>
+                  <div className="flex items-center gap-1">
+                    <span className="text-[#14F195]">✓</span>
+                    <span className="text-[#14F195] font-bold">live!</span>
+                  </div>
+                  <div className="text-white/20 text-[9px]">your-app.com</div>
+                </div>
+                {/* Glow pulse */}
+                <div className="absolute inset-0 rounded-2xl pointer-events-none"
+                  style={{ background: "radial-gradient(circle at 50% 50%, rgba(20,241,149,0.05), transparent 70%)" }} />
+              </div>
+              <p className="text-white/20 text-[10px] font-mono uppercase tracking-widest mt-2">your product</p>
+            </div>
+          </div>
+
+          {/* ── Stat pills ── */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            {[
+              { num: "0", label: "coding skills needed", color: "#9945FF", glow: "rgba(153,69,255,0.3)" },
+              { num: "7", label: "weeks to ship",        color: "#3B82F6", glow: "rgba(59,130,246,0.3)" },
+              { num: "1", label: "real product live",    color: "#14F195", glow: "rgba(20,241,149,0.3)" },
+            ].map(({ num, label, color, glow }) => (
+              <div
+                key={num + label}
+                className="flex items-center gap-3 bg-white/[0.03] border border-white/[0.07] rounded-2xl px-6 py-4"
+                style={{ boxShadow: `0 0 20px ${glow}` }}
+              >
+                <span className="font-heading font-black text-3xl" style={{ color }}>{num}</span>
+                <span className="text-white/50 text-sm font-body">{label}</span>
               </div>
             ))}
           </div>

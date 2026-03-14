@@ -202,6 +202,26 @@ h1, h2, h3, h4, h5, h6 {
   animation: gradient-ring-spin 4s linear infinite;
 }
 
+/* ── Code rain fall ─────────────────────────────── */
+@keyframes code-fall {
+  0%   { transform: translateY(-80px); opacity: 0; }
+  8%   { opacity: 1; }
+  80%  { opacity: 0.6; }
+  100% { transform: translateY(620px); opacity: 0; }
+}
+.code-drop { animation: code-fall linear infinite; }
+
+/* ── Barrier slash animation ─────────────────────── */
+@keyframes slash-draw {
+  0%   { stroke-dashoffset: 300; opacity: 0; }
+  30%  { opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: 1; }
+}
+.slash-line {
+  stroke-dasharray: 300;
+  animation: slash-draw 1.4s ease-out forwards;
+}
+
 /* ── Outcome character idle floats ──────────────── */
 @keyframes outcome-float {
   0%, 100% { transform: translateY(0px); }
