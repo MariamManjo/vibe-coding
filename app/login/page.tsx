@@ -5,6 +5,7 @@ import Link from "next/link";
 import Nav from "../components/Nav";
 import Footer from "../components/Footer";
 import {
+  Connection,
   PublicKey,
   SystemProgram,
   Transaction,
@@ -17,6 +18,13 @@ const RECIPIENT_ADDRESS =
   "GhgXp29MrWxzdU1pdjo7gbmm2QjTY4TE6iomsM4hv9Ct";
 const NETWORK = "devnet";
 const SOLSCAN_BASE = "https://solscan.io/tx/?cluster=devnet";
+
+// We send the transaction ourselves to this RPC — guarantees devnet
+// regardless of which network the user's Phantom is configured on.
+const DEVNET_RPCS = [
+  "https://api.devnet.solana.com",
+  "https://rpc.ankr.com/solana_devnet",
+];
 
 async function fetchBlockhash(): Promise<string> {
   const res = await fetch(`/api/blockhash`);
@@ -34,7 +42,8 @@ interface SolanaProvider {
   connect: (opts?: { onlyIfTrusted?: boolean }) => Promise<{ publicKey: { toString: () => string } }>;
   disconnect: () => Promise<void>;
   publicKey?: { toString: () => string } | null;
-  signAndSendTransaction: (tx: Transaction) => Promise<{ signature: string }>;
+  signTransaction: (tx: Transaction) => Promise<Transaction>;
+  signAndSendTransaction?: (tx: Transaction) => Promise<{ signature: string }>;
 }
 
 declare global {
@@ -105,6 +114,17 @@ export default function LoginPage() {
       const toPubkey = new PublicKey(RECIPIENT_ADDRESS);
       const lamports = Math.round(COURSE_PRICE_SOL * LAMPORTS_PER_SOL);
 
+      // Build a devnet Connection we control — this is what broadcasts the tx.
+      // We do NOT use signAndSendTransaction because Phantom would broadcast to
+      // whatever network the wallet is configured on (typically mainnet), causing
+      // a "blockhash not found" failure (code -32603). Instead we:
+      //   1. signTransaction — Phantom only signs, does NOT broadcast.
+      //   2. sendRawTransaction via our Connection — always hits devnet.
+      const connection = new Connection(DEVNET_RPCS[0], {
+        commitment: "confirmed",
+        disableRetryOnRateLimit: false,
+      });
+
       const blockhash = await fetchBlockhash();
 
       const transaction = new Transaction({
@@ -112,7 +132,18 @@ export default function LoginPage() {
         feePayer: fromPubkey,
       }).add(SystemProgram.transfer({ fromPubkey, toPubkey, lamports }));
 
-      const { signature } = await provider.signAndSendTransaction(transaction);
+      // Step 1: ask Phantom to sign only
+      const signedTx = await provider.signTransaction(transaction);
+
+      // Step 2: broadcast ourselves to devnet
+      const signature = await connection.sendRawTransaction(signedTx.serialize(), {
+        skipPreflight: false,
+        preflightCommitment: "confirmed",
+      });
+
+      // Step 3: wait for confirmation
+      await connection.confirmTransaction(signature, "confirmed");
+
       setTxSignature(signature);
       setPayStatus("idle");
       setStep("success");
@@ -128,15 +159,21 @@ export default function LoginPage() {
         code === 4001 ||
         msg.includes("reject") ||
         msg.includes("cancel") ||
-        msg.includes("user") ||
-        msg.includes("block") ||
         msg.includes("denied") ||
         msg.includes("dismiss") ||
         msg.includes("closed");
+      const isNetwork =
+        code === -32603 ||
+        msg.includes("reach") ||
+        msg.includes("network") ||
+        msg.includes("blockhash") ||
+        msg.includes("fetch") ||
+        msg.includes("rpc") ||
+        msg.includes("timeout");
       if (isRejected) {
         setPayError("Transaction was cancelled. Please try again.");
-      } else if (msg.includes("reach") || msg.includes("network") || msg.includes("blockhash") || msg.includes("fetch")) {
-        setPayError("Could not connect to Solana. Check your internet and try again.");
+      } else if (isNetwork) {
+        setPayError("Could not connect to Solana Devnet. Check your internet and try again.");
       } else {
         setPayError("Payment failed. Please try again.");
       }
@@ -159,7 +196,7 @@ export default function LoginPage() {
           style={{ background: "radial-gradient(circle, #8B5CF6 0%, transparent 70%)", filter: "blur(100px)" }}
         />
 
-        <div className="relative z-10 w-full max-w-md">
+        <div className="relative z-10 w-full max-w-lg">
           {step === "connect" && (
             <ConnectCard
               connectStatus={connectStatus}
@@ -448,65 +485,111 @@ function PaymentCard({
   currentStep: 1 | 2 | 3;
 }) {
   return (
-    <div className="glass-card rounded-3xl p-8 md:p-10">
+    <div className="glass-card rounded-3xl p-7 md:p-9">
       <StepIndicator current={currentStep} />
 
+      {/* ── Signed-in row ── */}
       <div className="flex items-center justify-between bg-white/[0.04] border border-white/10 rounded-xl px-4 py-3 mb-6">
         <div className="flex items-center gap-2.5">
           <div className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse" />
-          <span className="text-sm font-body text-white/60">Signed in</span>
+          <span className="text-sm font-body text-white/55">Signed in</span>
           <span className="text-sm font-mono text-white/90">{shortenAddress(walletAddress)}</span>
         </div>
-        <button
-          onClick={onDisconnect}
-          className="text-xs text-[#9CA3AF] hover:text-white transition-colors underline underline-offset-2"
-        >
+        <button onClick={onDisconnect}
+          className="text-xs text-white/30 hover:text-white transition-colors underline underline-offset-2">
           Sign out
         </button>
       </div>
 
-      <div className="mb-4">
-        <h2 className="font-heading font-bold text-2xl mb-1">Complete your purchase</h2>
-        <p className="text-[#9CA3AF] font-body text-sm">One-time payment — lifetime access</p>
-      </div>
-
-      {/* Network badge — always devnet */}
-      <div className="mb-5">
-        <p className="text-xs text-white/40 font-body mb-2 uppercase tracking-widest">Network</p>
-        <div className="flex items-center gap-3">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-amber-500/30 bg-amber-500/10">
-            <div className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
-            <span className="text-amber-400 text-xs font-semibold font-mono uppercase tracking-wide">Devnet</span>
-          </div>
-          <p className="text-amber-400/70 text-xs font-body">
-            ⚠ Switch your Phantom wallet to <strong>Devnet</strong> before paying
-          </p>
+      {/* ── Product header ── */}
+      <div className="flex items-start justify-between mb-5">
+        <div>
+          <p className="text-white/35 text-[11px] font-mono uppercase tracking-widest mb-1">Order Summary</p>
+          <h2 className="font-heading font-bold text-xl leading-tight text-white">
+            Vibe Coding — Full 7-Week Program
+          </h2>
+        </div>
+        <div className="text-right ml-4 flex-shrink-0">
+          <p className="font-heading font-bold text-3xl text-white leading-none">{COURSE_PRICE_SOL} SOL</p>
+          <p className="text-white/30 text-[11px] font-body mt-0.5">one-time · lifetime access</p>
         </div>
       </div>
 
-      <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-5 mb-6">
-        <div className="flex items-center justify-between mb-3">
-          <span className="text-[#9CA3AF] font-body text-sm">Vibe Coding — Full Program</span>
-          <span className="text-xs bg-[#3B82F6]/20 text-[#3B82F6] border border-[#3B82F6]/30 px-2 py-0.5 rounded-full font-body">
-            1 seat
-          </span>
-        </div>
-        <div className="flex items-end gap-2 mb-4">
-          <span className="font-heading font-bold text-4xl">{COURSE_PRICE_SOL} SOL</span>
-          <span className="text-[#9CA3AF] font-body text-sm mb-1">one-time</span>
-        </div>
-        <div className="border-t border-white/10 pt-3 flex flex-col gap-1.5">
-          {["7 hands-on lectures", "Real product you ship", "Lifetime access"].map((f) => (
-            <div key={f} className="flex items-center gap-2 text-sm text-[#9CA3AF] font-body">
-              <svg className="w-4 h-4 text-[#10B981] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      {/* ── What you get ── */}
+      <div className="bg-white/[0.035] border border-white/[0.07] rounded-2xl p-4 mb-5">
+        <p className="text-white/30 text-[10px] font-mono uppercase tracking-widest mb-3">What&apos;s included</p>
+        <div className="grid grid-cols-1 gap-2">
+          {[
+            { icon: "🎓", text: "7 hands-on lectures" },
+            { icon: "🚀", text: "Real product you ship" },
+            { icon: "♾️", text: "Lifetime access" },
+          ].map(({ icon, text }) => (
+            <div key={text} className="flex items-center gap-3">
+              <div className="w-7 h-7 rounded-lg flex items-center justify-center text-sm flex-shrink-0"
+                style={{ background: "rgba(20,241,149,0.1)", border: "1px solid rgba(20,241,149,0.2)" }}>
+                {icon}
+              </div>
+              <span className="text-white/70 text-sm font-body">{text}</span>
+              <svg className="w-4 h-4 text-[#14F195] flex-shrink-0 ml-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
               </svg>
-              {f}
             </div>
           ))}
         </div>
       </div>
 
+      {/* ── Transaction flow ── */}
+      <div className="bg-white/[0.025] border border-white/[0.06] rounded-2xl p-4 mb-5">
+        <p className="text-white/30 text-[10px] font-mono uppercase tracking-widest mb-3">Transaction Preview</p>
+        <div className="flex items-center gap-3">
+          {/* From */}
+          <div className="flex-1 bg-black/30 border border-white/[0.08] rounded-xl p-3 min-w-0">
+            <p className="text-white/30 text-[9px] font-mono uppercase tracking-widest mb-1.5">From</p>
+            <div className="flex items-center gap-2 mb-1">
+              <div className="w-6 h-6 rounded-lg flex-shrink-0 flex items-center justify-center"
+                style={{ background: "linear-gradient(135deg, #4C44C6, #9945FF)" }}>
+                <PhantomIcon />
+              </div>
+              <span className="text-white/60 text-xs font-body truncate">Your Wallet</span>
+            </div>
+            <p className="text-[#9945FF] text-[10px] font-mono truncate">{shortenAddress(walletAddress)}</p>
+          </div>
+
+          {/* Arrow + amount */}
+          <div className="flex flex-col items-center gap-1 flex-shrink-0">
+            <span className="text-white/50 text-[10px] font-mono font-bold">{COURSE_PRICE_SOL} SOL</span>
+            <div className="flex items-center gap-0.5">
+              <div className="w-4 h-px bg-gradient-to-r from-[#9945FF] to-[#14F195]" />
+              <svg className="w-3 h-3 text-[#14F195]" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd"/>
+              </svg>
+            </div>
+            <span className="text-white/20 text-[8px] font-mono">devnet</span>
+          </div>
+
+          {/* To */}
+          <div className="flex-1 bg-black/30 border border-[#14F195]/15 rounded-xl p-3 min-w-0">
+            <p className="text-white/30 text-[9px] font-mono uppercase tracking-widest mb-1.5">To</p>
+            <div className="flex items-center gap-2 mb-1">
+              <div className="w-6 h-6 rounded-lg flex-shrink-0 flex items-center justify-center text-sm"
+                style={{ background: "linear-gradient(135deg, #9945FF22, #14F19522)", border: "1px solid #14F19530" }}>
+                🎓
+              </div>
+              <span className="text-white/60 text-xs font-body truncate">Vibe Coding</span>
+            </div>
+            <p className="text-[#14F195] text-[10px] font-mono truncate">{shortenAddress(RECIPIENT_ADDRESS)}</p>
+          </div>
+        </div>
+
+        {/* Network strip */}
+        <div className="flex items-center gap-2 mt-3 pt-3 border-t border-white/[0.05]">
+          <div className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+          <span className="text-amber-400/70 text-[10px] font-mono uppercase tracking-widest">Solana Devnet</span>
+          <span className="text-white/20 text-[10px] font-body ml-auto">Switch Phantom → Devnet before paying</span>
+        </div>
+      </div>
+
+      {/* ── Error ── */}
       {errorMsg && (
         <div className="flex items-center gap-2 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3 mb-4 text-sm text-red-400 font-body">
           <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -516,16 +599,22 @@ function PaymentCard({
         </div>
       )}
 
+      {/* ── Pay button ── */}
       <button
         onClick={onPurchase}
         disabled={payStatus === "paying"}
-        className="w-full flex items-center justify-center gap-3 text-white font-semibold text-base px-6 py-4 rounded-2xl transition-all hover:scale-[1.02] disabled:opacity-60 disabled:cursor-not-allowed animated-gradient-bg"
-        style={{ boxShadow: "0 0 32px rgba(59,130,246,0.35)" }}
+        className="w-full flex items-center justify-center gap-3 text-white font-heading font-bold text-base px-6 py-4 rounded-2xl transition-all hover:scale-[1.02] disabled:opacity-60 disabled:cursor-not-allowed"
+        style={{
+          background: "linear-gradient(135deg, #9945FF 0%, #3B82F6 55%, #14F195 100%)",
+          boxShadow: payStatus === "paying"
+            ? "none"
+            : "0 0 28px rgba(153,69,255,0.4), 0 0 56px rgba(20,241,149,0.12)",
+        }}
       >
         {payStatus === "paying" ? (
           <>
             <Spinner />
-            Confirming payment…
+            Confirming on-chain…
           </>
         ) : (
           <>
@@ -533,13 +622,36 @@ function PaymentCard({
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
             </svg>
             Pay {COURSE_PRICE_SOL} SOL — Enroll Now
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+            </svg>
           </>
         )}
       </button>
 
-      <p className="text-center text-[#9CA3AF] text-xs font-body mt-5">
-        Transaction is signed by your wallet — we never hold your keys
-      </p>
+      {/* ── Trust footer ── */}
+      <div className="flex items-center justify-center gap-4 mt-4">
+        <div className="flex items-center gap-1.5 text-white/25 text-[10px] font-body">
+          <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+          </svg>
+          Non-custodial
+        </div>
+        <div className="w-px h-3 bg-white/10" />
+        <div className="flex items-center gap-1.5 text-white/25 text-[10px] font-body">
+          <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+          </svg>
+          We never hold your keys
+        </div>
+        <div className="w-px h-3 bg-white/10" />
+        <div className="flex items-center gap-1.5 text-white/25 text-[10px] font-body">
+          <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+          Instant on-chain confirmation
+        </div>
+      </div>
     </div>
   );
 }
