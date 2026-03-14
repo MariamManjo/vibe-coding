@@ -729,18 +729,21 @@ function SuccessCard({ txSignature }: { txSignature: string | null }) {
         {NETWORK}
       </span>
       {txSignature && (
-        <div className="block mb-8">
+        <div className="flex flex-col items-center gap-1.5 mb-8">
           <a
             href={`${SOLSCAN_BASE}${txSignature}?cluster=devnet`}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 text-xs text-[#3B82F6] hover:underline font-mono"
+            className="inline-flex items-center gap-2 text-sm font-semibold text-[#3B82F6] hover:text-blue-400 transition-colors"
           >
-            <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
             </svg>
-            {txSignature.slice(0, 16)}…{txSignature.slice(-8)}
+            View payment proof on Solscan
           </a>
+          <span className="text-[10px] text-[#6B7280] font-mono tracking-wide">
+            {txSignature.slice(0, 16)}…{txSignature.slice(-8)}
+          </span>
         </div>
       )}
       <Link
