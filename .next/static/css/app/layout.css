@@ -2528,6 +2528,30 @@ video {
 .ease-out {
   transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
 }
+.\[pay\:1\] {
+  pay: 1;
+}
+.\[pay\:2\] {
+  pay: 2;
+}
+.\[pay\:3\] {
+  pay: 3;
+}
+.\[pay\:4\] {
+  pay: 4;
+}
+.\[pay\:5\] {
+  pay: 5;
+}
+.\[pay\:6\] {
+  pay: 6;
+}
+.\[pay\:7\] {
+  pay: 7;
+}
+.\[pay\:error\] {
+  pay: error;
+}
 
 :root {
   --font-space-grotesk: 'Space Grotesk', sans-serif;

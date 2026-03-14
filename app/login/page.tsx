@@ -64,6 +64,46 @@ function shortenAddress(addr: string) {
   return addr.slice(0, 4) + "..." + addr.slice(-4);
 }
 
+/** Extract a human-readable message from any thrown value, including
+ *  Phantom's non-standard error objects that have non-enumerable properties. */
+function extractError(err: unknown): string {
+  if (!err) return "Unknown error (empty throw)";
+  if (typeof err === "string") return err;
+  if (err instanceof Error) return err.message;
+  if (typeof err === "object") {
+    // Phantom errors have non-enumerable .message and .code
+    const e = err as Record<string, unknown>;
+    const msg  = typeof e["message"] === "string" ? e["message"] : null;
+    const code = e["code"] !== undefined ? String(e["code"]) : null;
+    if (msg) return code ? `${msg} (code ${code})` : msg;
+    // Try serialising all own property names (catches non-enumerable ones)
+    try {
+      const full = JSON.stringify(err, Object.getOwnPropertyNames(err));
+      if (full && full !== "{}") return full;
+    } catch { /* ignore */ }
+    // Try toString as last resort
+    const s = String(err);
+    if (s !== "[object Object]") return s;
+  }
+  return "Unexpected error — check console for details";
+}
+
+/** Returns true if the error represents a deliberate user cancellation. */
+function isUserRejection(err: unknown): boolean {
+  if (!err || typeof err !== "object") return false;
+  const e = err as Record<string, unknown>;
+  const code = Number(e["code"]);
+  const msg  = String(e["message"] ?? "").toLowerCase();
+  return (
+    code === 4001 ||
+    msg.includes("reject") ||
+    msg.includes("cancel") ||
+    msg.includes("denied") ||
+    msg.includes("dismiss") ||
+    msg.includes("user rejected")
+  );
+}
+
 function getProvider(): SolanaProvider | undefined {
   if (typeof window === "undefined") return undefined;
   return window.phantom?.solana ?? window.solana;
@@ -134,133 +174,158 @@ export default function LoginPage() {
     const provider = getProvider();
     if (!provider || !walletAddress) return;
 
-    // Tracks the signature so we can verify on-chain even if confirmTransaction throws
     let txSig: string | null = null;
 
     try {
       setPayStatus("paying");
       setPayError("");
 
+      // ── Pre-flight validation ───────────────────────────────────────────────
       const fromPubkey = new PublicKey(walletAddress);
       const toPubkey   = new PublicKey(RECIPIENT_ADDRESS);
       const lamports   = Math.round(COURSE_PRICE_SOL * LAMPORTS_PER_SOL);
 
-      // ── 1. Create a working devnet Connection ──────────────────────────────
-      // Try each RPC in order; log success/failure for each attempt.
-      // If every probe fails we still fall back to the primary — it may recover
-      // by the time the transaction is sent (transient devnet hiccup).
+      console.log("[pay:1] sender pubkey  :", fromPubkey.toString());
+      console.log("[pay:1] recipient pubkey:", toPubkey.toString());
+      console.log("[pay:1] network        :", NETWORK);
+      console.log("[pay:1] current balance:", balance, "SOL");
+      console.log("[pay:1] amount lamports:", lamports, "(=", COURSE_PRICE_SOL, "SOL)");
+
+      if (fromPubkey.toString() === toPubkey.toString()) {
+        throw new Error("Sender and recipient are the same address. Payment blocked.");
+      }
+      if (toPubkey.toString() !== "GhgXp29MrWxzdU1pdjo7gbmm2QjTY4TE6iomsM4hv9Ct") {
+        throw new Error(`Recipient mismatch — expected treasury, got ${toPubkey.toString()}`);
+      }
+      if (NETWORK !== "devnet") {
+        throw new Error(`Wrong network: expected devnet, got ${NETWORK}`);
+      }
+      if (lamports !== 10_000_000) {
+        throw new Error(`Wrong amount: expected 10000000 lamports, got ${lamports}`);
+      }
+      console.log("[pay:1] ✓ all pre-flight checks passed");
+
+      // ── 2. Devnet connection ────────────────────────────────────────────────
       let connection!: Connection;
       let connectedRpc = "";
       for (const rpc of DEVNET_RPCS) {
         try {
           const candidate = new Connection(rpc, "confirmed");
-          await candidate.getVersion();          // lightweight health probe
-          connection  = candidate;
+          await candidate.getVersion();
+          connection   = candidate;
           connectedRpc = rpc;
-          console.log("[solana] RPC connected:", rpc);
+          console.log("[pay:2] RPC healthy:", rpc);
           break;
         } catch (probeErr) {
-          console.error("[solana] RPC unreachable, trying next:", rpc, probeErr);
+          console.warn("[pay:2] RPC unreachable, trying next:", rpc, probeErr);
         }
       }
       if (!connection) {
-        console.warn("[solana] all RPC probes failed — using primary as fallback");
-        connection  = new Connection(DEVNET_RPCS[0], "confirmed");
+        console.warn("[pay:2] all probes failed — using fallback");
+        connection   = new Connection(DEVNET_RPCS[0], "confirmed");
         connectedRpc = DEVNET_RPCS[0];
       }
 
-      // ── 2. Fetch a fresh blockhash ─────────────────────────────────────────
+      // ── 3. Blockhash ────────────────────────────────────────────────────────
       const { blockhash, lastValidBlockHeight } = await fetchBlockhash();
-      console.log("[solana] blockhash fetched:", blockhash, "via", connectedRpc);
+      console.log("[pay:3] blockhash           :", blockhash);
+      console.log("[pay:3] lastValidBlockHeight:", lastValidBlockHeight);
+      console.log("[pay:3] rpc                 :", connectedRpc);
 
-      // ── 3. Build the transfer transaction ─────────────────────────────────
+      // ── 4. Build transaction ────────────────────────────────────────────────
       const transaction = new Transaction({
         recentBlockhash: blockhash,
         feePayer: fromPubkey,
-      }).add(
-        SystemProgram.transfer({
-          fromPubkey,
-          toPubkey: new PublicKey(RECIPIENT_ADDRESS),
-          lamports,
-        })
-      );
+      }).add(SystemProgram.transfer({ fromPubkey, toPubkey, lamports }));
 
-      // ── 4. Phantom signs and sends via our devnet connection ───────────────
-      // provider.sendTransaction signs the tx with the user's key internally,
-      // then sends it over the connection we supply — guaranteeing devnet.
-      // skipPreflight: true prevents false-positive preflight rejections from
-      // RPC node desync on the public devnet cluster.
-      txSig = await provider.sendTransaction(transaction, connection, {
-        skipPreflight: true,
+      console.log("[pay:4] transaction built:", {
+        feePayer:    fromPubkey.toString(),
+        recentBlockhash: blockhash,
+        instructions: transaction.instructions.length,
+        fromPubkey:  fromPubkey.toString(),
+        toPubkey:    toPubkey.toString(),
+        lamports,
       });
-      console.log("[solana] transaction sent via provider.sendTransaction:", txSig);
 
-      // ── 5. Confirm with block-height strategy ─────────────────────────────
-      // If confirmTransaction throws (e.g. block-height window expired while
-      // waiting) we fall back to a direct status check — the tx may have already
-      // landed even though the polling timed out.
+      // ── 5. Sign + send ──────────────────────────────────────────────────────
+      // Try provider.sendTransaction first (Phantom ≥ 0.9).
+      // If that method is unavailable or throws immediately (no Phantom popup),
+      // fall back to the signTransaction + sendRawTransaction path which is
+      // confirmed working on this setup.
+      if (typeof provider.sendTransaction === "function") {
+        console.log("[pay:5] trying provider.sendTransaction …");
+        try {
+          txSig = await provider.sendTransaction(transaction, connection, {
+            skipPreflight: true,
+          });
+          console.log("[pay:5] provider.sendTransaction result:", txSig);
+        } catch (sendErr: unknown) {
+          const sendErrMsg = extractError(sendErr);
+          console.warn("[pay:5] provider.sendTransaction failed:", sendErrMsg, sendErr);
+          // Re-throw user cancellations immediately
+          if (isUserRejection(sendErr)) throw sendErr;
+          // Otherwise fall back to manual sign + broadcast
+          console.log("[pay:5] falling back to signTransaction + sendRawTransaction …");
+          const signedTx = await provider.signTransaction(transaction);
+          txSig = await connection.sendRawTransaction(signedTx.serialize(), {
+            skipPreflight: true,
+          });
+          console.log("[pay:5] sendRawTransaction result:", txSig);
+        }
+      } else {
+        console.log("[pay:5] provider.sendTransaction unavailable — using signTransaction + sendRawTransaction");
+        const signedTx = await provider.signTransaction(transaction);
+        txSig = await connection.sendRawTransaction(signedTx.serialize(), {
+          skipPreflight: true,
+        });
+        console.log("[pay:5] sendRawTransaction result:", txSig);
+      }
+
+      // ── 6. Confirm ──────────────────────────────────────────────────────────
+      let confirmed = false;
       try {
-        await connection.confirmTransaction(
+        const confirmResult = await connection.confirmTransaction(
           { signature: txSig, blockhash, lastValidBlockHeight },
           "confirmed",
         );
-        console.log("[solana] transaction confirmed:", txSig);
+        console.log("[pay:6] confirmTransaction result:", confirmResult);
+        confirmed = true;
       } catch (confirmErr) {
-        console.warn("[solana] confirmTransaction threw — checking status directly:", confirmErr);
+        console.warn("[pay:6] confirmTransaction threw — falling back to status check:", confirmErr);
         const status = await connection.getSignatureStatus(txSig, {
           searchTransactionHistory: true,
         });
         const conf = status?.value?.confirmationStatus;
-        console.log("[solana] status check result:", conf, status?.value?.err ?? "no error");
+        const onChainErr = status?.value?.err;
+        console.log("[pay:6] getSignatureStatus result:", { confirmationStatus: conf, err: onChainErr ?? null });
         if (conf === "confirmed" || conf === "finalized") {
-          console.log("[solana] transaction confirmed via status check:", txSig);
-          // falls through to success
-        } else if (status?.value?.err) {
-          throw new Error("Transaction rejected on-chain: " + JSON.stringify(status.value.err));
+          confirmed = true;
+        } else if (onChainErr) {
+          throw new Error("Transaction rejected on-chain: " + JSON.stringify(onChainErr));
         } else {
-          throw new Error("Transaction could not be confirmed — check Solscan with signature: " + txSig);
+          throw new Error(
+            "Transaction sent but could not be confirmed within the block window. " +
+            "Check Solscan: " + SOLSCAN_BASE + txSig + "?cluster=devnet"
+          );
         }
       }
 
-      console.log("[solana] enrollment confirmed — full signature:", txSig);
-      setTxSignature(txSig);
-      setPayStatus("idle");
-      setStep("success");
-      if (walletAddress) fetchBalance(walletAddress);
+      if (confirmed) {
+        console.log("[pay:7] ✓ enrollment confirmed — signature:", txSig);
+        setTxSignature(txSig);
+        setPayStatus("idle");
+        setStep("success");
+        if (walletAddress) fetchBalance(walletAddress);
+      }
+
     } catch (err: unknown) {
       setPayStatus("idle");
-      console.error("[payment error]", err);
-      const code    = (err as { code?: number })?.code;
-      const rawMsg  = err instanceof Error
-        ? err.message
-        : String((err as { message?: string })?.message ?? JSON.stringify(err));
-      const msg = rawMsg.toLowerCase();
-
-      const isRejected =
-        code === 4001 ||
-        msg.includes("reject") ||
-        msg.includes("cancel") ||
-        msg.includes("denied") ||
-        msg.includes("dismiss") ||
-        msg.includes("closed");
-      const isNetwork =
-        code === -32603 ||
-        msg.includes("reach") ||
-        msg.includes("network") ||
-        msg.includes("blockhash") ||
-        msg.includes("fetch") ||
-        msg.includes("rpc") ||
-        msg.includes("timeout");
-
-      if (isRejected) {
-        setPayError("Transaction was cancelled. Please try again.");
-      } else if (isNetwork) {
-        setPayError("Could not connect to Solana Devnet. Check your internet and try again.");
-      } else {
-        setPayError("Payment failed. Please try again.");
-      }
+      const msg = extractError(err);
+      console.error("[pay:error] raw error object:", err);
+      console.error("[pay:error] extracted message:", msg);
+      setPayError(msg);
     }
-  }, [walletAddress]);
+  }, [walletAddress, balance, fetchBalance]);
 
   const stepNumber = { connect: 1, payment: 2, success: 3 } as const;
 
