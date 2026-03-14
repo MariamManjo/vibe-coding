@@ -115,11 +115,24 @@ export default function LoginPage() {
       setStep("success");
     } catch (err: unknown) {
       setPayStatus("idle");
-      const msg = err instanceof Error ? err.message : "Transaction failed.";
-      if (msg.toLowerCase().includes("reject") || msg.toLowerCase().includes("cancel") || msg.toLowerCase().includes("user")) {
-        setPayError("Transaction was cancelled.");
+      // Phantom error objects have a numeric `code` — 4001 means user rejected/dismissed
+      const code = (err as { code?: number })?.code;
+      const msg = (err instanceof Error ? err.message : String((err as { message?: string })?.message ?? "")).toLowerCase();
+      const isRejected =
+        code === 4001 ||
+        msg.includes("reject") ||
+        msg.includes("cancel") ||
+        msg.includes("user") ||
+        msg.includes("block") ||
+        msg.includes("denied") ||
+        msg.includes("dismiss") ||
+        msg.includes("closed");
+      if (isRejected) {
+        setPayError("Transaction was cancelled or blocked. Please try again.");
+      } else if (msg.includes("reach") || msg.includes("network") || msg.includes("blockhash")) {
+        setPayError("Unable to reach the Solana network. Please check your connection and try again.");
       } else {
-        setPayError(msg);
+        setPayError("Something went wrong. Please try again.");
       }
     }
   }, [walletAddress]);
