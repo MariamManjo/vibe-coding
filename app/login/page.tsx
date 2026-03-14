@@ -5,7 +5,6 @@ import Link from "next/link";
 import Nav from "../components/Nav";
 import Footer from "../components/Footer";
 import {
-  Connection,
   PublicKey,
   SystemProgram,
   Transaction,
@@ -15,11 +14,42 @@ import {
 const COURSE_PRICE_SOL = 0.5;
 // TODO: Replace with your actual Solana wallet address to receive payments
 const RECIPIENT_ADDRESS = "So1endDq2YkqhipRh3WViPa8hdiSpxWy6z3Z6tMCpAo";
+
 const SOLANA_RPCS = [
   "https://rpc.ankr.com/solana",
-  "https://solana-mainnet.rpc.extrnode.com",
-  "https://mainnet.helius-rpc.com/?api-key=public",
+  "https://solana-mainnet.g.alchemy.com/v2/demo",
+  "https://api.mainnet-beta.solana.com",
 ];
+
+async function fetchBlockhash(): Promise<string> {
+  const body = JSON.stringify({
+    jsonrpc: "2.0",
+    id: 1,
+    method: "getLatestBlockhash",
+    params: [{ commitment: "finalized" }],
+  });
+
+  for (const rpc of SOLANA_RPCS) {
+    try {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 8000);
+      const res = await fetch(rpc, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body,
+        signal: controller.signal,
+      });
+      clearTimeout(timer);
+      const json = await res.json();
+      if (json?.result?.value?.blockhash) {
+        return json.result.value.blockhash as string;
+      }
+    } catch {
+      // try next RPC
+    }
+  }
+  throw new Error("Unable to reach the Solana network. Check your internet connection and try again.");
+}
 
 type Step = "connect" | "payment" | "success";
 type ConnectMode = "wallet" | "email";
@@ -100,25 +130,7 @@ export default function LoginPage() {
       const toPubkey = new PublicKey(RECIPIENT_ADDRESS);
       const lamports = Math.round(COURSE_PRICE_SOL * LAMPORTS_PER_SOL);
 
-      // Try each RPC until one works
-      let blockhash = "";
-      let connection: Connection | null = null;
-      let rpcError = "";
-      for (const rpc of SOLANA_RPCS) {
-        try {
-          const conn = new Connection(rpc, "confirmed");
-          const result = await conn.getLatestBlockhash();
-          blockhash = result.blockhash;
-          connection = conn;
-          break;
-        } catch (e) {
-          rpcError = e instanceof Error ? e.message : String(e);
-        }
-      }
-
-      if (!connection || !blockhash) {
-        throw new Error("Could not reach Solana network. Please try again. (" + rpcError + ")");
-      }
+      const blockhash = await fetchBlockhash();
 
       const transaction = new Transaction({
         recentBlockhash: blockhash,
