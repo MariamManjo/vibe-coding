@@ -17,7 +17,7 @@ const RECIPIENT_ADDRESS =
   process.env.NEXT_PUBLIC_SOLANA_RECIPIENT_ADDRESS ??
   "GhgXp29MrWxzdU1pdjo7gbmm2QjTY4TE6iomsM4hv9Ct";
 const NETWORK = "devnet";
-const SOLSCAN_BASE = "https://solscan.io/tx/?cluster=devnet";
+const SOLSCAN_BASE = "https://solscan.io/tx/";
 
 // We send the transaction ourselves to this RPC — guarantees devnet
 // regardless of which network the user's Phantom is configured on.
@@ -193,6 +193,7 @@ export default function LoginPage() {
         }
       }
 
+      console.log("[solana] enrollment confirmed — full signature:", txSig);
       setTxSignature(txSig);
       setPayStatus("idle");
       setStep("success");
@@ -730,7 +731,7 @@ function SuccessCard({ txSignature }: { txSignature: string | null }) {
       {txSignature && (
         <div className="block mb-8">
           <a
-            href={`${SOLSCAN_BASE}${txSignature}`}
+            href={`${SOLSCAN_BASE}${txSignature}?cluster=devnet`}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 text-xs text-[#3B82F6] hover:underline font-mono"
