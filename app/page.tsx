@@ -684,28 +684,159 @@ export default function Home() {
 
       <div className="section-divider" />
 
-      {/* ── FINAL CTA ──────────────────────────────────── */}
-      <section className="py-32 px-6">
-        <div
-          className="max-w-5xl mx-auto rounded-3xl py-24 px-8 text-center animated-gradient-bg"
-          style={{ boxShadow: "0 0 80px rgba(59,130,246,0.25)" }}
-        >
-          <h2 className="font-heading font-bold text-5xl md:text-7xl leading-tight mb-10 text-white">
-            Ready to build your first AI product?
-          </h2>
-          <div className="flex flex-col items-center gap-4">
-            <Link
-              href="/login"
-              className="inline-flex items-center gap-2 bg-white text-[#1d4ed8] font-bold text-xl px-10 py-5 rounded-full transition-all hover:scale-105 hover:shadow-2xl"
-            >
-              Start Learning →
-            </Link>
-            <a
-              href="mailto:mariammanjavidze01@gmail.com"
-              className="text-white/60 hover:text-white text-sm font-body underline underline-offset-4 transition-colors"
-            >
-              Have questions? Email me
-            </a>
+      {/* ── FINAL CTA — Web3 meme block ────────────────── */}
+      <section className="py-32 px-6 relative overflow-hidden">
+
+        {/* Animated orbs */}
+        <div className="cta-orb-1 absolute top-[-80px] left-[-80px] w-[500px] h-[500px] rounded-full pointer-events-none"
+          style={{ background: "radial-gradient(circle, rgba(153,69,255,0.22) 0%, transparent 70%)", filter: "blur(60px)" }} />
+        <div className="cta-orb-2 absolute bottom-[-100px] right-[-60px] w-[600px] h-[600px] rounded-full pointer-events-none"
+          style={{ background: "radial-gradient(circle, rgba(20,241,149,0.14) 0%, transparent 70%)", filter: "blur(80px)" }} />
+        <div className="cta-orb-3 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[400px] rounded-full pointer-events-none"
+          style={{ background: "radial-gradient(ellipse, rgba(59,130,246,0.1) 0%, transparent 65%)", filter: "blur(60px)" }} />
+
+        {/* Dot-grid texture */}
+        <div className="absolute inset-0 pointer-events-none opacity-[0.03]"
+          style={{ backgroundImage: "radial-gradient(circle, white 1px, transparent 1px)", backgroundSize: "28px 28px" }} />
+
+        <div className="max-w-5xl mx-auto relative z-10">
+
+          {/* ── Floating meme bubbles ── */}
+          {/* Top-left */}
+          <div className="float-bubble-1 hidden md:flex absolute -top-4 -left-6 items-center gap-2.5 bg-[#111] border border-white/10 rounded-2xl px-4 py-2.5 shadow-xl">
+            <span className="text-xl">👻</span>
+            <div>
+              <p className="text-white text-xs font-semibold font-body">gm ser</p>
+              <p className="text-white/40 text-[10px] font-body">wen ship?</p>
+            </div>
+          </div>
+          {/* Top-right */}
+          <div className="float-bubble-2 hidden md:flex absolute -top-8 -right-4 items-center gap-2.5 bg-[#111] border border-[#14F195]/20 rounded-2xl px-4 py-2.5 shadow-xl"
+            style={{ boxShadow: "0 0 20px rgba(20,241,149,0.1)" }}>
+            <span className="text-xl">🚀</span>
+            <div>
+              <p className="text-[#14F195] text-xs font-semibold font-body">just shipped</p>
+              <p className="text-white/40 text-[10px] font-body">my first AI product</p>
+            </div>
+          </div>
+          {/* Bottom-left */}
+          <div className="float-bubble-3 hidden md:flex absolute -bottom-6 -left-2 items-center gap-2.5 bg-[#111] border border-[#9945FF]/20 rounded-2xl px-4 py-2.5 shadow-xl"
+            style={{ boxShadow: "0 0 20px rgba(153,69,255,0.1)" }}>
+            <span className="text-xl">🧠</span>
+            <div>
+              <p className="text-[#9945FF] text-xs font-semibold font-body">no code needed</p>
+              <p className="text-white/40 text-[10px] font-body">just vibes + prompts</p>
+            </div>
+          </div>
+          {/* Bottom-right */}
+          <div className="float-bubble-4 hidden md:flex absolute -bottom-4 -right-6 items-center gap-2.5 bg-[#111] border border-white/10 rounded-2xl px-4 py-2.5 shadow-xl">
+            <span className="text-xl">🔥</span>
+            <div>
+              <p className="text-white text-xs font-semibold font-body">LFG</p>
+              <p className="text-white/40 text-[10px] font-body">wagmi fr fr</p>
+            </div>
+          </div>
+
+          {/* ── Main card ── */}
+          <div
+            className="rounded-3xl border border-white/[0.08] overflow-hidden"
+            style={{ background: "linear-gradient(135deg, #0d0d0d 0%, #111020 50%, #0a0f0a 100%)" }}
+          >
+            {/* Card top accent bar */}
+            <div className="h-[2px]" style={{ background: "linear-gradient(90deg, #9945FF, #14F195, #3B82F6, #9945FF)", backgroundSize: "300%", animation: "gradient-shift 6s linear infinite" }} />
+
+            <div className="px-8 md:px-16 py-16 md:py-20 text-center relative">
+
+              {/* Terminal illustration — top decorative */}
+              <div className="inline-flex items-center gap-2 bg-white/[0.04] border border-white/[0.08] rounded-xl px-5 py-3 mb-8 font-mono text-xs text-left">
+                <span className="text-[#14F195]">$</span>
+                <span className="text-white/60">vibe-coding</span>
+                <span className="text-[#9945FF]">--mode</span>
+                <span className="text-[#14F195]">on</span>
+                <span className="cursor-blink text-white/80 ml-1">▌</span>
+              </div>
+
+              {/* gm badge */}
+              <div className="flex justify-center mb-6">
+                <span className="inline-flex items-center gap-2 bg-[#9945FF]/10 border border-[#9945FF]/25 text-[#9945FF] text-xs font-body font-semibold uppercase tracking-widest px-4 py-1.5 rounded-full">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#14F195]" style={{ boxShadow: "0 0 6px #14F195" }} />
+                  gm builders
+                </span>
+              </div>
+
+              {/* Meme headline */}
+              <h2 className="font-heading font-black text-4xl md:text-6xl lg:text-7xl leading-[1.05] mb-4 tracking-tight">
+                <span className="text-white">ser, are you still</span>
+                <br />
+                <span style={{ background: "linear-gradient(90deg, #9945FF, #14F195)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
+                  doing things manually?
+                </span>
+              </h2>
+
+              {/* ngmi / wagmi line */}
+              <p className="font-heading font-bold text-xl md:text-2xl text-white/30 mb-3 tracking-wide">
+                ngmi.
+              </p>
+              <p className="text-[#9CA3AF] font-body text-base md:text-lg max-w-xl mx-auto leading-relaxed mb-12">
+                Real builders use AI. Join them — no coding background needed. 7 weeks. 1 shipped product. Lifetime access.
+              </p>
+
+              {/* ── Phantom-style ghost illustration ── */}
+              <div className="flex justify-center mb-12">
+                <div className="relative">
+                  {/* Glow halo */}
+                  <div className="absolute inset-0 rounded-full blur-2xl opacity-50"
+                    style={{ background: "radial-gradient(circle, rgba(153,69,255,0.5), rgba(20,241,149,0.2), transparent)" }} />
+                  <svg viewBox="0 0 120 120" fill="none" className="relative w-24 h-24 md:w-32 md:h-32" style={{ filter: "drop-shadow(0 0 20px rgba(153,69,255,0.6))" }}>
+                    {/* Ghost body */}
+                    <path d="M20 55 C20 30 38 12 60 12 C82 12 100 30 100 55 L100 95 C100 98 97 100 94 97 L84 90 L74 97 C72 99 68 99 66 97 L60 93 L54 97 C52 99 48 99 46 97 L36 90 L26 97 C23 100 20 98 20 95 Z"
+                      fill="url(#ghostGrad)" opacity="0.95"/>
+                    {/* Eyes */}
+                    <ellipse cx="46" cy="52" rx="7" ry="8" fill="white" opacity="0.95"/>
+                    <ellipse cx="74" cy="52" rx="7" ry="8" fill="white" opacity="0.95"/>
+                    <ellipse cx="47" cy="54" rx="3.5" ry="4" fill="#1a0a2e"/>
+                    <ellipse cx="75" cy="54" rx="3.5" ry="4" fill="#1a0a2e"/>
+                    {/* Eye shine */}
+                    <circle cx="49" cy="52" r="1.5" fill="white"/>
+                    <circle cx="77" cy="52" r="1.5" fill="white"/>
+                    {/* Floating sparkles */}
+                    <circle cx="18" cy="30" r="2" fill="#14F195" opacity="0.8"/>
+                    <circle cx="104" cy="35" r="1.5" fill="#9945FF" opacity="0.9"/>
+                    <circle cx="108" cy="20" r="1" fill="#14F195" opacity="0.6"/>
+                    <circle cx="12" cy="50" r="1" fill="#3B82F6" opacity="0.7"/>
+                    <defs>
+                      <linearGradient id="ghostGrad" x1="20" y1="12" x2="100" y2="100" gradientUnits="userSpaceOnUse">
+                        <stop stopColor="#9945FF"/>
+                        <stop offset="1" stopColor="#6e3bc4"/>
+                      </linearGradient>
+                    </defs>
+                  </svg>
+                </div>
+              </div>
+
+              {/* CTA button */}
+              <div className="flex flex-col items-center gap-5">
+                <Link
+                  href="/login"
+                  className="glow-cta-btn inline-flex items-center gap-3 font-heading font-bold text-lg md:text-xl px-10 py-5 rounded-2xl transition-all hover:scale-105 text-[#0a0a0a]"
+                  style={{ background: "linear-gradient(135deg, #14F195, #9945FF)", backgroundSize: "200%" }}
+                >
+                  <svg viewBox="0 0 20 20" fill="none" className="w-5 h-5">
+                    <path d="M3 10h14M10 3l7 7-7 7" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                  Start Building — LFG
+                </Link>
+                <p className="text-white/25 text-xs font-body font-mono tracking-wider">
+                  wagmi. no prior coding needed. ser trust.
+                </p>
+                <a
+                  href="mailto:mariammanjavidze01@gmail.com"
+                  className="text-white/40 hover:text-white/70 text-sm font-body underline underline-offset-4 transition-colors"
+                >
+                  have questions? email me →
+                </a>
+              </div>
+            </div>
           </div>
         </div>
       </section>
