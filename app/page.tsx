@@ -511,6 +511,214 @@ export default function Home() {
     </div>,
   ];
 
+  /* ── Step card illustrations + hover reveal data ── */
+  const stepExtras = [
+    // Week 1 - Intro to AI: 4 tool tiles pulsing
+    {
+      skills: ["GPT-4o", "Claude 3.5", "Builder mindset"],
+      illustration: (
+        <div className="flex flex-wrap gap-2 items-center justify-center p-4 h-full">
+          {[
+            { name: "GPT-4o",  cls: "tile-1 node-ping-1", c: "#3B82F6" },
+            { name: "Claude",  cls: "tile-2 node-ping-2", c: "#3B82F6" },
+            { name: "DALL·E",  cls: "tile-3 node-ping-3", c: "#3B82F6" },
+            { name: "Midj.",   cls: "tile-4 node-ping-4", c: "#3B82F6" },
+          ].map(({ name, cls, c }) => (
+            <div key={name} className={`${cls} flex flex-col items-center justify-center gap-1.5 w-[72px] h-[56px] rounded-xl border`}
+              style={{ borderColor: c + "35", background: c + "0f" }}>
+              <div className="w-4 h-4 rounded-md flex items-center justify-center" style={{ background: c + "30" }}>
+                <div className="w-2 h-2 rounded-full" style={{ background: c, boxShadow: `0 0 5px ${c}` }}/>
+              </div>
+              <span className="text-[8px] font-mono" style={{ color: c, opacity: 0.75 }}>{name}</span>
+            </div>
+          ))}
+        </div>
+      ),
+    },
+
+    // Week 2 - Prompt Engineering: mini chat loop
+    {
+      skills: ["Prompt anatomy", "Context framing", "Iteration"],
+      illustration: (
+        <div className="flex flex-col justify-center gap-2 p-3 h-full">
+          <div className="flex items-center gap-1.5">
+            <div className="w-5 h-5 rounded-full bg-[#8B5CF6]/25 border border-[#8B5CF6]/40 flex-shrink-0 flex items-center justify-center text-[8px] font-mono text-[#8B5CF6]/80">U</div>
+            <div className="flex-1 rounded-lg border border-[#8B5CF6]/25 bg-[#8B5CF6]/08 px-2.5 py-1.5 flex items-center gap-1">
+              <span className="text-[9px] font-mono text-[#8B5CF6]/80">&ldquo;Design a SaaS dashboard&rdquo;</span>
+              <span className="blink-cur text-[#8B5CF6] text-xs leading-none">▌</span>
+            </div>
+          </div>
+          <div className="flex items-center gap-1 ml-7">
+            {[0, 0.28, 0.56].map((d) => (
+              <span key={d} className="w-1.5 h-1.5 rounded-full bg-[#8B5CF6]/55"
+                style={{ animation: `blink-cur 0.85s step-end infinite ${d}s` }}/>
+            ))}
+          </div>
+          <div className="ai-bubble-glow flex items-center gap-1.5">
+            <div className="w-5 h-5 rounded-full bg-[#14F195]/20 border border-[#14F195]/35 flex-shrink-0 flex items-center justify-center">
+              <span className="text-[#14F195] text-[9px]">✓</span>
+            </div>
+            <div className="flex-1 rounded-lg border border-[#14F195]/20 bg-[#14F195]/06 px-2.5 py-1.5">
+              <span className="text-[9px] font-mono text-[#14F195]/80">Dashboard ready · 318 lines</span>
+            </div>
+          </div>
+        </div>
+      ),
+    },
+
+    // Week 3 - Design Thinking → MVP: pipeline
+    {
+      skills: ["User research", "Problem framing", "MVP scoping"],
+      illustration: (
+        <div className="flex items-center justify-center gap-2 px-3 h-full">
+          <div className="mvp-1 flex flex-col items-center gap-1">
+            <div className="w-[52px] h-[52px] rotate-45 border border-[#06B6D4]/40 bg-[#06B6D4]/10 flex items-center justify-center">
+              <span className="-rotate-45 text-xl">💡</span>
+            </div>
+            <span className="text-[8px] font-mono text-[#06B6D4]/55">Think</span>
+          </div>
+          <svg viewBox="0 0 24 8" className="w-5 h-2 mb-3" fill="none">
+            <path d="M0 4h19M15 1.5l4 2.5-4 2.5" stroke="#06B6D4" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" opacity="0.45"/>
+          </svg>
+          <div className="mvp-2 flex flex-col items-center gap-1">
+            <div className="w-[52px] h-[52px] rounded-xl border border-[#06B6D4]/35 bg-[#06B6D4]/08 p-2">
+              <svg viewBox="0 0 32 28" fill="none" className="w-full h-full">
+                <rect x="1" y="1" width="30" height="5" rx="1.5" stroke="#06B6D4" strokeWidth="1.2" opacity="0.55"/>
+                <rect x="1" y="9" width="12" height="18" rx="1.5" stroke="#06B6D4" strokeWidth="1.2" opacity="0.45"/>
+                <rect x="16" y="9" width="15" height="8" rx="1.5" stroke="#06B6D4" strokeWidth="1.2" opacity="0.45"/>
+                <rect x="16" y="19" width="15" height="8" rx="1.5" stroke="#06B6D4" strokeWidth="1.2" opacity="0.35"/>
+              </svg>
+            </div>
+            <span className="text-[8px] font-mono text-[#06B6D4]/55">Design</span>
+          </div>
+          <svg viewBox="0 0 24 8" className="w-5 h-2 mb-3" fill="none">
+            <path d="M0 4h19M15 1.5l4 2.5-4 2.5" stroke="#06B6D4" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" opacity="0.45"/>
+          </svg>
+          <div className="mvp-3 flex flex-col items-center gap-1">
+            <div className="relative w-[52px] h-[52px] rounded-xl border border-[#06B6D4]/50 bg-[#06B6D4]/15 flex items-center justify-center"
+              style={{ boxShadow: "0 0 14px rgba(6,182,212,0.3)" }}>
+              <span className="text-xl">🚀</span>
+              <div className="absolute -top-1.5 -right-1.5 bg-[#06B6D4] text-[6px] font-mono font-black text-black px-1 py-0.5 rounded-full">MVP</div>
+            </div>
+            <span className="text-[8px] font-mono text-[#06B6D4]/55">Ship</span>
+          </div>
+        </div>
+      ),
+    },
+
+    // Week 4 - Build MVP: sequential code lines
+    {
+      skills: ["No-code tools", "AI-first build", "Deploy live"],
+      illustration: (
+        <div className="flex flex-col justify-center gap-2 px-4 py-3 h-full">
+          <div className="space-y-2">
+            {[
+              { w: "78%", cls: "vl-1", op: 0.65 },
+              { w: "62%", cls: "vl-2", op: 0.55 },
+              { w: "88%", cls: "vl-3", op: 0.65 },
+              { w: "50%", cls: "vl-4", op: 0.45 },
+              { w: "72%", cls: "vl-5", op: 0.55 },
+            ].map(({ w, cls, op }, i) => (
+              <div key={i} className={`${cls} h-1.5 rounded-full`}
+                style={{ width: w, background: `linear-gradient(90deg, rgba(16,185,129,${op}), rgba(16,185,129,0.1))` }}/>
+            ))}
+          </div>
+          <div className="vl-preview flex items-center gap-2 mt-1">
+            <div className="w-2 h-2 rounded-full bg-[#10B981]" style={{ boxShadow: "0 0 5px #10B981" }}/>
+            <span className="text-[9px] font-mono text-[#10B981]/70">building with AI</span>
+            <span className="blink-cur text-[#10B981] text-xs leading-none">▌</span>
+          </div>
+        </div>
+      ),
+    },
+
+    // Week 5 - Automation: spinning gear pair
+    {
+      skills: ["AI workflows", "Triggers & actions", "Smart routing"],
+      illustration: (
+        <div className="flex items-center justify-center h-full">
+          <svg viewBox="0 0 130 90" fill="none" className="w-[170px]">
+            {/* Large gear */}
+            <g className="gear-cw" style={{ transformOrigin: "42px 48px" }}>
+              <circle cx="42" cy="48" r="22" stroke="#F59E0B" strokeWidth="8" strokeDasharray="6 3.5" strokeOpacity="0.65"/>
+              <circle cx="42" cy="48" r="9" fill="#F59E0B" fillOpacity="0.2" stroke="#F59E0B" strokeWidth="1.5"/>
+              <circle cx="42" cy="48" r="4" fill="#F59E0B" fillOpacity="0.5"/>
+            </g>
+            {/* Small gear */}
+            <g className="gear-ccw" style={{ transformOrigin: "82px 28px" }}>
+              <circle cx="82" cy="28" r="13" stroke="#F59E0B" strokeWidth="6" strokeDasharray="4.5 3" strokeOpacity="0.5"/>
+              <circle cx="82" cy="28" r="5" fill="#F59E0B" fillOpacity="0.2" stroke="#F59E0B" strokeWidth="1.2"/>
+              <circle cx="82" cy="28" r="2.5" fill="#F59E0B" fillOpacity="0.5"/>
+            </g>
+            {/* Mesh point */}
+            <circle cx="64" cy="38" r="3" fill="#F59E0B" fillOpacity="0.35" className="node-ping-3"/>
+            <text x="42" y="78" textAnchor="middle" fill="#F59E0B" fontSize="7" fontFamily="monospace" opacity="0.45">automate</text>
+            <text x="82" y="50" textAnchor="middle" fill="#F59E0B" fontSize="6.5" fontFamily="monospace" opacity="0.4">save time</text>
+            {/* Arrow output */}
+            <path d="M100 48h22M116 44l6 4-6 4" stroke="#F59E0B" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" opacity="0.35"/>
+            <text x="115" y="64" textAnchor="middle" fill="#F59E0B" fontSize="6" fontFamily="monospace" opacity="0.35">output</text>
+          </svg>
+        </div>
+      ),
+    },
+
+    // Week 6 - Platforms: triangle network (Make/Zapier/n8n)
+    {
+      skills: ["Make", "Zapier", "n8n"],
+      illustration: (
+        <div className="flex items-center justify-center h-full">
+          <svg viewBox="0 0 190 105" fill="none" className="w-[210px] max-w-full">
+            <line className="line-pulse-1" x1="58" y1="30" x2="132" y2="30" stroke="#EC4899" strokeWidth="1" strokeDasharray="4 3"/>
+            <line className="line-pulse-2" x1="46" y1="48" x2="82"  y2="86" stroke="#EC4899" strokeWidth="1" strokeDasharray="4 3"/>
+            <line className="line-pulse-3" x1="144" y1="48" x2="108" y2="86" stroke="#EC4899" strokeWidth="1" strokeDasharray="4 3"/>
+            {/* Make */}
+            <circle className="node-ping-1" cx="44"  cy="30" r="20" fill="#EC4899" fillOpacity="0.1" stroke="#EC4899" strokeWidth="1.2"/>
+            <text x="44"  y="27" textAnchor="middle" fill="#EC4899" fontSize="7.5" fontFamily="monospace" fontWeight="bold" opacity="0.9">Make</text>
+            <text x="44"  y="37" textAnchor="middle" fill="#EC4899" fontSize="6"   fontFamily="monospace" opacity="0.5">⬡ ⬡</text>
+            {/* Zapier */}
+            <circle className="node-ping-2" cx="146" cy="30" r="20" fill="#EC4899" fillOpacity="0.1" stroke="#EC4899" strokeWidth="1.2"/>
+            <text x="146" y="27" textAnchor="middle" fill="#EC4899" fontSize="7.5" fontFamily="monospace" fontWeight="bold" opacity="0.9">Zapier</text>
+            <text x="146" y="37" textAnchor="middle" fill="#EC4899" fontSize="6"   fontFamily="monospace" opacity="0.5">⚡ ⚡</text>
+            {/* n8n (center bottom, highlighted) */}
+            <circle className="node-ping-3" cx="95"  cy="92" r="20" fill="#EC4899" fillOpacity="0.15" stroke="#EC4899" strokeWidth="1.6"
+              style={{ filter: "drop-shadow(0 0 6px rgba(236,72,153,0.45))" }}/>
+            <text x="95"  y="90" textAnchor="middle" fill="#EC4899" fontSize="10" fontFamily="monospace" fontWeight="bold" opacity="0.9">n8n</text>
+            <text x="95"  y="100" textAnchor="middle" fill="#EC4899" fontSize="6"  fontFamily="monospace" opacity="0.5">open src</text>
+            {/* Center routing dot */}
+            <circle cx="95" cy="50" r="3" fill="#EC4899" fillOpacity="0.45" className="node-ping-4"/>
+          </svg>
+        </div>
+      ),
+    },
+
+    // Week 7 - Ship It: floating rocket + LIVE badge
+    {
+      skills: ["Final product", "Live deploy", "Real users"],
+      illustration: (
+        <div className="flex flex-col items-center justify-center gap-2 h-full py-1">
+          <div className="float-small relative">
+            <div className="absolute inset-0 rounded-full blur-lg opacity-55"
+              style={{ background: "radial-gradient(circle, rgba(168,85,247,0.6), transparent)" }}/>
+            <svg viewBox="0 0 48 58" fill="none" className="relative w-9 h-11"
+              style={{ filter: "drop-shadow(0 0 8px rgba(168,85,247,0.65))" }}>
+              <path d="M24 3C24 3 13 14 13 30h22C35 14 24 3 24 3z" fill="#A855F7" fillOpacity="0.7" stroke="#A855F7" strokeWidth="1.5"/>
+              <rect x="16" y="28" width="16" height="11" rx="2" fill="#A855F7" fillOpacity="0.45" stroke="#A855F7" strokeWidth="1.2"/>
+              <path d="M17 39l-4 8h22l-4-8z" fill="#A855F7" fillOpacity="0.35" stroke="#A855F7" strokeWidth="1"/>
+              <circle cx="24" cy="25" r="5" fill="#A855F7" fillOpacity="0.3" stroke="#A855F7" strokeWidth="1.5"/>
+              <circle cx="24" cy="25" r="2.5" fill="#A855F7" opacity="0.75"/>
+              <path d="M19 47c0 5 2.5 8.5 5 11 2.5-2.5 5-6 5-11z" fill="#14F195" fillOpacity="0.65" stroke="#14F195" strokeWidth="0.8"/>
+            </svg>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="bg-[#A855F7] text-[7px] font-mono font-black text-black px-2 py-0.5 rounded-full"
+              style={{ boxShadow: "0 0 10px rgba(168,85,247,0.6)" }}>LIVE</div>
+            <span className="text-[8px] font-mono text-[#A855F7]/55">your-app.vercel.app</span>
+          </div>
+        </div>
+      ),
+    },
+  ];
+
   return (
     <main className="min-h-screen bg-[#0A0A0A] text-white overflow-x-hidden">
       <Nav />
@@ -1064,10 +1272,10 @@ export default function Home() {
 
           {/* Cards grid */}
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {steps.map((step) => (
+            {steps.map((step, idx) => (
               <div
                 key={step.num}
-                className={`relative group card-hover rounded-2xl border border-white/[0.08] p-6 overflow-hidden transition-all duration-300 ${
+                className={`relative group card-hover rounded-2xl border border-white/[0.08] p-6 overflow-hidden transition-all duration-300 cursor-pointer ${
                   step.num === 7 ? "sm:col-span-2 lg:col-span-1" : ""
                 }`}
                 style={{ background: `linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%)` }}
@@ -1105,17 +1313,40 @@ export default function Home() {
                   </span>
                 </div>
 
-                {/* Content */}
-                <h3 className="font-heading font-bold text-lg leading-snug mb-2 text-white">{step.title}</h3>
-                <p className="text-[#9CA3AF] text-sm font-body leading-relaxed">{step.desc}</p>
+                {/* Title */}
+                <h3 className="font-heading font-bold text-lg leading-snug mb-3 text-white">{step.title}</h3>
+
+                {/* Interactive illustration panel */}
+                <div className="relative rounded-xl border border-white/[0.06] bg-black/25 overflow-hidden" style={{ height: "112px" }}>
+                  {/* Illustration (visible by default, fades out on hover) */}
+                  <div className="absolute inset-0 group-hover:opacity-0 group-hover:-translate-y-1 transition-all duration-300">
+                    {stepExtras[idx]?.illustration}
+                  </div>
+                  {/* Hover reveal: description + skill pills */}
+                  <div className="absolute inset-0 opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 p-3 flex flex-col justify-between">
+                    <p className="text-[11px] font-body text-white/60 leading-relaxed">{step.desc}</p>
+                    <div className="flex flex-wrap gap-1.5 mt-1.5">
+                      {stepExtras[idx]?.skills.map((s) => (
+                        <span key={s} className="text-[8px] font-mono px-2 py-0.5 rounded-full border"
+                          style={{ color: step.accent, borderColor: step.accent + "40", background: step.accent + "12" }}>
+                          {s}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  {/* Hover hint */}
+                  <div className="absolute bottom-1.5 right-2 group-hover:opacity-0 transition-opacity duration-150">
+                    <span className="text-[7px] font-mono text-white/15 tracking-widest">hover →</span>
+                  </div>
+                </div>
 
                 {/* Progress dots */}
-                <div className="flex gap-1 mt-5">
+                <div className="flex gap-1 mt-4">
                   {Array.from({ length: 7 }).map((_, dotIdx) => (
                     <div
                       key={dotIdx}
-                      className="h-0.5 flex-1 rounded-full transition-all"
-                      style={{ background: dotIdx < step.num ? step.accent : "rgba(255,255,255,0.08)" }}
+                      className="h-0.5 flex-1 rounded-full transition-all duration-500"
+                      style={{ background: dotIdx < step.num ? step.accent : "rgba(255,255,255,0.07)" }}
                     />
                   ))}
                 </div>
