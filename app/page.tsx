@@ -367,11 +367,11 @@ export default function Home() {
                   <p className="text-[#9CA3AF] text-sm font-body leading-relaxed">{mod.desc}</p>
                 </div>
                 <a
-                  href="#"
+                  href="mailto:mariammanjavidze01@gmail.com"
                   className="self-start text-sm font-semibold px-4 py-2 rounded-full border transition-all hover:scale-105"
                   style={{ borderColor: mod.accent + "50", color: mod.accent }}
                 >
-                  Learn More →
+                  Email Me →
                 </a>
               </div>
             ))}
