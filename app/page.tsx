@@ -313,49 +313,160 @@ export default function Home() {
       <div className="section-divider" />
 
       {/* ── INSTRUCTOR ─────────────────────────────────── */}
-      <section className="py-24 px-6">
-        <div className="max-w-5xl mx-auto">
-          <div className="flex flex-col md:flex-row items-center gap-14">
-            {/* Photo */}
-            <div className="flex-shrink-0">
-              <img
-                src="/mariam.jpg"
-                alt="Mariam Manjavidze"
-                className="photo-ring w-52 h-52 md:w-64 md:h-64 rounded-full object-cover border-4 border-[#3B82F6]"
-              />
+      <section className="py-24 px-6 relative overflow-hidden">
+        {/* Ambient orbs */}
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full pointer-events-none"
+          style={{ background: "radial-gradient(circle, rgba(153,69,255,0.12) 0%, transparent 65%)", filter: "blur(60px)" }} />
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] rounded-full pointer-events-none"
+          style={{ background: "radial-gradient(circle, rgba(20,241,149,0.08) 0%, transparent 65%)", filter: "blur(60px)" }} />
+
+        <div className="max-w-5xl mx-auto relative z-10">
+          <div className="flex flex-col md:flex-row items-center md:items-start gap-14">
+
+            {/* ── Photo column ── */}
+            <div className="flex-shrink-0 flex flex-col items-center gap-5">
+              {/* Spinning gradient ring + photo */}
+              <div className="relative w-52 h-52 md:w-64 md:h-64">
+                {/* Spinning conic gradient ring */}
+                <div
+                  className="ring-spin absolute inset-[-4px] rounded-full"
+                  style={{ background: "conic-gradient(from 0deg, #9945FF, #14F195, #3B82F6, #9945FF)", padding: "3px" }}
+                >
+                  <div className="w-full h-full rounded-full bg-[#0A0A0A]" />
+                </div>
+                {/* Static glow pulse */}
+                <div className="builder-photo-ring absolute inset-0 rounded-full" />
+                {/* Photo */}
+                <img
+                  src="/mariam.jpg"
+                  alt="Mariam Manjavidze"
+                  className="relative z-10 w-full h-full rounded-full object-cover"
+                />
+                {/* Live indicator */}
+                <div className="absolute bottom-3 right-3 z-20 flex items-center gap-1.5 bg-[#0d0d0d] border border-[#14F195]/30 rounded-full px-2.5 py-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#14F195]" style={{ boxShadow: "0 0 6px #14F195" }} />
+                  <span className="text-[#14F195] text-[10px] font-body font-semibold">LIVE</span>
+                </div>
+              </div>
+
+              {/* Mini on-chain credential card */}
+              <div className="w-full max-w-[220px] bg-white/[0.03] border border-white/[0.08] rounded-2xl px-4 py-3.5">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-5 h-5 rounded-full flex items-center justify-center"
+                    style={{ background: "linear-gradient(135deg,#9945FF,#14F195)" }}>
+                    <svg viewBox="0 0 12 12" fill="none" className="w-3 h-3">
+                      <path d="M2 6l3 3 5-5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </div>
+                  <span className="text-white/60 text-[10px] font-mono uppercase tracking-widest">Builder Registry</span>
+                </div>
+                <div className="space-y-1.5">
+                  {[
+                    { k: "Status", v: "Active Builder", accent: "#14F195" },
+                    { k: "Stack", v: "AI + Design", accent: "#9945FF" },
+                    { k: "Students", v: "0 → builders", accent: "#3B82F6" },
+                  ].map(({ k, v, accent }) => (
+                    <div key={k} className="flex items-center justify-between">
+                      <span className="text-white/30 text-[10px] font-mono">{k}</span>
+                      <span className="text-[10px] font-mono font-semibold" style={{ color: accent }}>{v}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
 
-            {/* Content */}
+            {/* ── Content column ── */}
             <div className="flex-1 text-center md:text-left">
-              <p className="text-[#9CA3AF] text-sm font-body mb-1">Hello I Am</p>
-              <h2 className="font-heading font-bold text-4xl md:text-5xl mb-2">Mariam Manjavidze</h2>
-              <p className="text-[#3B82F6] font-heading font-semibold text-lg mb-6">
-                Vibe Coder · UX/UI Designer
-              </p>
-              <p className="text-[#9CA3AF] font-body leading-relaxed mb-8 max-w-lg">
-                Product designer based in Tbilisi, Georgia.
-                I teach Vibe Coding and AI product building —
-                helping complete beginners ship real products with AI tools.
-              </p>
 
-              <div className="border-t border-dashed border-white/15 mb-8" />
+              {/* Eyebrow */}
+              <div className="inline-flex items-center gap-2 bg-[#9945FF]/10 border border-[#9945FF]/20 rounded-full px-3.5 py-1.5 mb-5">
+                <svg viewBox="0 0 14 14" fill="none" className="w-3.5 h-3.5 text-[#9945FF]">
+                  <circle cx="7" cy="7" r="6" stroke="currentColor" strokeWidth="1.4"/>
+                  <path d="M5 7l1.5 1.5L9 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+                <span className="text-[#9945FF] text-xs font-body font-semibold uppercase tracking-widest">Your Instructor</span>
+              </div>
 
-              <div className="grid grid-cols-2 gap-5 mb-8">
-                {stats.map((s) => (
-                  <div key={s.label}>
-                    <div className="font-heading font-bold text-3xl text-white">{s.value}</div>
-                    <div className="text-[#9CA3AF] text-sm font-body">{s.label}</div>
-                  </div>
+              {/* Name + verified */}
+              <div className="flex items-center justify-center md:justify-start gap-3 mb-2 flex-wrap">
+                <h2 className="font-heading font-black text-4xl md:text-5xl">Mariam Manjavidze</h2>
+                <span
+                  className="inline-flex items-center gap-1 text-[10px] font-body font-bold uppercase tracking-widest px-2.5 py-1 rounded-full mt-1"
+                  style={{ background: "rgba(20,241,149,0.12)", color: "#14F195", border: "1px solid rgba(20,241,149,0.25)" }}
+                >
+                  <svg viewBox="0 0 10 10" fill="none" className="w-2.5 h-2.5">
+                    <path d="M2 5l2 2 4-4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                  Verified
+                </span>
+              </div>
+
+              {/* Role pills */}
+              <div className="flex flex-wrap justify-center md:justify-start gap-2 mb-6">
+                {[
+                  { label: "Builder", color: "#9945FF" },
+                  { label: "Vibe Coder", color: "#14F195" },
+                  { label: "UX/UI Maxi", color: "#3B82F6" },
+                ].map(({ label, color }) => (
+                  <span
+                    key={label}
+                    className="text-xs font-body font-semibold px-3 py-1 rounded-full border"
+                    style={{ color, borderColor: color + "40", background: color + "12" }}
+                  >
+                    {label}
+                  </span>
                 ))}
               </div>
 
+              {/* Bio — witty builder copy */}
+              <p className="text-[#9CA3AF] font-body leading-relaxed mb-8 max-w-lg text-base">
+                Tbilisi-based product designer who got tired of watching smart people feel locked out of tech. Spent years shipping products for startups — then AI tools changed everything.{" "}
+                <span className="text-white/70">Now I teach complete beginners to build real AI products in 7 weeks.</span>{" "}
+                No fluff. No gatekeeping. Just builds.
+              </p>
+
+              {/* Divider */}
+              <div className="h-px mb-8"
+                style={{ background: "linear-gradient(90deg, transparent, rgba(153,69,255,0.3), rgba(20,241,149,0.3), transparent)" }} />
+
+              {/* Stats — "Proof of Work" */}
+              <div className="mb-8">
+                <p className="text-[10px] font-mono text-white/25 uppercase tracking-widest mb-4">// proof of work</p>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                  {stats.map((s, i) => {
+                    const colors = ["#9945FF", "#14F195", "#3B82F6", "#F59E0B"];
+                    return (
+                      <div
+                        key={s.label}
+                        className="bg-white/[0.03] border border-white/[0.06] rounded-xl px-4 py-3 text-center md:text-left"
+                        style={{ borderColor: colors[i] + "20" }}
+                      >
+                        <div
+                          className="font-heading font-black text-2xl mb-0.5"
+                          style={{ color: colors[i] }}
+                        >
+                          {s.value}
+                        </div>
+                        <div className="text-white/40 text-[11px] font-body leading-tight">{s.label}</div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Tags */}
               <div className="flex flex-wrap justify-center md:justify-start gap-2 mb-8">
-                {["Tbilisi, Georgia", "AI Product Building", "UX/UI"].map((tag) => (
+                {[
+                  { label: "📍 Tbilisi, Georgia" },
+                  { label: "🤖 AI Product Building" },
+                  { label: "🎨 UX/UI" },
+                  { label: "⚡ No-Code" },
+                ].map(({ label }) => (
                   <span
-                    key={tag}
-                    className="bg-white/[0.06] border border-white/15 text-[#9CA3AF] text-xs font-body px-3 py-1.5 rounded-full"
+                    key={label}
+                    className="bg-white/[0.04] border border-white/10 text-white/50 hover:text-white/80 text-xs font-body px-3 py-1.5 rounded-full transition-colors cursor-default"
                   >
-                    {tag}
+                    {label}
                   </span>
                 ))}
               </div>
@@ -363,6 +474,7 @@ export default function Home() {
               {/* Social links */}
               <SocialLinks className="md:justify-start" />
             </div>
+
           </div>
         </div>
       </section>
