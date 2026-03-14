@@ -201,3 +201,12 @@ h1, h2, h3, h4, h5, h6 {
 .ring-spin {
   animation: gradient-ring-spin 4s linear infinite;
 }
+
+/* ── Outcome character idle floats ──────────────── */
+@keyframes outcome-float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-14px); }
+}
+.outcome-float-1 { animation: outcome-float 4s   ease-in-out infinite; }
+.outcome-float-2 { animation: outcome-float 5.2s ease-in-out infinite 0.8s; }
+.outcome-float-3 { animation: outcome-float 3.8s ease-in-out infinite 1.5s; }

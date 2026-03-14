@@ -107,42 +107,124 @@ const steps = [
 const outcomes = [
   {
     title: "A working web app",
-    gradient: "linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%)",
-    accentColor: "#3B82F6",
-    icon: (
-      <svg viewBox="0 0 48 48" fill="none" className="w-10 h-10">
-        <rect x="4" y="10" width="40" height="28" rx="4" stroke="#3B82F6" strokeWidth="2.5" />
-        <line x1="4" y1="18" x2="44" y2="18" stroke="#3B82F6" strokeWidth="2.5" />
-        <circle cx="10" cy="14" r="1.5" fill="#3B82F6" />
-        <circle cx="16" cy="14" r="1.5" fill="#3B82F6" />
-        <circle cx="22" cy="14" r="1.5" fill="#3B82F6" />
-        <rect x="12" y="24" width="24" height="3" rx="1.5" fill="#3B82F6" opacity="0.5" />
-        <rect x="16" y="31" width="16" height="3" rx="1.5" fill="#3B82F6" opacity="0.3" />
+    msg: "From blank page to live URL in one session. You'll build and deploy a real working app — no stack knowledge needed.",
+    bg: "linear-gradient(145deg, #060d1f 0%, #0b1a3a 100%)",
+    bgFade: "rgba(11,26,58,0.98)",
+    accent: "#3B82F6",
+    glow: "rgba(59,130,246,0.4)",
+    floatClass: "outcome-float-1",
+    character: (
+      <svg viewBox="0 0 100 120" fill="none" className="w-32 h-40">
+        {/* Monitor body */}
+        <rect x="8" y="18" width="84" height="62" rx="8" stroke="currentColor" strokeWidth="2.2" fill="currentColor" fillOpacity="0.06"/>
+        {/* Browser bar */}
+        <line x1="8" y1="34" x2="92" y2="34" stroke="currentColor" strokeWidth="1.8"/>
+        {/* Traffic dots */}
+        <circle cx="18" cy="26" r="3" fill="currentColor" opacity="0.9"/>
+        <circle cx="28" cy="26" r="3" fill="currentColor" opacity="0.55"/>
+        <circle cx="38" cy="26" r="3" fill="currentColor" opacity="0.3"/>
+        {/* Eye sockets */}
+        <rect x="22" y="44" width="18" height="16" rx="4" fill="currentColor" fillOpacity="0.15" stroke="currentColor" strokeWidth="1.5"/>
+        <rect x="60" y="44" width="18" height="16" rx="4" fill="currentColor" fillOpacity="0.15" stroke="currentColor" strokeWidth="1.5"/>
+        {/* Pupils (cursor blink rects) */}
+        <rect x="28" y="47" width="5" height="10" rx="2" fill="currentColor"/>
+        <rect x="66" y="47" width="5" height="10" rx="2" fill="currentColor"/>
+        {/* Smile (angle brackets) */}
+        <path d="M35 68 Q50 77 65 68" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"/>
+        {/* Stand */}
+        <rect x="45" y="80" width="10" height="12" rx="3" fill="currentColor" fillOpacity="0.5"/>
+        <rect x="30" y="90" width="40" height="5" rx="2.5" fill="currentColor" fillOpacity="0.3"/>
+        {/* Antennae */}
+        <line x1="35" y1="18" x2="30" y2="8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+        <circle cx="30" cy="7" r="2.5" fill="currentColor"/>
+        <line x1="65" y1="18" x2="70" y2="8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+        <circle cx="70" cy="7" r="2.5" fill="currentColor"/>
+        {/* Sparkles */}
+        <circle cx="4" cy="44" r="2.5" fill="currentColor" opacity="0.5"/>
+        <circle cx="97" cy="30" r="2" fill="currentColor" opacity="0.4"/>
+        <circle cx="96" cy="68" r="1.5" fill="currentColor" opacity="0.3"/>
+        <circle cx="3" cy="70" r="1.5" fill="currentColor" opacity="0.35"/>
       </svg>
     ),
   },
   {
     title: "An automated workflow",
-    gradient: "linear-gradient(135deg, #120a1f 0%, #2d1b4e 100%)",
-    accentColor: "#8B5CF6",
-    icon: (
-      <svg viewBox="0 0 48 48" fill="none" className="w-10 h-10">
-        <circle cx="10" cy="24" r="5" stroke="#8B5CF6" strokeWidth="2.5" />
-        <circle cx="38" cy="12" r="5" stroke="#8B5CF6" strokeWidth="2.5" />
-        <circle cx="38" cy="36" r="5" stroke="#8B5CF6" strokeWidth="2.5" />
-        <line x1="15" y1="22" x2="33" y2="14" stroke="#8B5CF6" strokeWidth="2" strokeDasharray="3 2" />
-        <line x1="15" y1="26" x2="33" y2="34" stroke="#8B5CF6" strokeWidth="2" strokeDasharray="3 2" />
+    msg: "Your tools talk to each other while you sleep. Make, Zapier, n8n — set once, run forever. You just watch the magic happen.",
+    bg: "linear-gradient(145deg, #0c0618 0%, #1a0d35 100%)",
+    bgFade: "rgba(26,13,53,0.98)",
+    accent: "#9945FF",
+    glow: "rgba(153,69,255,0.4)",
+    floatClass: "outcome-float-2",
+    character: (
+      <svg viewBox="0 0 100 120" fill="none" className="w-32 h-40">
+        {/* Ghost body fill */}
+        <path d="M18 52C18 27 32 8 50 8C68 8 82 27 82 52L82 94C82 97 79 99 76 96L68 89L60 96C58 98 55 98 53 96L50 93L47 96C45 98 42 98 40 96L32 89L24 96C21 99 18 97 18 94Z"
+          fill="currentColor" fillOpacity="0.09" stroke="currentColor" strokeWidth="2"/>
+        {/* Eyes */}
+        <ellipse cx="37" cy="54" rx="7" ry="8" fill="currentColor" opacity="0.95"/>
+        <ellipse cx="63" cy="54" rx="7" ry="8" fill="currentColor" opacity="0.95"/>
+        <ellipse cx="38" cy="56" rx="3.5" ry="4" fill="#0c0618"/>
+        <ellipse cx="64" cy="56" rx="3.5" ry="4" fill="#0c0618"/>
+        <circle cx="40" cy="54" r="1.5" fill="currentColor" opacity="0.7"/>
+        <circle cx="66" cy="54" r="1.5" fill="currentColor" opacity="0.7"/>
+        {/* Circuit on body */}
+        <circle cx="50" cy="74" r="4" stroke="currentColor" strokeWidth="1.8"/>
+        <line x1="50" y1="74" x2="36" y2="82" stroke="currentColor" strokeWidth="1.5"/>
+        <line x1="50" y1="74" x2="64" y2="82" stroke="currentColor" strokeWidth="1.5"/>
+        <line x1="50" y1="70" x2="50" y2="62" stroke="currentColor" strokeWidth="1.5"/>
+        <circle cx="36" cy="82" r="2.5" fill="currentColor" opacity="0.8"/>
+        <circle cx="64" cy="82" r="2.5" fill="currentColor" opacity="0.8"/>
+        <circle cx="50" cy="62" r="2" fill="currentColor" opacity="0.6"/>
+        {/* Floating orbit nodes */}
+        <circle cx="6" cy="30" r="3.5" stroke="currentColor" strokeWidth="1.5" opacity="0.7"/>
+        <circle cx="95" cy="42" r="2.5" fill="currentColor" opacity="0.5"/>
+        <circle cx="4" cy="68" r="2" fill="currentColor" opacity="0.4"/>
+        <circle cx="96" cy="75" r="3" stroke="currentColor" strokeWidth="1.5" opacity="0.5"/>
+        <circle cx="90" cy="20" r="2" fill="currentColor" opacity="0.35"/>
+        <line x1="9.5" y1="30" x2="18" y2="52" stroke="currentColor" strokeWidth="1" opacity="0.25" strokeDasharray="3 3"/>
       </svg>
     ),
   },
   {
     title: "A shipped AI product",
-    gradient: "linear-gradient(135deg, #051a0f 0%, #0a3320 100%)",
-    accentColor: "#10B981",
-    icon: (
-      <svg viewBox="0 0 48 48" fill="none" className="w-10 h-10">
-        <path d="M24 4 L28 18 L42 18 L31 27 L35 42 L24 33 L13 42 L17 27 L6 18 L20 18 Z"
-          stroke="#10B981" strokeWidth="2.5" strokeLinejoin="round" />
+    msg: "gm world 🚀 — a real thing, live on the internet, built by you. From zero to something people can actually use.",
+    bg: "linear-gradient(145deg, #021510 0%, #052e1c 100%)",
+    bgFade: "rgba(5,46,28,0.98)",
+    accent: "#14F195",
+    glow: "rgba(20,241,149,0.35)",
+    floatClass: "outcome-float-3",
+    character: (
+      <svg viewBox="0 0 100 120" fill="none" className="w-32 h-40">
+        {/* Rocket body */}
+        <path d="M50 6C40 6 26 22 26 44L26 78C26 81 50 88 50 88C50 88 74 81 74 78L74 44C74 22 60 6 50 6Z"
+          fill="currentColor" fillOpacity="0.1" stroke="currentColor" strokeWidth="2.2"/>
+        {/* Nose cone accent */}
+        <path d="M50 6C44 6 36 14 32 24L68 24C64 14 56 6 50 6Z" fill="currentColor" fillOpacity="0.18"/>
+        {/* Porthole (face circle) */}
+        <circle cx="50" cy="44" r="15" stroke="currentColor" strokeWidth="2" fill="currentColor" fillOpacity="0.07"/>
+        {/* Eyes */}
+        <circle cx="44" cy="42" r="4" fill="currentColor" opacity="0.95"/>
+        <circle cx="56" cy="42" r="4" fill="currentColor" opacity="0.95"/>
+        <circle cx="44" cy="42" r="1.8" fill="#021510"/>
+        <circle cx="56" cy="42" r="1.8" fill="#021510"/>
+        <circle cx="45.5" cy="40.5" r="1" fill="currentColor" opacity="0.7"/>
+        <circle cx="57.5" cy="40.5" r="1" fill="currentColor" opacity="0.7"/>
+        {/* Smile */}
+        <path d="M44 50Q50 56 56 50" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+        {/* Fins */}
+        <path d="M26 64L13 82L26 78Z" stroke="currentColor" strokeWidth="2" fill="currentColor" fillOpacity="0.25"/>
+        <path d="M74 64L87 82L74 78Z" stroke="currentColor" strokeWidth="2" fill="currentColor" fillOpacity="0.25"/>
+        {/* Flames */}
+        <path d="M38 88Q50 110 62 88" stroke="currentColor" strokeWidth="2" strokeLinecap="round" opacity="0.5"/>
+        <path d="M42 88Q50 104 58 88" stroke="currentColor" strokeWidth="3" strokeLinecap="round"/>
+        <path d="M46 88Q50 98 54 88" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" opacity="0.7"/>
+        {/* Stars */}
+        <circle cx="7" cy="18" r="2.5" fill="currentColor" opacity="0.6"/>
+        <circle cx="94" cy="12" r="2" fill="currentColor" opacity="0.5"/>
+        <circle cx="5" cy="58" r="1.5" fill="currentColor" opacity="0.4"/>
+        <circle cx="96" cy="62" r="2.5" fill="currentColor" opacity="0.55"/>
+        <path d="M88 28L89.5 32.5L94 32.5L90.5 35.5L91.8 40L88 37.5L84.2 40L85.5 35.5L82 32.5L86.5 32.5Z"
+          fill="currentColor" opacity="0.45"/>
       </svg>
     ),
   },
@@ -569,19 +651,66 @@ export default function Home() {
       {/* ── WHAT YOU WILL BUILD ────────────────────────── */}
       <section className="py-24 px-6">
         <div className="max-w-7xl mx-auto">
-          <p className="text-[#9CA3AF] uppercase tracking-widest text-xs font-body mb-3">Outcomes</p>
-          <h2 className="font-heading font-bold text-4xl md:text-5xl mb-16">What You Will Build</h2>
+          {/* Header */}
+          <div className="mb-14">
+            <p className="text-[#9CA3AF] uppercase tracking-widest text-xs font-body mb-3">Outcomes</p>
+            <h2 className="font-heading font-bold text-4xl md:text-5xl mb-4">What You Will Build</h2>
+            <p className="text-white/30 text-sm font-body font-mono">// hover to reveal</p>
+          </div>
+
           <div className="grid md:grid-cols-3 gap-6">
             {outcomes.map((item) => (
               <div
                 key={item.title}
-                className="card-hover relative rounded-2xl p-8 border border-white/10 overflow-hidden"
-                style={{ background: item.gradient }}
+                className="group relative rounded-3xl border border-white/[0.07] overflow-hidden cursor-pointer h-80"
+                style={{ background: item.bg }}
               >
-                <div className="mb-6">{item.icon}</div>
-                <h3 className="font-heading font-bold text-2xl" style={{ color: item.accentColor }}>
-                  {item.title}
-                </h3>
+                {/* Hover glow flood */}
+                <div
+                  className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                  style={{ background: `radial-gradient(ellipse at 50% 40%, ${item.glow} 0%, transparent 68%)` }}
+                />
+
+                {/* Top accent line — appears on hover */}
+                <div
+                  className="absolute top-0 left-0 right-0 h-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                  style={{ background: `linear-gradient(90deg, transparent, ${item.accent}, transparent)` }}
+                />
+
+                {/* Character — floats at rest, jumps on hover */}
+                <div
+                  className={`${item.floatClass} absolute inset-0 flex items-center justify-center
+                    transition-transform duration-500
+                    group-hover:-translate-y-8 group-hover:scale-110`}
+                  style={{ color: item.accent, filter: `drop-shadow(0 0 18px ${item.glow})` }}
+                >
+                  {item.character}
+                </div>
+
+                {/* Text — hidden at rest, slides up on hover */}
+                <div
+                  className="absolute bottom-0 left-0 right-0 px-6 pb-7 pt-10
+                    translate-y-5 opacity-0
+                    group-hover:translate-y-0 group-hover:opacity-100
+                    transition-all duration-500 ease-out"
+                  style={{ background: `linear-gradient(to top, ${item.bgFade} 60%, transparent)` }}
+                >
+                  <h3
+                    className="font-heading font-bold text-lg mb-2"
+                    style={{ color: item.accent }}
+                  >
+                    {item.title}
+                  </h3>
+                  <p className="text-white/55 text-sm font-body leading-relaxed">{item.msg}</p>
+                </div>
+
+                {/* Tiny "hover me" label — visible at rest, hidden on hover */}
+                <div
+                  className="absolute bottom-4 left-0 right-0 flex justify-center
+                    opacity-100 group-hover:opacity-0 transition-opacity duration-300"
+                >
+                  <span className="text-white/20 text-[10px] font-mono uppercase tracking-widest">hover me</span>
+                </div>
               </div>
             ))}
           </div>
