@@ -26,12 +26,15 @@ const DEVNET_RPCS = [
   "https://rpc.ankr.com/solana_devnet",
 ];
 
-async function fetchBlockhash(): Promise<string> {
+async function fetchBlockhash(): Promise<{ blockhash: string; lastValidBlockHeight: number }> {
   const res = await fetch(`/api/blockhash`);
   if (!res.ok) throw new Error("Unable to reach the Solana network. Please try again.");
   const json = await res.json();
   if (!json.blockhash) throw new Error("Unable to reach the Solana network. Please try again.");
-  return json.blockhash as string;
+  return {
+    blockhash: json.blockhash as string,
+    lastValidBlockHeight: (json.lastValidBlockHeight as number) ?? 0,
+  };
 }
 
 type Step = "connect" | "payment" | "success";
@@ -125,24 +128,30 @@ export default function LoginPage() {
         disableRetryOnRateLimit: false,
       });
 
-      const blockhash = await fetchBlockhash();
+      const { blockhash, lastValidBlockHeight } = await fetchBlockhash();
 
       const transaction = new Transaction({
         recentBlockhash: blockhash,
         feePayer: fromPubkey,
       }).add(SystemProgram.transfer({ fromPubkey, toPubkey, lamports }));
 
-      // Step 1: ask Phantom to sign only
+      // Step 1: ask Phantom to sign only — does NOT broadcast
       const signedTx = await provider.signTransaction(transaction);
 
-      // Step 2: broadcast ourselves to devnet
+      // Step 2: broadcast ourselves to devnet.
+      // skipPreflight: true avoids a false "Blockhash not found" rejection
+      // that happens when the preflight node hasn't yet propagated the blockhash
+      // from the node we fetched it from (common on the public devnet RPC cluster).
       const signature = await connection.sendRawTransaction(signedTx.serialize(), {
-        skipPreflight: false,
-        preflightCommitment: "confirmed",
+        skipPreflight: true,
       });
 
-      // Step 3: wait for confirmation
-      await connection.confirmTransaction(signature, "confirmed");
+      // Step 3: wait for on-chain confirmation using the block-height strategy
+      // (the deprecated string-only form of confirmTransaction can hang on devnet).
+      await connection.confirmTransaction(
+        { signature, blockhash, lastValidBlockHeight },
+        "confirmed"
+      );
 
       setTxSignature(signature);
       setPayStatus("idle");

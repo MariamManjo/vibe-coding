@@ -29,8 +29,9 @@ export async function GET() {
       });
       const json = await res.json();
       const blockhash = json?.result?.value?.blockhash;
+      const lastValidBlockHeight = json?.result?.value?.lastValidBlockHeight;
       if (blockhash) {
-        return NextResponse.json({ blockhash, network: NETWORK });
+        return NextResponse.json({ blockhash, lastValidBlockHeight, network: NETWORK });
       }
     } catch {
       // try next RPC
