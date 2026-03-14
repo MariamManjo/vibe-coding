@@ -1,23 +1,16 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
+
+const NETWORK = process.env.SOLANA_NETWORK ?? "devnet";
 
 const RPC_ENDPOINTS: Record<string, string[]> = {
-  mainnet: [
-    "https://api.mainnet-beta.solana.com",
-    "https://rpc.ankr.com/solana",
-    "https://solana-mainnet.g.alchemy.com/v2/demo",
-  ],
   devnet: [
     "https://api.devnet.solana.com",
     "https://rpc.ankr.com/solana_devnet",
   ],
-  testnet: [
-    "https://api.testnet.solana.com",
-  ],
 };
 
-export async function GET(req: NextRequest) {
-  const network = req.nextUrl.searchParams.get("network") ?? "mainnet";
-  const rpcs = RPC_ENDPOINTS[network] ?? RPC_ENDPOINTS.mainnet;
+export async function GET() {
+  const rpcs = RPC_ENDPOINTS[NETWORK] ?? RPC_ENDPOINTS.devnet;
 
   const body = JSON.stringify({
     jsonrpc: "2.0",
@@ -37,7 +30,7 @@ export async function GET(req: NextRequest) {
       const json = await res.json();
       const blockhash = json?.result?.value?.blockhash;
       if (blockhash) {
-        return NextResponse.json({ blockhash, network });
+        return NextResponse.json({ blockhash, network: NETWORK });
       }
     } catch {
       // try next RPC
@@ -45,7 +38,7 @@ export async function GET(req: NextRequest) {
   }
 
   return NextResponse.json(
-    { error: `Unable to fetch blockhash from ${network}` },
+    { error: `Unable to fetch blockhash from ${NETWORK}` },
     { status: 503 }
   );
 }

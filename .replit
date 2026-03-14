@@ -37,3 +37,11 @@ externalPort = 80
 deploymentTarget = "autoscale"
 run = ["npm", "run", "start"]
 build = ["npm", "run", "build"]
+
+[userenv]
+
+[userenv.shared]
+SOLANA_NETWORK = "devnet"
+SOLANA_RECIPIENT_ADDRESS = "GhgXp29MrWxzdU1pdjo7gbmm2QjTY4TE6iomsM4hv9Ct"
+NEXT_PUBLIC_SOLANA_NETWORK = "devnet"
+NEXT_PUBLIC_SOLANA_RECIPIENT_ADDRESS = "GhgXp29MrWxzdU1pdjo7gbmm2QjTY4TE6iomsM4hv9Ct"
