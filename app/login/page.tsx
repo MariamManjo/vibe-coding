@@ -282,7 +282,13 @@ function ConnectCard({
 
       {mode === "wallet" ? (
         <div className="flex flex-col gap-3">
-          {hasWallet ? (
+          {/* Still detecting — skeleton button so nothing flashes incorrectly */}
+          {hasWallet === null && (
+            <div className="w-full h-14 rounded-2xl bg-white/[0.06] animate-pulse" />
+          )}
+
+          {/* Phantom IS installed — real connection */}
+          {hasWallet === true && (
             <button
               onClick={onConnect}
               disabled={connectStatus === "connecting"}
@@ -301,10 +307,16 @@ function ConnectCard({
                 </>
               )}
             </button>
-          ) : (
+          )}
+
+          {/* Phantom NOT installed — install only, no fake connect button */}
+          {hasWallet === false && (
             <div className="flex flex-col gap-3">
-              <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl px-4 py-3 text-sm text-amber-400 font-body text-center">
-                Phantom wallet not detected in this browser.
+              <div className="flex items-center gap-2 bg-amber-500/10 border border-amber-500/20 rounded-xl px-4 py-3 text-sm text-amber-400 font-body">
+                <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+                </svg>
+                Phantom not detected. Install it to continue.
               </div>
               <a
                 href="https://phantom.app/"
@@ -314,10 +326,10 @@ function ConnectCard({
                 style={{ background: "linear-gradient(135deg, #4C44C6, #9945FF)", boxShadow: "0 0 32px rgba(153,69,255,0.35)" }}
               >
                 <PhantomIcon />
-                Install Phantom &amp; Connect
+                Install Phantom Wallet →
               </a>
               <p className="text-center text-[#9CA3AF] text-xs font-body">
-                After installing, refresh this page and try again.
+                After installing, refresh this page to connect.
               </p>
             </div>
           )}
