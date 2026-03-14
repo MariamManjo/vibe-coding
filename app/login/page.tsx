@@ -17,7 +17,9 @@ const COURSE_PRICE_SOL = 0.5;
 const RECIPIENT_ADDRESS = "So1endDq2YkqhipRh3WViPa8hdiSpxWy6z3Z6tMCpAo";
 const SOLANA_RPC = "https://api.mainnet-beta.solana.com";
 
-type WalletStatus = "idle" | "connecting" | "connected" | "paying" | "success" | "error";
+type Step = "sign-in" | "payment" | "success";
+type ConnectStatus = "idle" | "connecting";
+type PayStatus = "idle" | "paying";
 
 interface SolanaProvider {
   isPhantom?: boolean;
@@ -44,18 +46,21 @@ function getProvider(): SolanaProvider | undefined {
 }
 
 export default function LoginPage() {
-  const [status, setStatus] = useState<WalletStatus>("idle");
+  const [step, setStep] = useState<Step>("sign-in");
+  const [connectStatus, setConnectStatus] = useState<ConnectStatus>("idle");
+  const [payStatus, setPayStatus] = useState<PayStatus>("idle");
   const [walletAddress, setWalletAddress] = useState<string | null>(null);
   const [txSignature, setTxSignature] = useState<string | null>(null);
-  const [errorMsg, setErrorMsg] = useState<string>("");
   const [hasWallet, setHasWallet] = useState<boolean | null>(null);
+  const [connectError, setConnectError] = useState("");
+  const [payError, setPayError] = useState("");
 
   useEffect(() => {
     const provider = getProvider();
     setHasWallet(!!provider);
     if (provider?.publicKey) {
       setWalletAddress(provider.publicKey.toString());
-      setStatus("connected");
+      setStep("payment");
     }
   }, []);
 
@@ -66,14 +71,15 @@ export default function LoginPage() {
       return;
     }
     try {
-      setStatus("connecting");
-      setErrorMsg("");
+      setConnectStatus("connecting");
+      setConnectError("");
       const resp = await provider.connect();
       setWalletAddress(resp.publicKey.toString());
-      setStatus("connected");
+      setConnectStatus("idle");
+      setStep("payment");
     } catch {
-      setStatus("idle");
-      setErrorMsg("Wallet connection was cancelled.");
+      setConnectStatus("idle");
+      setConnectError("Connection was cancelled. Please try again.");
     }
   }, []);
 
@@ -81,17 +87,18 @@ export default function LoginPage() {
     const provider = getProvider();
     if (provider) await provider.disconnect();
     setWalletAddress(null);
-    setStatus("idle");
+    setStep("sign-in");
+    setPayError("");
+    setConnectError("");
     setTxSignature(null);
-    setErrorMsg("");
   }, []);
 
   const purchaseCourse = useCallback(async () => {
     const provider = getProvider();
     if (!provider || !walletAddress) return;
     try {
-      setStatus("paying");
-      setErrorMsg("");
+      setPayStatus("paying");
+      setPayError("");
 
       const connection = new Connection(SOLANA_RPC, "confirmed");
       const fromPubkey = new PublicKey(walletAddress);
@@ -106,14 +113,15 @@ export default function LoginPage() {
 
       const { signature } = await provider.signAndSendTransaction(transaction);
       setTxSignature(signature);
-      setStatus("success");
+      setPayStatus("idle");
+      setStep("success");
     } catch (err: unknown) {
-      setStatus("connected");
+      setPayStatus("idle");
       const msg = err instanceof Error ? err.message : "Transaction failed.";
       if (msg.toLowerCase().includes("reject") || msg.toLowerCase().includes("cancel") || msg.toLowerCase().includes("user")) {
-        setErrorMsg("Transaction was cancelled.");
+        setPayError("Transaction was cancelled.");
       } else {
-        setErrorMsg(msg);
+        setPayError(msg);
       }
     }
   }, [walletAddress]);
@@ -133,18 +141,25 @@ export default function LoginPage() {
         />
 
         <div className="relative z-10 w-full max-w-md">
-          {status === "success" ? (
-            <SuccessCard txSignature={txSignature} />
-          ) : (
-            <PurchaseCard
-              status={status}
-              walletAddress={walletAddress}
+          {step === "sign-in" && (
+            <SignInCard
+              connectStatus={connectStatus}
               hasWallet={hasWallet}
-              errorMsg={errorMsg}
+              errorMsg={connectError}
               onConnect={connectWallet}
-              onDisconnect={disconnectWallet}
-              onPurchase={purchaseCourse}
             />
+          )}
+          {step === "payment" && walletAddress && (
+            <PaymentCard
+              walletAddress={walletAddress}
+              payStatus={payStatus}
+              errorMsg={payError}
+              onPurchase={purchaseCourse}
+              onDisconnect={disconnectWallet}
+            />
+          )}
+          {step === "success" && (
+            <SuccessCard txSignature={txSignature} />
           )}
         </div>
       </section>
@@ -154,27 +169,67 @@ export default function LoginPage() {
   );
 }
 
-function PurchaseCard({
-  status,
-  walletAddress,
+function StepIndicator({ current }: { current: 1 | 2 | 3 }) {
+  const steps = [
+    { n: 1, label: "Sign In" },
+    { n: 2, label: "Payment" },
+    { n: 3, label: "Done" },
+  ];
+  return (
+    <div className="flex items-center justify-center gap-2 mb-8">
+      {steps.map((s, i) => {
+        const done = s.n < current;
+        const active = s.n === current;
+        return (
+          <div key={s.n} className="flex items-center gap-2">
+            <div className="flex flex-col items-center gap-1">
+              <div
+                className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
+                  done
+                    ? "bg-[#10B981] text-white"
+                    : active
+                    ? "text-white"
+                    : "bg-white/10 text-white/40"
+                }`}
+                style={active ? { background: "linear-gradient(135deg, #3B82F6, #8B5CF6)" } : undefined}
+              >
+                {done ? (
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                  </svg>
+                ) : (
+                  s.n
+                )}
+              </div>
+              <span className={`text-[10px] font-body ${active ? "text-white/80" : done ? "text-[#10B981]" : "text-white/30"}`}>
+                {s.label}
+              </span>
+            </div>
+            {i < steps.length - 1 && (
+              <div className={`w-10 h-px mb-4 ${s.n < current ? "bg-[#10B981]" : "bg-white/10"}`} />
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function SignInCard({
+  connectStatus,
   hasWallet,
   errorMsg,
   onConnect,
-  onDisconnect,
-  onPurchase,
 }: {
-  status: WalletStatus;
-  walletAddress: string | null;
+  connectStatus: ConnectStatus;
   hasWallet: boolean | null;
   errorMsg: string;
   onConnect: () => void;
-  onDisconnect: () => void;
-  onPurchase: () => void;
 }) {
-  const isConnected = status === "connected" || status === "paying";
-
   return (
     <div className="glass-card rounded-3xl p-8 md:p-10">
+      <StepIndicator current={1} />
+
       <div className="text-center mb-8">
         <div
           className="inline-flex items-center justify-center w-14 h-14 rounded-2xl mb-5"
@@ -182,10 +237,98 @@ function PurchaseCard({
         >
           <SolanaIcon />
         </div>
-        <h1 className="font-heading font-bold text-3xl mb-2">Enroll with Solana</h1>
-        <p className="text-[#9CA3AF] font-body text-sm">
-          Connect your wallet to purchase the course
+        <h1 className="font-heading font-bold text-3xl mb-2">Connect your wallet</h1>
+        <p className="text-[#9CA3AF] font-body text-sm leading-relaxed">
+          Sign in with your Solana wallet to continue.<br />
+          Works with Phantom, Backpack &amp; more.
         </p>
+      </div>
+
+      {errorMsg && (
+        <div className="flex items-center gap-2 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3 mb-5 text-sm text-red-400 font-body">
+          <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+          </svg>
+          {errorMsg}
+        </div>
+      )}
+
+      <button
+        onClick={onConnect}
+        disabled={connectStatus === "connecting"}
+        className="w-full flex items-center justify-center gap-3 bg-[#3B82F6] hover:bg-blue-400 disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold text-base px-6 py-4 rounded-2xl transition-all hover:scale-[1.02]"
+        style={{ boxShadow: "0 0 32px rgba(59,130,246,0.35)" }}
+      >
+        {connectStatus === "connecting" ? (
+          <>
+            <Spinner />
+            Connecting…
+          </>
+        ) : hasWallet === false ? (
+          <>
+            <SolanaIcon small />
+            Install Phantom Wallet
+          </>
+        ) : (
+          <>
+            <SolanaIcon small />
+            Connect Solana Wallet
+          </>
+        )}
+      </button>
+
+      <div className="flex items-center gap-3 mt-6">
+        <div className="flex-1 h-px bg-white/10" />
+        <span className="text-white/30 text-xs font-body">secure &amp; non-custodial</span>
+        <div className="flex-1 h-px bg-white/10" />
+      </div>
+
+      <p className="text-center text-[#9CA3AF] text-xs font-body mt-4">
+        Questions?{" "}
+        <a href="mailto:mariammanjavidze01@gmail.com" className="text-[#3B82F6] hover:underline">
+          Email Mariam
+        </a>
+      </p>
+    </div>
+  );
+}
+
+function PaymentCard({
+  walletAddress,
+  payStatus,
+  errorMsg,
+  onPurchase,
+  onDisconnect,
+}: {
+  walletAddress: string;
+  payStatus: PayStatus;
+  errorMsg: string;
+  onPurchase: () => void;
+  onDisconnect: () => void;
+}) {
+  return (
+    <div className="glass-card rounded-3xl p-8 md:p-10">
+      <StepIndicator current={2} />
+
+      <div className="flex items-center justify-between bg-white/[0.04] border border-white/10 rounded-xl px-4 py-3 mb-6">
+        <div className="flex items-center gap-2.5">
+          <div className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse" />
+          <span className="text-sm font-body text-white/80">Signed in</span>
+        </div>
+        <div className="flex items-center gap-3">
+          <span className="text-sm font-mono text-[#9CA3AF]">{shortenAddress(walletAddress)}</span>
+          <button
+            onClick={onDisconnect}
+            className="text-xs text-[#9CA3AF] hover:text-white transition-colors underline underline-offset-2"
+          >
+            Sign out
+          </button>
+        </div>
+      </div>
+
+      <div className="mb-6">
+        <h2 className="font-heading font-bold text-2xl mb-1">Complete your purchase</h2>
+        <p className="text-[#9CA3AF] font-body text-sm">One-time payment — lifetime access</p>
       </div>
 
       <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-5 mb-6">
@@ -195,11 +338,11 @@ function PurchaseCard({
             1 seat
           </span>
         </div>
-        <div className="flex items-end gap-2">
+        <div className="flex items-end gap-2 mb-4">
           <span className="font-heading font-bold text-4xl">{COURSE_PRICE_SOL} SOL</span>
           <span className="text-[#9CA3AF] font-body text-sm mb-1">one-time</span>
         </div>
-        <div className="mt-3 pt-3 border-t border-white/10 flex flex-col gap-1.5">
+        <div className="border-t border-white/10 pt-3 flex flex-col gap-1.5">
           {["7 hands-on lectures", "Real product you ship", "Lifetime access"].map((f) => (
             <div key={f} className="flex items-center gap-2 text-sm text-[#9CA3AF] font-body">
               <svg className="w-4 h-4 text-[#10B981] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -211,24 +354,6 @@ function PurchaseCard({
         </div>
       </div>
 
-      {isConnected && walletAddress && (
-        <div className="flex items-center justify-between bg-white/[0.04] border border-white/10 rounded-xl px-4 py-3 mb-4">
-          <div className="flex items-center gap-2.5">
-            <div className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse" />
-            <span className="text-sm font-body text-white/80">Wallet connected</span>
-          </div>
-          <div className="flex items-center gap-3">
-            <span className="text-sm font-mono text-[#9CA3AF]">{shortenAddress(walletAddress)}</span>
-            <button
-              onClick={onDisconnect}
-              className="text-xs text-[#9CA3AF] hover:text-white transition-colors underline underline-offset-2"
-            >
-              Disconnect
-            </button>
-          </div>
-        </div>
-      )}
-
       {errorMsg && (
         <div className="flex items-center gap-2 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3 mb-4 text-sm text-red-400 font-body">
           <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -238,60 +363,29 @@ function PurchaseCard({
         </div>
       )}
 
-      {!isConnected ? (
-        <button
-          onClick={onConnect}
-          disabled={status === "connecting"}
-          className="w-full flex items-center justify-center gap-3 bg-[#3B82F6] hover:bg-blue-400 disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold text-base px-6 py-4 rounded-2xl transition-all hover:scale-[1.02]"
-          style={{ boxShadow: "0 0 32px rgba(59,130,246,0.35)" }}
-        >
-          {status === "connecting" ? (
-            <>
-              <Spinner />
-              Connecting…
-            </>
-          ) : hasWallet === false ? (
-            <>
-              <SolanaIcon small />
-              Install Phantom Wallet
-            </>
-          ) : (
-            <>
-              <SolanaIcon small />
-              Connect Solana Wallet
-            </>
-          )}
-        </button>
-      ) : (
-        <button
-          onClick={onPurchase}
-          disabled={status === "paying"}
-          className="w-full flex items-center justify-center gap-3 text-white font-semibold text-base px-6 py-4 rounded-2xl transition-all hover:scale-[1.02] disabled:opacity-60 disabled:cursor-not-allowed animated-gradient-bg"
-          style={{ boxShadow: "0 0 32px rgba(59,130,246,0.35)" }}
-        >
-          {status === "paying" ? (
-            <>
-              <Spinner />
-              Confirming payment…
-            </>
-          ) : (
-            <>
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-              </svg>
-              Pay {COURSE_PRICE_SOL} SOL — Enroll Now
-            </>
-          )}
-        </button>
-      )}
+      <button
+        onClick={onPurchase}
+        disabled={payStatus === "paying"}
+        className="w-full flex items-center justify-center gap-3 text-white font-semibold text-base px-6 py-4 rounded-2xl transition-all hover:scale-[1.02] disabled:opacity-60 disabled:cursor-not-allowed animated-gradient-bg"
+        style={{ boxShadow: "0 0 32px rgba(59,130,246,0.35)" }}
+      >
+        {payStatus === "paying" ? (
+          <>
+            <Spinner />
+            Confirming payment…
+          </>
+        ) : (
+          <>
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+            Pay {COURSE_PRICE_SOL} SOL — Enroll Now
+          </>
+        )}
+      </button>
 
       <p className="text-center text-[#9CA3AF] text-xs font-body mt-5">
-        Supports Phantom, Backpack &amp; any Solana wallet
-        <br />
-        Questions?{" "}
-        <a href="mailto:mariammanjavidze01@gmail.com" className="text-[#3B82F6] hover:underline">
-          Email Mariam
-        </a>
+        Transaction is signed by your wallet — we never hold your keys
       </p>
     </div>
   );
@@ -300,6 +394,8 @@ function PurchaseCard({
 function SuccessCard({ txSignature }: { txSignature: string | null }) {
   return (
     <div className="glass-card rounded-3xl p-8 md:p-10 text-center">
+      <StepIndicator current={3} />
+
       <div
         className="inline-flex items-center justify-center w-16 h-16 rounded-full mb-6"
         style={{ background: "linear-gradient(135deg, #10B981, #059669)" }}
