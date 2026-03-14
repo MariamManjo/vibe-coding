@@ -202,6 +202,45 @@ h1, h2, h3, h4, h5, h6 {
   animation: gradient-ring-spin 4s linear infinite;
 }
 
+/* ── Hero animations ─────────────────────────────── */
+@keyframes hero-bg-rotate {
+  from { transform: rotate(0deg) scale(1.5); }
+  to   { transform: rotate(360deg) scale(1.5); }
+}
+.hero-bg-rotate { animation: hero-bg-rotate 45s linear infinite; }
+
+@keyframes glow-ring {
+  0%   { transform: scale(0.5); opacity: 0; }
+  15%  { opacity: 0.5; }
+  100% { transform: scale(4.5); opacity: 0; }
+}
+.glow-ring-1 { animation: glow-ring 6s ease-out infinite; }
+.glow-ring-2 { animation: glow-ring 6s ease-out infinite 2s; }
+.glow-ring-3 { animation: glow-ring 6s ease-out infinite 4s; }
+
+@keyframes headline-pulse {
+  0%, 100% { opacity: 0.22; transform: scale(1); }
+  50%      { opacity: 0.42; transform: scale(1.07); }
+}
+.headline-pulse { animation: headline-pulse 5s ease-in-out infinite; }
+
+@keyframes pdrift-a { 0%,100%{ transform:translate(0,0) }    50%{ transform:translate(16px,-26px) } }
+@keyframes pdrift-b { 0%,100%{ transform:translate(0,0) }    50%{ transform:translate(-20px,-34px) } }
+@keyframes pdrift-c { 0%,100%{ transform:translate(0,0) }    50%{ transform:translate(10px,-48px) } }
+@keyframes pdrift-d { 0%,100%{ transform:translate(0,0) }    50%{ transform:translate(-14px,-18px) } }
+.pdrift-a { animation: pdrift-a 6s   ease-in-out infinite; }
+.pdrift-b { animation: pdrift-b 8.5s ease-in-out infinite 1.2s; }
+.pdrift-c { animation: pdrift-c 7.2s ease-in-out infinite 2.4s; }
+.pdrift-d { animation: pdrift-d 9.8s ease-in-out infinite 0.6s; }
+
+@keyframes hero-btn-glow {
+  0%, 100% { box-shadow: 0 0 24px rgba(153,69,255,0.55), 0 0 60px rgba(59,130,246,0.25); }
+  50%      { box-shadow: 0 0 44px rgba(153,69,255,0.9), 0 0 110px rgba(59,130,246,0.45); }
+}
+.hero-cta-btn { animation: hero-btn-glow 3s ease-in-out infinite; }
+
+.blob-3 { animation: blob-move-2 22s ease-in-out infinite 3s; }
+
 /* ── Code rain fall ─────────────────────────────── */
 @keyframes code-fall {
   0%   { transform: translateY(-80px); opacity: 0; }

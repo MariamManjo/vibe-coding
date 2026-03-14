@@ -321,6 +321,23 @@ const stats = [
   { value: "2+", label: "Years Teaching AI & Design" },
 ];
 
+const heroParticles = [
+  { left: "7%",  top: "18%", size: 2.5, drift: "pdrift-a", color: "rgba(153,69,255,0.45)", delay: "0s" },
+  { left: "14%", top: "72%", size: 2,   drift: "pdrift-b", color: "rgba(59,130,246,0.40)", delay: "0.8s" },
+  { left: "22%", top: "38%", size: 1.5, drift: "pdrift-c", color: "rgba(20,241,149,0.35)", delay: "1.6s" },
+  { left: "28%", top: "83%", size: 2,   drift: "pdrift-d", color: "rgba(153,69,255,0.30)", delay: "2.4s" },
+  { left: "4%",  top: "52%", size: 3,   drift: "pdrift-c", color: "rgba(20,241,149,0.20)", delay: "1.8s" },
+  { left: "38%", top: "10%", size: 2,   drift: "pdrift-b", color: "rgba(59,130,246,0.30)", delay: "3.2s" },
+  { left: "62%", top: "7%",  size: 2.5, drift: "pdrift-c", color: "rgba(59,130,246,0.38)", delay: "0.2s" },
+  { left: "72%", top: "22%", size: 2.5, drift: "pdrift-b", color: "rgba(59,130,246,0.40)", delay: "0.4s" },
+  { left: "78%", top: "68%", size: 2,   drift: "pdrift-a", color: "rgba(20,241,149,0.35)", delay: "1.2s" },
+  { left: "86%", top: "42%", size: 1.5, drift: "pdrift-c", color: "rgba(153,69,255,0.30)", delay: "2.0s" },
+  { left: "93%", top: "78%", size: 2,   drift: "pdrift-d", color: "rgba(59,130,246,0.25)", delay: "3.6s" },
+  { left: "96%", top: "30%", size: 2,   drift: "pdrift-a", color: "rgba(153,69,255,0.35)", delay: "0.6s" },
+  { left: "55%", top: "88%", size: 2,   drift: "pdrift-d", color: "rgba(20,241,149,0.25)", delay: "1.4s" },
+  { left: "46%", top: "92%", size: 1.5, drift: "pdrift-a", color: "rgba(153,69,255,0.20)", delay: "4.0s" },
+];
+
 const codeRain = [
   { char: "0",    left: "4%",  delay: "0s",    dur: "5.2s", opacity: "0.06" },
   { char: "{}",   left: "10%", delay: "1.3s",  dur: "7.1s", opacity: "0.05" },
@@ -351,41 +368,114 @@ export default function Home() {
 
       {/* ── HERO ──────────────────────────────────────── */}
       <section className="relative min-h-screen flex flex-col items-center justify-center text-center px-6 pt-20 overflow-hidden">
-        <div
-          className="blob-1 absolute top-1/4 left-1/4 w-[500px] h-[500px] rounded-full opacity-20 pointer-events-none"
-          style={{ background: "radial-gradient(circle, #3B82F6 0%, transparent 70%)", filter: "blur(80px)" }}
-        />
-        <div
-          className="blob-2 absolute bottom-1/4 right-1/4 w-[600px] h-[600px] rounded-full opacity-15 pointer-events-none"
-          style={{ background: "radial-gradient(circle, #8B5CF6 0%, transparent 70%)", filter: "blur(100px)" }}
-        />
 
+        {/* ── Layer 0: Rotating conic gradient background ── */}
+        <div className="hero-bg-rotate absolute inset-[-50%] pointer-events-none">
+          <div className="w-full h-full" style={{
+            background: "conic-gradient(from 0deg at 50% 50%, rgba(153,69,255,0.07) 0deg, rgba(59,130,246,0.09) 90deg, rgba(20,241,149,0.05) 180deg, rgba(139,92,246,0.07) 270deg, rgba(153,69,255,0.07) 360deg)"
+          }} />
+        </div>
+
+        {/* ── Layer 1: Dot grid texture ── */}
+        <div className="absolute inset-0 pointer-events-none" style={{
+          backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.05) 1px, transparent 1px)",
+          backgroundSize: "44px 44px",
+        }} />
+
+        {/* ── Layer 2: Depth blobs ── */}
+        <div className="blob-1 absolute top-[15%] left-[10%] w-[700px] h-[700px] rounded-full pointer-events-none"
+          style={{ background: "radial-gradient(circle, rgba(153,69,255,0.28) 0%, transparent 65%)", filter: "blur(90px)" }} />
+        <div className="blob-2 absolute bottom-[10%] right-[8%] w-[750px] h-[750px] rounded-full pointer-events-none"
+          style={{ background: "radial-gradient(circle, rgba(59,130,246,0.25) 0%, transparent 65%)", filter: "blur(110px)" }} />
+        <div className="blob-3 absolute bottom-[-10%] left-1/2 -translate-x-1/2 w-[600px] h-[350px] rounded-full pointer-events-none"
+          style={{ background: "radial-gradient(ellipse, rgba(20,241,149,0.08) 0%, transparent 65%)", filter: "blur(70px)" }} />
+
+        {/* ── Layer 3: Glow wave rings (radar pings from centre) ── */}
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <div className="glow-ring-1 absolute w-[220px] h-[220px] rounded-full"
+            style={{ border: "1px solid rgba(153,69,255,0.4)" }} />
+          <div className="glow-ring-2 absolute w-[220px] h-[220px] rounded-full"
+            style={{ border: "1px solid rgba(59,130,246,0.3)" }} />
+          <div className="glow-ring-3 absolute w-[220px] h-[220px] rounded-full"
+            style={{ border: "1px solid rgba(20,241,149,0.2)" }} />
+        </div>
+
+        {/* ── Layer 4: Floating particles ── */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          {heroParticles.map((p, i) => (
+            <div
+              key={i}
+              className={`${p.drift} absolute rounded-full`}
+              style={{
+                left: p.left,
+                top: p.top,
+                width: `${p.size}px`,
+                height: `${p.size}px`,
+                background: p.color,
+                animationDelay: p.delay,
+                boxShadow: `0 0 ${p.size * 3}px ${p.color}`,
+              }}
+            />
+          ))}
+        </div>
+
+        {/* ── Layer 5: Headline glow pulse ── */}
+        <div className="headline-pulse absolute inset-0 flex items-center justify-center pointer-events-none">
+          <div className="w-[860px] h-[420px] rounded-full" style={{
+            background: "radial-gradient(ellipse, rgba(153,69,255,0.14) 0%, rgba(59,130,246,0.10) 45%, transparent 72%)",
+            filter: "blur(48px)",
+          }} />
+        </div>
+
+        {/* ── Content ── */}
         <div className="relative z-10 max-w-5xl mx-auto">
-          <h1 className="font-heading font-bold text-5xl md:text-7xl lg:text-8xl leading-[1.05] tracking-tight mb-6">
-            Build Real AI Products.{" "}
-            <span style={{
-              background: "linear-gradient(90deg, #3B82F6, #8B5CF6)",
+
+          {/* Pre-headline badge */}
+          <div className="inline-flex items-center gap-2 bg-white/[0.05] border border-[#9945FF]/25 rounded-full px-5 py-1.5 mb-8"
+            style={{ boxShadow: "0 0 20px rgba(153,69,255,0.15)" }}>
+            <span className="w-1.5 h-1.5 rounded-full bg-[#14F195] inline-block"
+              style={{ boxShadow: "0 0 8px #14F195", animation: "hero-btn-glow 2s ease-in-out infinite" }} />
+            <span className="text-white/55 text-xs font-mono uppercase tracking-widest">Vibe Coding Platform · Web3 Edition</span>
+          </div>
+
+          <h1 className="font-heading font-black text-5xl md:text-7xl lg:text-[5.5rem] leading-[1.04] tracking-tight mb-3">
+            Build Real AI Products.
+          </h1>
+          <h1 className="font-heading font-black text-5xl md:text-7xl lg:text-[5.5rem] leading-[1.04] tracking-tight mb-8"
+            style={{
+              background: "linear-gradient(90deg, #9945FF 0%, #3B82F6 50%, #14F195 100%)",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
               backgroundClip: "text",
             }}>
-              From Zero.
-            </span>
+            From Zero.
           </h1>
-          <p className="text-[#9CA3AF] text-xl md:text-2xl font-body max-w-2xl mx-auto mb-10 leading-relaxed">
+
+          <p className="text-white/50 text-xl md:text-2xl font-body max-w-xl mx-auto mb-12 leading-relaxed">
             Taught by Mariam Manjavidze — hands-on program for complete beginners.
             No coding background needed.
           </p>
+
+          {/* CTA button — premium Solana gradient + pulsing glow */}
           <Link
             href="/login"
-            className="inline-flex items-center gap-2 bg-[#3B82F6] hover:bg-blue-400 text-white font-semibold text-lg px-8 py-4 rounded-full transition-all hover:scale-105"
-            style={{ boxShadow: "0 0 32px rgba(59,130,246,0.45)" }}
+            className="hero-cta-btn inline-flex items-center gap-3 text-white font-bold text-lg px-10 py-5 rounded-full transition-all duration-300 hover:scale-105 hover:brightness-110"
+            style={{
+              background: "linear-gradient(135deg, #9945FF 0%, #3B82F6 60%, #14F195 100%)",
+            }}
           >
-            Start Learning →
+            <span>Start Learning</span>
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+            </svg>
           </Link>
+
+          {/* Trust micro-copy */}
+          <p className="text-white/20 text-xs font-mono mt-5 tracking-wide">0.01 SOL · Phantom Wallet · Instant Access</p>
         </div>
 
-        <div className="scroll-bounce absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-white/30 text-xs font-body">
+        {/* Scroll indicator */}
+        <div className="scroll-bounce absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-white/25 text-xs font-body">
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 9l-7 7-7-7" />
           </svg>
