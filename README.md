@@ -14,7 +14,7 @@ pnpm dev
 bun dev
 ```
 
-Open [https://vibe-coding000.vercel.app/](https://vibe-coding000.vercel.app/) with your browser to see the result.
+Open [https://vibe-coding-manjom0m.replit.app/](https://vibe-coding-manjom0m.replit.app/) with your browser to see the result.
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
